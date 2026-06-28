@@ -1,0 +1,94 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ix-sally"
+version = "0.1.0"
+description = "Governed multi-agent autonomy habitat with doctrine, evidence gates, memory law, sandboxed action, transfer testing, and human boundary authority."
+requires-python = ">=3.11"
+license = { text = "LicenseRef-IX-Sally-Source-Available-Evaluation-1.0" }
+authors = [
+  { name = "Bryce Lovell" }
+]
+keywords = [
+  "agentic-ai",
+  "ai-governance",
+  "ai-safety",
+  "autonomy",
+  "evidence",
+  "human-authority",
+  "multi-agent",
+  "source-available"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed"
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "mypy>=1.10",
+  "pytest>=8.0",
+  "ruff>=0.5"
+]
+
+[project.scripts]
+ix-sally = "ix_sally.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+ix_sally = ["py.typed"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+mypy_path = "src"
+packages = ["ix_sally"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+  "A",
+  "ARG",
+  "B",
+  "C4",
+  "E",
+  "F",
+  "I",
+  "N",
+  "PL",
+  "PT",
+  "PTH",
+  "RET",
+  "RUF",
+  "SIM",
+  "T20",
+  "UP",
+  "W"
+]
+ignore = [
+  "PLR0913"
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+  "S101"
+]
