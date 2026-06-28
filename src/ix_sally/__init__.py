@@ -47,6 +47,7 @@ from ix_sally.session_baseline import (
     session_one_contract,
     session_one_runtime_kit,
 )
+from ix_sally.state import NinefoldRunState
 from ix_sally.transfer import TransferStatus, TransferTrial, TransferTrialPacket
 
 __all__ = [
@@ -96,6 +97,7 @@ __all__ = [
     "MnemosyneMemoryDecisionPacket",
     "NinefoldCycleLedger",
     "NinefoldCyclePacket",
+    "NinefoldRunState",
     "NinefoldRuntimeKit",
     "ObservationChamberConfig",
     "OraclePrediction",
