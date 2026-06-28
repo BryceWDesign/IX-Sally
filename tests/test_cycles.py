@@ -5,6 +5,7 @@ import pytest
 from ix_sally.agents import AgentRole
 from ix_sally.artifacts import AgentArtifact, AgentArtifactKind
 from ix_sally.cycles import CycleCoordinationStatus, NinefoldCycleLedger, NinefoldCyclePacket
+from ix_sally.digest import JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError
 
 
@@ -13,7 +14,7 @@ def _artifact(
     role: AgentRole,
     kind: AgentArtifactKind,
     cycle: int = 1,
-    data: dict[str, object] | None = None,
+    data: JsonObject | None = None,
 ) -> AgentArtifact:
     return AgentArtifact.create(
         cycle=cycle,
