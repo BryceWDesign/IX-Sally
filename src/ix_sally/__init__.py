@@ -17,6 +17,7 @@ from ix_sally.events import RuntimeEvent, RuntimeEventType, RuntimeTranscript
 from ix_sally.evidence import EvidenceKind, EvidenceLedger, EvidenceRecord, EvidenceStatus
 from ix_sally.foundation import CanonicalKey, FoundationError
 from ix_sally.jurisdiction import JurisdictionDecision, JurisdictionGate, JurisdictionStatus
+from ix_sally.memory import MemoryLedger, MemoryRecord, MemoryStatus
 
 __all__ = [
     "__version__",
@@ -41,6 +42,9 @@ __all__ = [
     "JurisdictionDecision",
     "JurisdictionGate",
     "JurisdictionStatus",
+    "MemoryLedger",
+    "MemoryRecord",
+    "MemoryStatus",
     "ObservationChamberConfig",
     "RuntimeEvent",
     "RuntimeEventType",
