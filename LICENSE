@@ -1,0 +1,181 @@
+IX-SALLY SOURCE-AVAILABLE EVALUATION LICENSE
+Version 1.0
+
+Copyright (c) 2026 Bryce Lovell. All rights reserved.
+
+This software, including all source code, documentation, tests, examples, schemas, interfaces, agent designs, runtime designs, governance logic, evidence models, memory models, and related materials, is made available only under the terms of this IX-Sally Source-Available Evaluation License.
+
+This is not an open-source license. This is a source-available evaluation license.
+
+1. DEFINITIONS
+
+"Software" means the IX-Sally project, including its source code, documentation, tests, examples, configuration files, schemas, interfaces, models, agent-role definitions, runtime logic, governance systems, evidence systems, memory systems, and all related materials made available in this repository.
+
+"Licensor" means Bryce Lovell.
+
+"You" or "Licensee" means any individual, organization, company, institution, agency, contractor, researcher, evaluator, or other entity accessing, viewing, cloning, downloading, copying, studying, testing, or otherwise interacting with the Software.
+
+"Evaluation Use" means limited, non-commercial review, inspection, study, testing, or evaluation of the Software for the sole purpose of understanding its design, capabilities, limitations, and potential licensing suitability.
+
+"Commercial Use" means any use of the Software, directly or indirectly, for commercial advantage, revenue generation, paid services, internal business operations, product development, client work, consulting, resale, support, contracting, procurement, funded work, production use, or any other activity that provides business, institutional, operational, financial, or strategic value.
+
+"Production Use" means any use of the Software in a live, deployed, operational, customer-facing, mission-facing, business-facing, government-facing, regulated, safety-relevant, security-relevant, or decision-support environment.
+
+"Derivative Work" means any modification, adaptation, extension, integration, translation, port, rewrite, reimplementation, fork, wrapper, service, product, platform, agent system, runtime system, or other work based on, derived from, incorporating, or substantially informed by the Software.
+
+"Hosted Use" means making the Software, a modified version of the Software, a derivative of the Software, or a system incorporating the Software available to others over a network, including as a service, API, web application, internal platform, managed tool, hosted agent, hosted runtime, or cloud-accessible system.
+
+"Government Use" means use by or for any government, military, defense, intelligence, law-enforcement, public-sector, public-administration, government contractor, federally funded research and development center, national laboratory, or other government-related organization or program.
+
+"Regulated Use" means use in or for any regulated domain, including but not limited to defense, intelligence, aerospace, healthcare, medicine, finance, banking, insurance, legal services, energy, critical infrastructure, education, employment, public-sector decision-making, safety-critical systems, or security-critical systems.
+
+2. GRANT OF LIMITED EVALUATION RIGHTS
+
+Subject to the terms of this License, Licensor grants You a limited, revocable, non-exclusive, non-transferable, non-sublicensable right to access, view, clone, download, copy, and run the Software solely for Evaluation Use.
+
+Evaluation Use is permitted only for non-commercial, non-production, non-hosted, non-operational, internal review and testing.
+
+No other rights are granted.
+
+3. PERMITTED USES
+
+You may:
+
+a. View and study the Software.
+
+b. Clone or download the repository for Evaluation Use.
+
+c. Run the Software locally for Evaluation Use.
+
+d. Inspect the Software’s architecture, tests, examples, documentation, and behavior.
+
+e. Evaluate whether You wish to request a separate commercial, production, government, regulated, hosted, or derivative license from Licensor.
+
+4. PROHIBITED USES
+
+You may not, without prior written permission from Licensor and a separate paid or negotiated license:
+
+a. Use the Software for Commercial Use.
+
+b. Use the Software for Production Use.
+
+c. Use the Software for Hosted Use.
+
+d. Use the Software for Government Use.
+
+e. Use the Software for Regulated Use.
+
+f. Use the Software for client work, consulting, contracting, procurement, paid research, sponsored work, or funded development.
+
+g. Sell, rent, lease, sublicense, distribute, publish, provide, or otherwise make the Software available to any third party except as permitted for personal Evaluation Use.
+
+h. Create, distribute, commercialize, host, deploy, or operate any Derivative Work.
+
+i. Incorporate the Software into any product, service, platform, workflow, model system, agent runtime, software development tool, compliance tool, security tool, governance system, or commercial offering.
+
+j. Use the Software to train, fine-tune, distill, benchmark, evaluate, improve, or derive an artificial intelligence model or agent system for commercial, institutional, hosted, government, regulated, or production purposes.
+
+k. Use the Software to develop, improve, validate, compare, or operate competing products, services, frameworks, agent systems, governance systems, coding agents, autonomy runtimes, or AI evaluation platforms.
+
+l. Remove, alter, obscure, or misrepresent copyright notices, license notices, attribution notices, provenance notices, claim boundaries, or authorship information.
+
+m. Claim ownership of the Software or any part of the Software.
+
+n. Represent the Software as open source.
+
+o. Use the Software in any manner that violates applicable law, regulation, contract, policy, or third-party rights.
+
+5. NO IMPLIED COMMERCIAL, GOVERNMENT, HOSTED, OR PRODUCTION RIGHTS
+
+Access to the Software does not grant any right to use it commercially, operationally, in production, in hosted environments, in government programs, in regulated domains, in funded work, or as part of any product, service, platform, workflow, procurement, contract, or institutional system.
+
+Such rights require a separate written agreement with Licensor.
+
+6. DERIVATIVE WORKS AND INTEGRATIONS
+
+You may not create, distribute, publish, host, commercialize, deploy, operate, or otherwise use Derivative Works without prior written permission from Licensor and a separate paid or negotiated license.
+
+You may not integrate the Software into another repository, product, service, agent system, model workflow, toolchain, platform, or runtime except for limited local Evaluation Use.
+
+All rights in Derivative Works, integrations, adaptations, extensions, and modifications are reserved by Licensor unless otherwise agreed in writing.
+
+7. CONTRIBUTIONS
+
+Unless a separate written contributor agreement is signed by Licensor, any issue, suggestion, pull request, patch, code contribution, documentation contribution, architecture proposal, idea, design, test, example, or other submission made to the Software may be used, modified, rejected, accepted, relicensed, or commercialized by Licensor without restriction, compensation, obligation, or attribution beyond what Licensor chooses to provide.
+
+You represent that any contribution You submit is either Your original work or that You have the necessary rights to submit it.
+
+8. OWNERSHIP
+
+The Software is licensed, not sold.
+
+Licensor retains all right, title, and interest in and to the Software, including all intellectual property rights, copyrights, trade secrets, design rights, architecture rights, governance concepts, agent-role designs, memory models, evidence models, runtime structures, documentation, tests, examples, and related materials.
+
+No ownership rights are transferred under this License.
+
+9. THIRD-PARTY COMPONENTS
+
+The Software may reference, interface with, or be used alongside third-party tools, libraries, runtimes, models, or services. Such third-party components are governed by their own licenses and terms.
+
+This License does not grant You any rights to third-party components.
+
+You are solely responsible for complying with all third-party licenses, terms, laws, and restrictions.
+
+10. AI, AGENT, AND AUTONOMY CLAIM BOUNDARY
+
+The Software is an experimental, governed autonomy habitat and research-oriented runtime.
+
+The Software is not represented as artificial general intelligence, autonomous personhood, consciousness, sentience, a certified safety system, a certified compliance system, a certified security system, or a production-ready decision authority.
+
+The Software’s outputs are not evidence unless supported by the Software’s evidence mechanisms and independently reviewed where appropriate.
+
+The Software’s memory is not truth unless validated under the Software’s memory and evidence rules.
+
+The Software’s generated content, code, plans, judgments, agent outputs, evidence records, or recommendations are not approvals, certifications, legal advice, professional advice, operational authorization, or human decisions.
+
+Human authority remains required for all consequential, commercial, production, government, regulated, safety-relevant, security-relevant, or operational use.
+
+11. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, LICENSOR DISCLAIMS ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, ACCURACY, RELIABILITY, SECURITY, AVAILABILITY, PERFORMANCE, OR SUITABILITY FOR ANY USE.
+
+LICENSOR DOES NOT WARRANT THAT THE SOFTWARE WILL BE ERROR-FREE, SECURE, RELIABLE, COMPLETE, CURRENT, UNINTERRUPTED, SAFE, COMPLIANT, OR SUITABLE FOR ANY PARTICULAR PURPOSE.
+
+12. LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, LICENSOR SHALL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, PUNITIVE, OR OTHER DAMAGES, INCLUDING BUT NOT LIMITED TO LOST PROFITS, LOST REVENUE, LOST DATA, BUSINESS INTERRUPTION, SECURITY INCIDENTS, COMPLIANCE FAILURES, PROCUREMENT FAILURES, OPERATIONAL FAILURES, MODEL FAILURES, AGENT FAILURES, OR ANY DAMAGES ARISING OUT OF OR RELATED TO THE SOFTWARE OR THIS LICENSE, EVEN IF LICENSOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+13. TERMINATION
+
+This License terminates automatically if You violate any term of this License.
+
+Upon termination, You must immediately stop using the Software and delete all copies in Your possession or control, including any unauthorized modifications, integrations, derivatives, hosted versions, or redistributed copies.
+
+Sections concerning ownership, prohibited uses, derivative works, disclaimers, limitation of liability, termination, and enforcement survive termination.
+
+14. RESERVATION OF RIGHTS
+
+All rights not expressly granted in this License are reserved by Licensor.
+
+No rights are granted by implication, exhaustion, estoppel, waiver, or otherwise.
+
+15. COMMERCIAL LICENSING AND PERMISSION REQUESTS
+
+For commercial, production, hosted, derivative, government, regulated, funded, institutional, or other non-evaluation use, You must obtain a separate written license from Licensor.
+
+Contact:
+
+Bryce Lovell
+https://www.linkedin.com/in/brycewdesign/
+
+16. GOVERNING TERMS
+
+If any provision of this License is found unenforceable, the remaining provisions remain in effect.
+
+Failure by Licensor to enforce any provision of this License does not constitute a waiver of any rights.
+
+This License is the entire agreement governing Evaluation Use of the Software unless superseded by a separate written agreement signed by Licensor.
+
+END OF LICENSE
