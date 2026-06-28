@@ -9,6 +9,7 @@ from ix_sally.agents import (
     default_agent_role_registry,
 )
 from ix_sally.artifacts import AgentArtifact, AgentArtifactKind, AgentArtifactLedger
+from ix_sally.boundaries import BoundaryFinding, BoundarySeverity, SentinelBoundaryReport
 from ix_sally.chamber import ObservationChamberConfig, StopCondition, StopReason
 from ix_sally.claims import ClaimLedger, ClaimRecord, ClaimStatus
 from ix_sally.contracts import AutonomyContract, AutonomyMode
@@ -48,6 +49,8 @@ __all__ = [
     "AgentRoleRegistry",
     "AutonomyContract",
     "AutonomyMode",
+    "BoundaryFinding",
+    "BoundarySeverity",
     "ButchFalsificationPacket",
     "CanonicalKey",
     "ClaimLedger",
@@ -86,6 +89,7 @@ __all__ = [
     "RuntimeEventType",
     "RuntimeTranscript",
     "SallyProposalPacket",
+    "SentinelBoundaryReport",
     "StopCondition",
     "StopReason",
     "VerityEvidenceJudgment",
