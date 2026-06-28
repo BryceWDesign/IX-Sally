@@ -30,6 +30,11 @@ from ix_sally.judgments import (
 )
 from ix_sally.jurisdiction import JurisdictionDecision, JurisdictionGate, JurisdictionStatus
 from ix_sally.memory import MemoryLedger, MemoryRecord, MemoryStatus
+from ix_sally.memory_decisions import (
+    MemoryDecisionAction,
+    MnemosyneMemoryDecision,
+    MnemosyneMemoryDecisionPacket,
+)
 from ix_sally.predictions import OraclePrediction, OraclePredictionPacket, PredictionStatus
 from ix_sally.proposals import ProposalAction, SallyProposalPacket
 
@@ -66,9 +71,12 @@ __all__ = [
     "JurisdictionDecision",
     "JurisdictionGate",
     "JurisdictionStatus",
+    "MemoryDecisionAction",
     "MemoryLedger",
     "MemoryRecord",
     "MemoryStatus",
+    "MnemosyneMemoryDecision",
+    "MnemosyneMemoryDecisionPacket",
     "ObservationChamberConfig",
     "OraclePrediction",
     "OraclePredictionPacket",
