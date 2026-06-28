@@ -2,6 +2,12 @@
 
 from __future__ import annotations
 
+from ix_sally.agents import (
+    AgentRole,
+    AgentRoleDefinition,
+    AgentRoleRegistry,
+    default_agent_role_registry,
+)
 from ix_sally.chamber import ObservationChamberConfig, StopCondition, StopReason
 from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.digest import DigestRecord
@@ -10,6 +16,9 @@ from ix_sally.foundation import CanonicalKey, FoundationError
 
 __all__ = [
     "__version__",
+    "AgentRole",
+    "AgentRoleDefinition",
+    "AgentRoleRegistry",
     "AutonomyContract",
     "AutonomyMode",
     "CanonicalKey",
@@ -21,6 +30,7 @@ __all__ = [
     "ObservationChamberConfig",
     "StopCondition",
     "StopReason",
+    "default_agent_role_registry",
 ]
 
 __version__ = "0.1.0"
