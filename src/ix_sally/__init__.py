@@ -22,6 +22,11 @@ from ix_sally.falsifications import (
     FalsificationSeverity,
 )
 from ix_sally.foundation import CanonicalKey, FoundationError
+from ix_sally.judgments import (
+    EvidenceJudgmentStatus,
+    VerityEvidenceJudgment,
+    VerityJudgmentPacket,
+)
 from ix_sally.jurisdiction import JurisdictionDecision, JurisdictionGate, JurisdictionStatus
 from ix_sally.memory import MemoryLedger, MemoryRecord, MemoryStatus
 from ix_sally.proposals import ProposalAction, SallyProposalPacket
@@ -45,6 +50,7 @@ __all__ = [
     "DoctrineCatalog",
     "DoctrineRule",
     "DoctrineSeverity",
+    "EvidenceJudgmentStatus",
     "EvidenceKind",
     "EvidenceLedger",
     "EvidenceRecord",
@@ -66,6 +72,8 @@ __all__ = [
     "SallyProposalPacket",
     "StopCondition",
     "StopReason",
+    "VerityEvidenceJudgment",
+    "VerityJudgmentPacket",
     "default_agent_role_registry",
 ]
 
