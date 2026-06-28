@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from ix_sally.chamber import ObservationChamberConfig, StopCondition, StopReason
 from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.digest import DigestRecord
 from ix_sally.doctrine import DoctrineCatalog, DoctrineRule, DoctrineSeverity
@@ -17,6 +18,9 @@ __all__ = [
     "DoctrineRule",
     "DoctrineSeverity",
     "FoundationError",
+    "ObservationChamberConfig",
+    "StopCondition",
+    "StopReason",
 ]
 
 __version__ = "0.1.0"
