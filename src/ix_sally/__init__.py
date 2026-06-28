@@ -12,6 +12,7 @@ from ix_sally.chamber import ObservationChamberConfig, StopCondition, StopReason
 from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.digest import DigestRecord
 from ix_sally.doctrine import DoctrineCatalog, DoctrineRule, DoctrineSeverity
+from ix_sally.events import RuntimeEvent, RuntimeEventType, RuntimeTranscript
 from ix_sally.foundation import CanonicalKey, FoundationError
 from ix_sally.jurisdiction import JurisdictionDecision, JurisdictionGate, JurisdictionStatus
 
@@ -32,6 +33,9 @@ __all__ = [
     "JurisdictionGate",
     "JurisdictionStatus",
     "ObservationChamberConfig",
+    "RuntimeEvent",
+    "RuntimeEventType",
+    "RuntimeTranscript",
     "StopCondition",
     "StopReason",
     "default_agent_role_registry",
