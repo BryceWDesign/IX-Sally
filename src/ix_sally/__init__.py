@@ -16,6 +16,11 @@ from ix_sally.digest import DigestRecord
 from ix_sally.doctrine import DoctrineCatalog, DoctrineRule, DoctrineSeverity
 from ix_sally.events import RuntimeEvent, RuntimeEventType, RuntimeTranscript
 from ix_sally.evidence import EvidenceKind, EvidenceLedger, EvidenceRecord, EvidenceStatus
+from ix_sally.falsifications import (
+    ButchFalsificationPacket,
+    FalsificationFinding,
+    FalsificationSeverity,
+)
 from ix_sally.foundation import CanonicalKey, FoundationError
 from ix_sally.jurisdiction import JurisdictionDecision, JurisdictionGate, JurisdictionStatus
 from ix_sally.memory import MemoryLedger, MemoryRecord, MemoryStatus
@@ -31,6 +36,7 @@ __all__ = [
     "AgentRoleRegistry",
     "AutonomyContract",
     "AutonomyMode",
+    "ButchFalsificationPacket",
     "CanonicalKey",
     "ClaimLedger",
     "ClaimRecord",
@@ -43,6 +49,8 @@ __all__ = [
     "EvidenceLedger",
     "EvidenceRecord",
     "EvidenceStatus",
+    "FalsificationFinding",
+    "FalsificationSeverity",
     "FoundationError",
     "JurisdictionDecision",
     "JurisdictionGate",
