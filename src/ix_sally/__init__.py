@@ -14,6 +14,7 @@ from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.digest import DigestRecord
 from ix_sally.doctrine import DoctrineCatalog, DoctrineRule, DoctrineSeverity
 from ix_sally.events import RuntimeEvent, RuntimeEventType, RuntimeTranscript
+from ix_sally.evidence import EvidenceKind, EvidenceLedger, EvidenceRecord, EvidenceStatus
 from ix_sally.foundation import CanonicalKey, FoundationError
 from ix_sally.jurisdiction import JurisdictionDecision, JurisdictionGate, JurisdictionStatus
 
@@ -32,6 +33,10 @@ __all__ = [
     "DoctrineCatalog",
     "DoctrineRule",
     "DoctrineSeverity",
+    "EvidenceKind",
+    "EvidenceLedger",
+    "EvidenceRecord",
+    "EvidenceStatus",
     "FoundationError",
     "JurisdictionDecision",
     "JurisdictionGate",
