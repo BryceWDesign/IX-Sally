@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from ix_sally.artifacts import AgentArtifact, AgentArtifactLedger
+from ix_sally.authorization import AuthorityDecision, AuthorityDecisionLedger
 from ix_sally.claims import ClaimLedger, ClaimRecord
 from ix_sally.cycles import NinefoldCycleLedger, NinefoldCyclePacket
 from ix_sally.digest import DigestRecord, JsonObject
@@ -24,6 +25,7 @@ class NinefoldRunState:
     claims: ClaimLedger
     evidence: EvidenceLedger
     memory: MemoryLedger
+    authority_decisions: AuthorityDecisionLedger
     cycles: NinefoldCycleLedger
 
     @classmethod
@@ -37,6 +39,7 @@ class NinefoldRunState:
             claims=ClaimLedger.create(()),
             evidence=EvidenceLedger.create(()),
             memory=MemoryLedger.create(()),
+            authority_decisions=AuthorityDecisionLedger.create(()),
             cycles=NinefoldCycleLedger.create(()),
         )
 
@@ -57,6 +60,7 @@ class NinefoldRunState:
             claims=self.claims,
             evidence=self.evidence,
             memory=self.memory,
+            authority_decisions=self.authority_decisions,
             cycles=self.cycles,
         )
 
@@ -69,6 +73,7 @@ class NinefoldRunState:
             claims=self.claims,
             evidence=self.evidence,
             memory=self.memory,
+            authority_decisions=self.authority_decisions,
             cycles=self.cycles,
         )
 
@@ -81,6 +86,7 @@ class NinefoldRunState:
             claims=self.claims.append(claim),
             evidence=self.evidence,
             memory=self.memory,
+            authority_decisions=self.authority_decisions,
             cycles=self.cycles,
         )
 
@@ -93,6 +99,7 @@ class NinefoldRunState:
             claims=self.claims,
             evidence=self.evidence.append(evidence),
             memory=self.memory,
+            authority_decisions=self.authority_decisions,
             cycles=self.cycles,
         )
 
@@ -105,6 +112,20 @@ class NinefoldRunState:
             claims=self.claims,
             evidence=self.evidence,
             memory=self.memory.append(memory),
+            authority_decisions=self.authority_decisions,
+            cycles=self.cycles,
+        )
+
+    def with_authority_decision(self, decision: AuthorityDecision) -> NinefoldRunState:
+        """Return a new state with an appended authority decision."""
+        return NinefoldRunState(
+            runtime_kit=self.runtime_kit,
+            transcript=self.transcript,
+            artifacts=self.artifacts,
+            claims=self.claims,
+            evidence=self.evidence,
+            memory=self.memory,
+            authority_decisions=self.authority_decisions.append(decision),
             cycles=self.cycles,
         )
 
@@ -117,12 +138,24 @@ class NinefoldRunState:
             claims=self.claims,
             evidence=self.evidence,
             memory=self.memory,
+            authority_decisions=self.authority_decisions,
             cycles=self.cycles.append(cycle),
         )
 
     def requires_human_review(self) -> bool:
-        """Return whether the state contains any human-review cycle."""
-        return bool(self.cycles.human_review_cycles())
+        """Return whether the state contains any human-review decision or cycle."""
+        return bool(
+            self.authority_decisions.human_review_decisions()
+            or self.cycles.human_review_cycles()
+        )
+
+    def denied_authority_count(self) -> int:
+        """Return the number of denied authority decisions."""
+        return len(self.authority_decisions.denied_decisions())
+
+    def human_review_authority_count(self) -> int:
+        """Return the number of authority decisions requiring human review."""
+        return len(self.authority_decisions.human_review_decisions())
 
     def stop_condition_payload(self) -> JsonObject:
         """Return the current chamber stop condition as stable payload data."""
@@ -137,12 +170,16 @@ class NinefoldRunState:
             "claim_ledger_digest": self.claims.digest().value,
             "evidence_ledger_digest": self.evidence.digest().value,
             "memory_ledger_digest": self.memory.digest().value,
+            "authority_decision_ledger_digest": self.authority_decisions.digest().value,
             "cycle_ledger_digest": self.cycles.digest().value,
             "event_count": len(self.transcript.events),
             "artifact_count": len(self.artifacts.artifacts),
             "claim_count": len(self.claims.claims),
             "evidence_count": len(self.evidence.records),
             "memory_count": len(self.memory.records),
+            "authority_decision_count": len(self.authority_decisions.decisions),
+            "denied_authority_count": self.denied_authority_count(),
+            "human_review_authority_count": self.human_review_authority_count(),
             "completed_cycles": self.completed_cycles(),
             "requires_human_review": self.requires_human_review(),
             "stop_condition": self.stop_condition_payload(),
