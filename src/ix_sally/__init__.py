@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.digest import DigestRecord
 from ix_sally.doctrine import DoctrineCatalog, DoctrineRule, DoctrineSeverity
 from ix_sally.foundation import CanonicalKey, FoundationError
 
 __all__ = [
     "__version__",
+    "AutonomyContract",
+    "AutonomyMode",
     "CanonicalKey",
     "DigestRecord",
     "DoctrineCatalog",
