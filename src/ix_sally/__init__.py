@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from ix_sally.digest import DigestRecord
 from ix_sally.foundation import CanonicalKey, FoundationError
 
 __all__ = [
     "__version__",
     "CanonicalKey",
+    "DigestRecord",
     "FoundationError",
 ]
 
