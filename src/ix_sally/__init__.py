@@ -29,6 +29,7 @@ from ix_sally.judgments import (
 )
 from ix_sally.jurisdiction import JurisdictionDecision, JurisdictionGate, JurisdictionStatus
 from ix_sally.memory import MemoryLedger, MemoryRecord, MemoryStatus
+from ix_sally.predictions import OraclePrediction, OraclePredictionPacket, PredictionStatus
 from ix_sally.proposals import ProposalAction, SallyProposalPacket
 
 __all__ = [
@@ -65,6 +66,9 @@ __all__ = [
     "MemoryRecord",
     "MemoryStatus",
     "ObservationChamberConfig",
+    "OraclePrediction",
+    "OraclePredictionPacket",
+    "PredictionStatus",
     "ProposalAction",
     "RuntimeEvent",
     "RuntimeEventType",
