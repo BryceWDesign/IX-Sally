@@ -40,6 +40,7 @@ from ix_sally.memory_decisions import (
 )
 from ix_sally.predictions import OraclePrediction, OraclePredictionPacket, PredictionStatus
 from ix_sally.proposals import ProposalAction, SallyProposalPacket
+from ix_sally.recording import StateRecorder
 from ix_sally.runtime import NinefoldRuntimeKit
 from ix_sally.session_baseline import (
     session_one_baseline_digest,
@@ -109,6 +110,7 @@ __all__ = [
     "RuntimeTranscript",
     "SallyProposalPacket",
     "SentinelBoundaryReport",
+    "StateRecorder",
     "StopCondition",
     "StopReason",
     "TransferStatus",
