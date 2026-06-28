@@ -6,6 +6,7 @@ from ix_sally.chamber import StopReason
 from ix_sally.claims import ClaimRecord
 from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.cycles import CycleCoordinationStatus, NinefoldCyclePacket
+from ix_sally.digest import JsonObject
 from ix_sally.events import RuntimeEvent, RuntimeEventType
 from ix_sally.evidence import EvidenceKind, EvidenceRecord, EvidenceStatus
 from ix_sally.memory import MemoryRecord
@@ -28,7 +29,7 @@ def _artifact(
     role: AgentRole,
     kind: AgentArtifactKind,
     cycle: int = 1,
-    data: dict[str, bool] | None = None,
+    data: JsonObject | None = None,
 ) -> AgentArtifact:
     return AgentArtifact.create(
         cycle=cycle,
@@ -40,7 +41,7 @@ def _artifact(
 
 
 def _complete_cycle(*, blocked: bool = False) -> NinefoldCyclePacket:
-    sentinel_data = {"has_blocker": True} if blocked else {}
+    sentinel_data: JsonObject = {"has_blocker": True} if blocked else {}
     artifacts = (
         _artifact(role=AgentRole.SALLY, kind=AgentArtifactKind.PROPOSAL),
         _artifact(role=AgentRole.BUTCH, kind=AgentArtifactKind.FALSIFICATION),
