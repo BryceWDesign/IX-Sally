@@ -16,6 +16,7 @@ from ix_sally.digest import DigestRecord
 from ix_sally.doctrine import DoctrineCatalog, DoctrineRule, DoctrineSeverity
 from ix_sally.events import RuntimeEvent, RuntimeEventType, RuntimeTranscript
 from ix_sally.evidence import EvidenceKind, EvidenceLedger, EvidenceRecord, EvidenceStatus
+from ix_sally.executions import ExecutionStatus, ForgeExecutionPacket, ForgeExecutionReceipt
 from ix_sally.falsifications import (
     ButchFalsificationPacket,
     FalsificationFinding,
@@ -56,8 +57,11 @@ __all__ = [
     "EvidenceLedger",
     "EvidenceRecord",
     "EvidenceStatus",
+    "ExecutionStatus",
     "FalsificationFinding",
     "FalsificationSeverity",
+    "ForgeExecutionPacket",
+    "ForgeExecutionReceipt",
     "FoundationError",
     "JurisdictionDecision",
     "JurisdictionGate",
