@@ -40,6 +40,7 @@ from ix_sally.memory_decisions import (
 )
 from ix_sally.predictions import OraclePrediction, OraclePredictionPacket, PredictionStatus
 from ix_sally.proposals import ProposalAction, SallyProposalPacket
+from ix_sally.runtime import NinefoldRuntimeKit
 from ix_sally.transfer import TransferStatus, TransferTrial, TransferTrialPacket
 
 __all__ = [
@@ -89,6 +90,7 @@ __all__ = [
     "MnemosyneMemoryDecisionPacket",
     "NinefoldCycleLedger",
     "NinefoldCyclePacket",
+    "NinefoldRuntimeKit",
     "ObservationChamberConfig",
     "OraclePrediction",
     "OraclePredictionPacket",
