@@ -13,6 +13,7 @@ from ix_sally.boundaries import BoundaryFinding, BoundarySeverity, SentinelBound
 from ix_sally.chamber import ObservationChamberConfig, StopCondition, StopReason
 from ix_sally.claims import ClaimLedger, ClaimRecord, ClaimStatus
 from ix_sally.contracts import AutonomyContract, AutonomyMode
+from ix_sally.cycles import CycleCoordinationStatus, NinefoldCycleLedger, NinefoldCyclePacket
 from ix_sally.digest import DigestRecord
 from ix_sally.dockets import ClerkDocketEntry, ClerkDocketPacket, DocketEntryKind
 from ix_sally.doctrine import DoctrineCatalog, DoctrineRule, DoctrineSeverity
@@ -60,6 +61,7 @@ __all__ = [
     "ClaimStatus",
     "ClerkDocketEntry",
     "ClerkDocketPacket",
+    "CycleCoordinationStatus",
     "DigestRecord",
     "DocketEntryKind",
     "DoctrineCatalog",
@@ -85,6 +87,8 @@ __all__ = [
     "MemoryStatus",
     "MnemosyneMemoryDecision",
     "MnemosyneMemoryDecisionPacket",
+    "NinefoldCycleLedger",
+    "NinefoldCyclePacket",
     "ObservationChamberConfig",
     "OraclePrediction",
     "OraclePredictionPacket",
