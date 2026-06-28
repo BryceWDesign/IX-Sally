@@ -19,6 +19,7 @@ from ix_sally.evidence import EvidenceKind, EvidenceLedger, EvidenceRecord, Evid
 from ix_sally.foundation import CanonicalKey, FoundationError
 from ix_sally.jurisdiction import JurisdictionDecision, JurisdictionGate, JurisdictionStatus
 from ix_sally.memory import MemoryLedger, MemoryRecord, MemoryStatus
+from ix_sally.proposals import ProposalAction, SallyProposalPacket
 
 __all__ = [
     "__version__",
@@ -50,9 +51,11 @@ __all__ = [
     "MemoryRecord",
     "MemoryStatus",
     "ObservationChamberConfig",
+    "ProposalAction",
     "RuntimeEvent",
     "RuntimeEventType",
     "RuntimeTranscript",
+    "SallyProposalPacket",
     "StopCondition",
     "StopReason",
     "default_agent_role_registry",
