@@ -38,6 +38,7 @@ from ix_sally.memory_decisions import (
 )
 from ix_sally.predictions import OraclePrediction, OraclePredictionPacket, PredictionStatus
 from ix_sally.proposals import ProposalAction, SallyProposalPacket
+from ix_sally.transfer import TransferStatus, TransferTrial, TransferTrialPacket
 
 __all__ = [
     "__version__",
@@ -92,6 +93,9 @@ __all__ = [
     "SentinelBoundaryReport",
     "StopCondition",
     "StopReason",
+    "TransferStatus",
+    "TransferTrial",
+    "TransferTrialPacket",
     "VerityEvidenceJudgment",
     "VerityJudgmentPacket",
     "default_agent_role_registry",
