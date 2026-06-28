@@ -9,6 +9,13 @@ from ix_sally.agents import (
     default_agent_role_registry,
 )
 from ix_sally.artifacts import AgentArtifact, AgentArtifactKind, AgentArtifactLedger
+from ix_sally.authorization import (
+    AuthorityDecision,
+    AuthorityDecisionLedger,
+    AuthorityDecisionStatus,
+    AuthorityRequest,
+    decide_authority_request,
+)
 from ix_sally.boundaries import BoundaryFinding, BoundarySeverity, SentinelBoundaryReport
 from ix_sally.chamber import ObservationChamberConfig, StopCondition, StopReason
 from ix_sally.claims import ClaimLedger, ClaimRecord, ClaimStatus
@@ -59,6 +66,10 @@ __all__ = [
     "AgentRole",
     "AgentRoleDefinition",
     "AgentRoleRegistry",
+    "AuthorityDecision",
+    "AuthorityDecisionLedger",
+    "AuthorityDecisionStatus",
+    "AuthorityRequest",
     "AutonomyContract",
     "AutonomyMode",
     "BoundaryFinding",
@@ -118,6 +129,7 @@ __all__ = [
     "TransferTrialPacket",
     "VerityEvidenceJudgment",
     "VerityJudgmentPacket",
+    "decide_authority_request",
     "default_agent_role_registry",
     "session_one_baseline_digest",
     "session_one_baseline_payload",
