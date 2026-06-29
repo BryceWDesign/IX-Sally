@@ -17,6 +17,11 @@ from ix_sally.authorization import (
     AuthorityRequest,
     decide_authority_request,
 )
+from ix_sally.authority_processing import (
+    AuthorityBatchProcessingResult,
+    AuthorityProcessingResult,
+    AuthorityProcessor,
+)
 from ix_sally.boundaries import BoundaryFinding, BoundarySeverity, SentinelBoundaryReport
 from ix_sally.chamber import ObservationChamberConfig, StopCondition, StopReason
 from ix_sally.claims import ClaimLedger, ClaimRecord, ClaimStatus
@@ -69,9 +74,12 @@ __all__ = [
     "AgentRole",
     "AgentRoleDefinition",
     "AgentRoleRegistry",
+    "AuthorityBatchProcessingResult",
     "AuthorityDecision",
     "AuthorityDecisionLedger",
     "AuthorityDecisionStatus",
+    "AuthorityProcessingResult",
+    "AuthorityProcessor",
     "AuthorityRequest",
     "AutonomyContract",
     "AutonomyMode",
