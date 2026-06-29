@@ -14,6 +14,7 @@ from ix_sally.evidence import EvidenceRecord
 from ix_sally.evidence_support import EvidenceSupportFinding
 from ix_sally.execution_queue import ExecutionQueueItem
 from ix_sally.forge_results import ForgeResultRecord
+from ix_sally.foundation import FoundationError
 from ix_sally.memory import MemoryRecord
 from ix_sally.state import NinefoldRunState
 
@@ -111,7 +112,7 @@ class StateRecorder:
         state: NinefoldRunState,
         action: BoundedActionRecord,
     ) -> NinefoldRunState:
-        """Record a bounded action and emit an action transcript event."""
+        """Record a new bounded action and emit an action transcript event."""
         updated = state.with_action(action)
         event = RuntimeEvent.create(
             sequence=updated.next_event_sequence(),
@@ -125,6 +126,29 @@ class StateRecorder:
             ),
         )
         return updated.with_event(event)
+
+    def record_action_update(
+        self,
+        state: NinefoldRunState,
+        action: BoundedActionRecord,
+    ) -> NinefoldRunState:
+        """Record a transcript event for an already-replaced bounded action."""
+        existing = state.actions.require_action(action.action_id.value)
+        if existing != action:
+            raise FoundationError("bounded action update does not match state ledger")
+
+        event = RuntimeEvent.create(
+            sequence=state.next_event_sequence(),
+            cycle=action.cycle,
+            event_type=RuntimeEventType.JURISDICTION_DECIDED,
+            actor=action.proposed_by,
+            summary=f"Updated bounded action from {action.proposed_by.value}: {action.status.value}.",
+            payload=event_payload_with_reference(
+                reference_type="bounded-action",
+                reference_digest=action.digest(),
+            ),
+        )
+        return state.with_event(event)
 
     def record_authority_decision(
         self,
