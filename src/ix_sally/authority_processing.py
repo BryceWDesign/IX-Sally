@@ -97,15 +97,19 @@ class AuthorityProcessor:
         action: BoundedActionRecord,
     ) -> AuthorityProcessingResult:
         """Process one proposed action and update the run state."""
-        existing = state.actions.require_action(action.action_id.value)
+        try:
+            existing = state.actions.require_action(action.action_id.value)
+        except FoundationError as error:
+            raise FoundationError("action does not match state ledger") from error
+
         if existing != action:
             raise FoundationError("action does not match state ledger")
 
         request = action.to_authority_request()
         decision = decide_authority_request(
             request=request,
-            contract=state.runtime_kit.contract,
-            jurisdiction_gate=state.runtime_kit.jurisdiction,
+            contract=state.runtime_kit.chamber.contract,
+            jurisdiction_gate=state.runtime_kit.jurisdiction_gate,
         )
         updated_action = action.with_authority_decision(decision)
 
