@@ -102,7 +102,7 @@ class ForgeResultProcessor:
 
         updated_state = self.recorder.record_forge_result(state, result)
         updated_state = updated_state.replace_action(updated_action)
-        updated_state = self.recorder.record_action(updated_state, updated_action)
+        updated_state = self.recorder.record_action_update(updated_state, updated_action)
 
         return ForgeResultProcessingResult(
             state=updated_state,
