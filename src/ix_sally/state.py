@@ -138,6 +138,20 @@ class NinefoldRunState:
             cycles=self.cycles,
         )
 
+    def replace_action(self, action: BoundedActionRecord) -> NinefoldRunState:
+        """Return a new state with an existing bounded action replaced."""
+        return NinefoldRunState(
+            runtime_kit=self.runtime_kit,
+            transcript=self.transcript,
+            artifacts=self.artifacts,
+            claims=self.claims,
+            evidence=self.evidence,
+            memory=self.memory,
+            actions=self.actions.replace(action),
+            authority_decisions=self.authority_decisions,
+            cycles=self.cycles,
+        )
+
     def with_authority_decision(self, decision: AuthorityDecision) -> NinefoldRunState:
         """Return a new state with an appended authority decision."""
         return NinefoldRunState(
@@ -182,6 +196,10 @@ class NinefoldRunState:
         """Return the number of authority decisions requiring human review."""
         return len(self.authority_decisions.human_review_decisions())
 
+    def proposed_action_count(self) -> int:
+        """Return the number of bounded actions still waiting for authority decisions."""
+        return len(self.actions.proposed_actions())
+
     def executable_action_count(self) -> int:
         """Return the number of bounded actions authorized for execution."""
         return len(self.actions.executable_actions())
@@ -216,6 +234,7 @@ class NinefoldRunState:
             "evidence_count": len(self.evidence.records),
             "memory_count": len(self.memory.records),
             "action_count": len(self.actions.actions),
+            "proposed_action_count": self.proposed_action_count(),
             "executable_action_count": self.executable_action_count(),
             "blocked_action_count": self.blocked_action_count(),
             "human_review_action_count": self.human_review_action_count(),
