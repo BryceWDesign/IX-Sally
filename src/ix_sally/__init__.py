@@ -32,6 +32,7 @@ from ix_sally.dockets import ClerkDocketEntry, ClerkDocketPacket, DocketEntryKin
 from ix_sally.doctrine import DoctrineCatalog, DoctrineRule, DoctrineSeverity
 from ix_sally.events import RuntimeEvent, RuntimeEventType, RuntimeTranscript
 from ix_sally.evidence import EvidenceKind, EvidenceLedger, EvidenceRecord, EvidenceStatus
+from ix_sally.execution_planning import ExecutionPlanner, ExecutionPlanningResult
 from ix_sally.execution_queue import ExecutionQueue, ExecutionQueueItem, ExecutionQueueStatus
 from ix_sally.executions import ExecutionStatus, ForgeExecutionPacket, ForgeExecutionReceipt
 from ix_sally.falsifications import (
@@ -106,6 +107,8 @@ __all__ = [
     "EvidenceLedger",
     "EvidenceRecord",
     "EvidenceStatus",
+    "ExecutionPlanner",
+    "ExecutionPlanningResult",
     "ExecutionQueue",
     "ExecutionQueueItem",
     "ExecutionQueueStatus",
