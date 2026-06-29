@@ -1,4 +1,4 @@
-"""Authority processing flow for bounded IX-Sally actions."""
+"""Authority processing flow for IX-Sally bounded actions."""
 
 from __future__ import annotations
 
@@ -29,9 +29,7 @@ class AuthorityProcessingResult:
             "authority_decision_digest": self.authority_decision.digest().value,
             "updated_action_digest": self.updated_action.digest().value,
             "updated_action_status": self.updated_action.status.value,
-            "allows_execution": self.updated_action.allows_execution(),
-            "requires_human_review": self.updated_action.requires_human_review(),
-            "blocks_progress": self.updated_action.blocks_progress(),
+            "authority_status": self.authority_decision.status.value,
         }
 
     def digest(self) -> DigestRecord:
@@ -41,29 +39,33 @@ class AuthorityProcessingResult:
 
 @dataclass(frozen=True, slots=True)
 class AuthorityBatchProcessingResult:
-    """Result of processing all proposed bounded actions in a state."""
+    """Result of processing all proposed bounded actions in ledger order."""
 
     state: NinefoldRunState
     processed: tuple[AuthorityProcessingResult, ...]
 
     def processed_count(self) -> int:
-        """Return how many actions were processed."""
+        """Return the number of processed actions."""
         return len(self.processed)
 
     def authorized_count(self) -> int:
-        """Return how many processed actions became executable."""
-        return sum(1 for result in self.processed if result.updated_action.allows_execution())
+        """Return how many processed actions were authorized."""
+        return sum(1 for result in self.processed if result.authority_decision.allows_action())
 
     def human_review_count(self) -> int:
         """Return how many processed actions require human review."""
-        return sum(1 for result in self.processed if result.updated_action.requires_human_review())
+        return sum(
+            1
+            for result in self.processed
+            if result.authority_decision.requires_human_review()
+        )
 
     def blocked_count(self) -> int:
-        """Return how many processed actions block progress."""
+        """Return how many processed actions block autonomous continuation."""
         return sum(1 for result in self.processed if result.updated_action.blocks_progress())
 
     def to_payload(self) -> JsonObject:
-        """Return a stable JSON-compatible batch result."""
+        """Return a stable JSON-compatible authority batch result."""
         processed_payload: JsonArray = []
         for result in self.processed:
             processed_payload.append(result.to_payload())
@@ -78,13 +80,13 @@ class AuthorityBatchProcessingResult:
         }
 
     def digest(self) -> DigestRecord:
-        """Return a deterministic digest for this batch result."""
+        """Return a deterministic digest for this authority batch result."""
         return DigestRecord.from_payload(self.to_payload())
 
 
 @dataclass(frozen=True, slots=True)
 class AuthorityProcessor:
-    """Processes proposed bounded actions through jurisdiction and contract gates."""
+    """Processes bounded actions through contract and jurisdiction authority gates."""
 
     recorder: StateRecorder
 
@@ -94,22 +96,22 @@ class AuthorityProcessor:
         state: NinefoldRunState,
         action: BoundedActionRecord,
     ) -> AuthorityProcessingResult:
-        """Process one bounded action through the authority gate."""
+        """Process one proposed action and update the run state."""
         existing = state.actions.require_action(action.action_id.value)
         if existing != action:
-            raise FoundationError("authority processor action does not match state ledger")
+            raise FoundationError("action does not match state ledger")
 
         request = action.to_authority_request()
         decision = decide_authority_request(
             request=request,
-            contract=state.runtime_kit.chamber.contract,
-            jurisdiction_gate=state.runtime_kit.jurisdiction_gate,
+            contract=state.runtime_kit.contract,
+            jurisdiction_gate=state.runtime_kit.jurisdiction,
         )
         updated_action = action.with_authority_decision(decision)
 
         updated_state = self.recorder.record_authority_decision(state, decision)
         updated_state = updated_state.replace_action(updated_action)
-        updated_state = self.recorder.record_action(updated_state, updated_action)
+        updated_state = self.recorder.record_action_update(updated_state, updated_action)
 
         return AuthorityProcessingResult(
             state=updated_state,
@@ -119,16 +121,16 @@ class AuthorityProcessor:
         )
 
     def process_all_proposed(self, *, state: NinefoldRunState) -> AuthorityBatchProcessingResult:
-        """Process all currently proposed bounded actions in ledger order."""
+        """Process all currently proposed actions in ledger order."""
         current = state
-        results: list[AuthorityProcessingResult] = []
+        processed: list[AuthorityProcessingResult] = []
 
         for action in state.actions.proposed_actions():
             result = self.process_action(state=current, action=action)
             current = result.state
-            results.append(result)
+            processed.append(result)
 
         return AuthorityBatchProcessingResult(
             state=current,
-            processed=tuple(results),
+            processed=tuple(processed),
         )
