@@ -24,6 +24,7 @@ from ix_sally.authority_processing import (
 )
 from ix_sally.boundaries import BoundaryFinding, BoundarySeverity, SentinelBoundaryReport
 from ix_sally.chamber import ObservationChamberConfig, StopCondition, StopReason
+from ix_sally.chamber_closing import ChamberCloseResult, ChamberCloseStatus, ChamberCloser
 from ix_sally.claims import ClaimLedger, ClaimRecord, ClaimStatus
 from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.cycles import CycleCoordinationStatus, NinefoldCycleLedger, NinefoldCyclePacket
@@ -124,6 +125,9 @@ __all__ = [
     "BoundedActionRecord",
     "ButchFalsificationPacket",
     "CanonicalKey",
+    "ChamberCloseResult",
+    "ChamberCloseStatus",
+    "ChamberCloser",
     "ClaimLedger",
     "ClaimRecord",
     "ClaimStatus",
