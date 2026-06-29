@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from ix_sally.artifacts import AgentArtifact
+from ix_sally.authorization import AuthorityDecision
 from ix_sally.claims import ClaimRecord
 from ix_sally.cycles import NinefoldCyclePacket
 from ix_sally.events import RuntimeEvent, RuntimeEventType, event_payload_with_reference
@@ -77,6 +78,25 @@ class StateRecorder:
             payload=event_payload_with_reference(
                 reference_type="memory-record",
                 reference_digest=memory.digest(),
+            ),
+        )
+        return updated.with_event(event)
+
+    def record_authority_decision(
+        self,
+        state: NinefoldRunState,
+        decision: AuthorityDecision,
+    ) -> NinefoldRunState:
+        """Record an authority decision and emit a jurisdiction transcript event."""
+        updated = state.with_authority_decision(decision)
+        event = RuntimeEvent.create(
+            sequence=updated.next_event_sequence(),
+            cycle=decision.cycle,
+            event_type=RuntimeEventType.JURISDICTION_DECIDED,
+            summary=f"Recorded authority decision: {decision.status.value}.",
+            payload=event_payload_with_reference(
+                reference_type="authority-decision",
+                reference_digest=decision.digest(),
             ),
         )
         return updated.with_event(event)
