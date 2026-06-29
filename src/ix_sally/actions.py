@@ -214,6 +214,33 @@ class BoundedActionRecord:
             boundary_note=self.boundary_note,
         )
 
+    def with_blocking_result(
+        self,
+        *,
+        execution_digest: DigestRecord,
+        boundary_note: str,
+    ) -> BoundedActionRecord:
+        """Return this action marked as blocked by a Forge execution result."""
+        if self.status is not ActionStatus.AUTHORIZED:
+            raise FoundationError("only authorized bounded actions may receive blocking results")
+
+        return BoundedActionRecord.create(
+            action_id=self.action_id,
+            cycle=self.cycle,
+            proposed_by=self.proposed_by,
+            description=self.description,
+            requested_authority=self.requested_authority.value,
+            proposal_action_digest=self.proposal_action_digest,
+            status=ActionStatus.BLOCKED,
+            tool_key=self.tool_key.value if self.tool_key is not None else None,
+            requires_tool=self.requires_tool,
+            requires_memory_write=self.requires_memory_write,
+            requires_human_boundary=self.requires_human_boundary,
+            authority_decision_digest=self.authority_decision_digest,
+            execution_digest=execution_digest,
+            boundary_note=boundary_note,
+        )
+
     def allows_execution(self) -> bool:
         """Return whether this bounded action is authorized for execution."""
         return self.status is ActionStatus.AUTHORIZED
@@ -329,6 +356,10 @@ class BoundedActionLedger:
     def proposed_actions(self) -> tuple[BoundedActionRecord, ...]:
         """Return bounded actions still waiting for authority decisions."""
         return tuple(action for action in self.actions if action.status is ActionStatus.PROPOSED)
+
+    def executed_actions(self) -> tuple[BoundedActionRecord, ...]:
+        """Return bounded actions marked executed by Forge results."""
+        return tuple(action for action in self.actions if action.status is ActionStatus.EXECUTED)
 
     def human_review_actions(self) -> tuple[BoundedActionRecord, ...]:
         """Return bounded actions waiting on human review."""
