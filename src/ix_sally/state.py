@@ -12,6 +12,7 @@ from ix_sally.cycles import NinefoldCycleLedger, NinefoldCyclePacket
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.events import RuntimeEvent, RuntimeTranscript
 from ix_sally.evidence import EvidenceLedger, EvidenceRecord
+from ix_sally.evidence_support import EvidenceSupportFinding, EvidenceSupportLedger
 from ix_sally.execution_queue import ExecutionQueue, ExecutionQueueItem
 from ix_sally.forge_results import ForgeResultLedger, ForgeResultRecord
 from ix_sally.memory import MemoryLedger, MemoryRecord
@@ -27,6 +28,7 @@ class NinefoldRunState:
     artifacts: AgentArtifactLedger
     claims: ClaimLedger
     evidence: EvidenceLedger
+    evidence_support: EvidenceSupportLedger
     memory: MemoryLedger
     actions: BoundedActionLedger
     authority_decisions: AuthorityDecisionLedger
@@ -44,6 +46,7 @@ class NinefoldRunState:
             artifacts=AgentArtifactLedger.create(()),
             claims=ClaimLedger.create(()),
             evidence=EvidenceLedger.create(()),
+            evidence_support=EvidenceSupportLedger.create(()),
             memory=MemoryLedger.create(()),
             actions=BoundedActionLedger.create(()),
             authority_decisions=AuthorityDecisionLedger.create(()),
@@ -68,6 +71,7 @@ class NinefoldRunState:
             artifacts=self.artifacts,
             claims=self.claims,
             evidence=self.evidence,
+            evidence_support=self.evidence_support,
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions,
@@ -84,6 +88,7 @@ class NinefoldRunState:
             artifacts=self.artifacts.append(artifact),
             claims=self.claims,
             evidence=self.evidence,
+            evidence_support=self.evidence_support,
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions,
@@ -100,6 +105,7 @@ class NinefoldRunState:
             artifacts=self.artifacts,
             claims=self.claims.append(claim),
             evidence=self.evidence,
+            evidence_support=self.evidence_support,
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions,
@@ -116,6 +122,27 @@ class NinefoldRunState:
             artifacts=self.artifacts,
             claims=self.claims,
             evidence=self.evidence.append(evidence),
+            evidence_support=self.evidence_support,
+            memory=self.memory,
+            actions=self.actions,
+            authority_decisions=self.authority_decisions,
+            execution_queue=self.execution_queue,
+            forge_results=self.forge_results,
+            cycles=self.cycles,
+        )
+
+    def with_evidence_support_finding(
+        self,
+        finding: EvidenceSupportFinding,
+    ) -> NinefoldRunState:
+        """Return a new state with an appended evidence support finding."""
+        return NinefoldRunState(
+            runtime_kit=self.runtime_kit,
+            transcript=self.transcript,
+            artifacts=self.artifacts,
+            claims=self.claims,
+            evidence=self.evidence,
+            evidence_support=self.evidence_support.append(finding),
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions,
@@ -132,6 +159,7 @@ class NinefoldRunState:
             artifacts=self.artifacts,
             claims=self.claims,
             evidence=self.evidence,
+            evidence_support=self.evidence_support,
             memory=self.memory.append(memory),
             actions=self.actions,
             authority_decisions=self.authority_decisions,
@@ -148,6 +176,7 @@ class NinefoldRunState:
             artifacts=self.artifacts,
             claims=self.claims,
             evidence=self.evidence,
+            evidence_support=self.evidence_support,
             memory=self.memory,
             actions=self.actions.append(action),
             authority_decisions=self.authority_decisions,
@@ -164,6 +193,7 @@ class NinefoldRunState:
             artifacts=self.artifacts,
             claims=self.claims,
             evidence=self.evidence,
+            evidence_support=self.evidence_support,
             memory=self.memory,
             actions=self.actions.replace(action),
             authority_decisions=self.authority_decisions,
@@ -180,6 +210,7 @@ class NinefoldRunState:
             artifacts=self.artifacts,
             claims=self.claims,
             evidence=self.evidence,
+            evidence_support=self.evidence_support,
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions.append(decision),
@@ -196,6 +227,7 @@ class NinefoldRunState:
             artifacts=self.artifacts,
             claims=self.claims,
             evidence=self.evidence,
+            evidence_support=self.evidence_support,
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions,
@@ -212,6 +244,7 @@ class NinefoldRunState:
             artifacts=self.artifacts,
             claims=self.claims,
             evidence=self.evidence,
+            evidence_support=self.evidence_support,
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions,
@@ -228,6 +261,7 @@ class NinefoldRunState:
             artifacts=self.artifacts,
             claims=self.claims,
             evidence=self.evidence,
+            evidence_support=self.evidence_support,
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions,
@@ -244,6 +278,7 @@ class NinefoldRunState:
             artifacts=self.artifacts,
             claims=self.claims,
             evidence=self.evidence,
+            evidence_support=self.evidence_support,
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions,
@@ -260,6 +295,7 @@ class NinefoldRunState:
             artifacts=self.artifacts,
             claims=self.claims,
             evidence=self.evidence,
+            evidence_support=self.evidence_support,
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions,
@@ -269,10 +305,11 @@ class NinefoldRunState:
         )
 
     def requires_human_review(self) -> bool:
-        """Return whether the state contains any human-review action, decision, result, or cycle."""
+        """Return whether the state contains any human-review record."""
         return bool(
             self.actions.human_review_actions()
             or self.authority_decisions.human_review_decisions()
+            or self.evidence_support.human_review_findings()
             or self.forge_results.human_review_results()
             or self.cycles.human_review_cycles()
         )
@@ -284,6 +321,14 @@ class NinefoldRunState:
     def human_review_authority_count(self) -> int:
         """Return the number of authority decisions requiring human review."""
         return len(self.authority_decisions.human_review_decisions())
+
+    def supported_evidence_finding_count(self) -> int:
+        """Return the number of fully supported evidence findings."""
+        return len(self.evidence_support.supported_findings())
+
+    def human_review_evidence_finding_count(self) -> int:
+        """Return the number of evidence findings requiring human review."""
+        return len(self.evidence_support.human_review_findings())
 
     def proposed_action_count(self) -> int:
         """Return the number of bounded actions still waiting for authority decisions."""
@@ -345,6 +390,7 @@ class NinefoldRunState:
             "artifact_ledger_digest": self.artifacts.digest().value,
             "claim_ledger_digest": self.claims.digest().value,
             "evidence_ledger_digest": self.evidence.digest().value,
+            "evidence_support_ledger_digest": self.evidence_support.digest().value,
             "memory_ledger_digest": self.memory.digest().value,
             "action_ledger_digest": self.actions.digest().value,
             "authority_decision_ledger_digest": self.authority_decisions.digest().value,
@@ -355,6 +401,9 @@ class NinefoldRunState:
             "artifact_count": len(self.artifacts.artifacts),
             "claim_count": len(self.claims.claims),
             "evidence_count": len(self.evidence.records),
+            "evidence_support_finding_count": len(self.evidence_support.findings),
+            "supported_evidence_finding_count": self.supported_evidence_finding_count(),
+            "human_review_evidence_finding_count": self.human_review_evidence_finding_count(),
             "memory_count": len(self.memory.records),
             "action_count": len(self.actions.actions),
             "proposed_action_count": self.proposed_action_count(),
