@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from ix_sally.agents import AgentRole
 from ix_sally.artifacts import AgentArtifact, AgentArtifactKind
+from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
 from ix_sally.chamber import StopReason
 from ix_sally.claims import ClaimRecord
 from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.cycles import CycleCoordinationStatus, NinefoldCyclePacket
-from ix_sally.digest import JsonObject
+from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.events import RuntimeEvent, RuntimeEventType
 from ix_sally.evidence import EvidenceKind, EvidenceRecord, EvidenceStatus
 from ix_sally.memory import MemoryRecord
@@ -62,6 +63,16 @@ def _complete_cycle(*, blocked: bool = False) -> NinefoldCyclePacket:
         cycle_goal="Complete state cycle.",
         artifacts=artifacts,
         status=CycleCoordinationStatus.BLOCKED if blocked else CycleCoordinationStatus.COMPLETE,
+    )
+
+
+def _human_review_decision() -> AuthorityDecision:
+    return AuthorityDecision.create(
+        cycle=1,
+        request_digest=DigestRecord.from_payload({"request": "tool"}),
+        status=AuthorityDecisionStatus.HUMAN_REVIEW_REQUIRED,
+        rationale="Human review required.",
+        human_review_note="Boundary review required.",
     )
 
 
@@ -125,6 +136,18 @@ def test_run_state_appends_artifact_claim_evidence_and_memory() -> None:
     assert len(updated.memory.records) == 1
 
 
+def test_run_state_appends_authority_decision() -> None:
+    state = NinefoldRunState.create(runtime_kit=_runtime_kit())
+    decision = _human_review_decision()
+
+    updated = state.with_authority_decision(decision)
+
+    assert len(state.authority_decisions.decisions) == 0
+    assert len(updated.authority_decisions.decisions) == 1
+    assert updated.requires_human_review() is True
+    assert updated.human_review_authority_count() == 1
+
+
 def test_run_state_appends_cycle_and_reports_stop_condition() -> None:
     state = NinefoldRunState.create(runtime_kit=_runtime_kit())
     updated = state.with_cycle(_complete_cycle())
@@ -156,12 +179,17 @@ def test_run_state_payload_records_ledger_counts_and_digests() -> None:
     assert payload["claim_ledger_digest"] == state.claims.digest().value
     assert payload["evidence_ledger_digest"] == state.evidence.digest().value
     assert payload["memory_ledger_digest"] == state.memory.digest().value
+    assert (
+        payload["authority_decision_ledger_digest"]
+        == state.authority_decisions.digest().value
+    )
     assert payload["cycle_ledger_digest"] == state.cycles.digest().value
     assert payload["event_count"] == 1
     assert payload["artifact_count"] == 0
     assert payload["claim_count"] == 0
     assert payload["evidence_count"] == 0
     assert payload["memory_count"] == 0
+    assert payload["authority_decision_count"] == 0
     assert payload["completed_cycles"] == 0
 
 
