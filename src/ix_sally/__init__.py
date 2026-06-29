@@ -45,6 +45,11 @@ from ix_sally.falsifications import (
     FalsificationFinding,
     FalsificationSeverity,
 )
+from ix_sally.forge_evidence import (
+    ForgeEvidenceAdapter,
+    ForgeEvidenceProcessingResult,
+    ForgeEvidenceRecord,
+)
 from ix_sally.forge_result_processing import (
     ForgeResultBatchProcessingResult,
     ForgeResultProcessingResult,
@@ -129,6 +134,9 @@ __all__ = [
     "ExecutionStatus",
     "FalsificationFinding",
     "FalsificationSeverity",
+    "ForgeEvidenceAdapter",
+    "ForgeEvidenceProcessingResult",
+    "ForgeEvidenceRecord",
     "ForgeExecutionPacket",
     "ForgeExecutionReceipt",
     "ForgeResultBatchProcessingResult",
