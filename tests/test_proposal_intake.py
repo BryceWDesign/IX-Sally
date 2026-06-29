@@ -4,9 +4,10 @@ import pytest
 
 from ix_sally.actions import ActionStatus
 from ix_sally.agents import AgentRole
-from ix_sally.artifacts import AgentArtifactKind
+from ix_sally.artifacts import AgentArtifact, AgentArtifactKind
 from ix_sally.claims import ClaimRecord
 from ix_sally.contracts import AutonomyContract, AutonomyMode
+from ix_sally.cycles import NinefoldCyclePacket
 from ix_sally.events import RuntimeEventType
 from ix_sally.foundation import FoundationError
 from ix_sally.proposal_intake import SallyProposalIntake
@@ -24,6 +25,33 @@ def _state(*, max_cycles: int = 2) -> NinefoldRunState:
         doctrine_keys=("output-is-not-evidence",),
     )
     return NinefoldRunState.create(runtime_kit=NinefoldRuntimeKit.create(contract=contract))
+
+
+def _artifact(*, role: AgentRole, kind: AgentArtifactKind, cycle: int = 1) -> AgentArtifact:
+    return AgentArtifact.create(
+        cycle=cycle,
+        role=role,
+        kind=kind,
+        summary=f"{role.value} artifact.",
+    )
+
+
+def _complete_cycle() -> NinefoldCyclePacket:
+    return NinefoldCyclePacket.create(
+        cycle=1,
+        cycle_goal="Complete intake stop cycle.",
+        artifacts=(
+            _artifact(role=AgentRole.SALLY, kind=AgentArtifactKind.PROPOSAL),
+            _artifact(role=AgentRole.BUTCH, kind=AgentArtifactKind.FALSIFICATION),
+            _artifact(role=AgentRole.VERITY, kind=AgentArtifactKind.EVIDENCE_JUDGMENT),
+            _artifact(role=AgentRole.ORACLE, kind=AgentArtifactKind.PREDICTION),
+            _artifact(role=AgentRole.FORGE, kind=AgentArtifactKind.EXECUTION_RECEIPT),
+            _artifact(role=AgentRole.MNEMOSYNE, kind=AgentArtifactKind.MEMORY_DECISION),
+            _artifact(role=AgentRole.SENTINEL, kind=AgentArtifactKind.BOUNDARY_REPORT),
+            _artifact(role=AgentRole.TRANSFER, kind=AgentArtifactKind.TRANSFER_RESULT),
+            _artifact(role=AgentRole.CLERK, kind=AgentArtifactKind.DOSSIER_ENTRY),
+        ),
+    )
 
 
 def test_sally_proposal_intake_records_artifact_claims_actions_and_events() -> None:
@@ -135,7 +163,7 @@ def test_sally_proposal_intake_rejects_cycle_zero() -> None:
 
 
 def test_sally_proposal_intake_rejects_stopped_chamber() -> None:
-    state = _state(max_cycles=0)
+    state = _state(max_cycles=1).with_cycle(_complete_cycle())
     action = ProposalAction.create(
         description="Inspect chamber state.",
         intended_authority="observation",
