@@ -11,6 +11,7 @@ from ix_sally.claims import ClaimRecord
 from ix_sally.cycles import NinefoldCyclePacket
 from ix_sally.events import RuntimeEvent, RuntimeEventType, event_payload_with_reference
 from ix_sally.evidence import EvidenceRecord
+from ix_sally.evidence_support import EvidenceSupportFinding
 from ix_sally.execution_queue import ExecutionQueueItem
 from ix_sally.forge_results import ForgeResultRecord
 from ix_sally.memory import MemoryRecord
@@ -65,6 +66,26 @@ class StateRecorder:
             payload=event_payload_with_reference(
                 reference_type="evidence-record",
                 reference_digest=evidence.digest(),
+            ),
+        )
+        return updated.with_event(event)
+
+    def record_evidence_support_finding(
+        self,
+        state: NinefoldRunState,
+        finding: EvidenceSupportFinding,
+    ) -> NinefoldRunState:
+        """Record an evidence support finding and emit a Verity transcript event."""
+        updated = state.with_evidence_support_finding(finding)
+        event = RuntimeEvent.create(
+            sequence=updated.next_event_sequence(),
+            cycle=finding.cycle,
+            event_type=RuntimeEventType.EVIDENCE_RECORDED,
+            actor=finding.reviewed_by,
+            summary=f"Recorded evidence support finding: {finding.status.value}.",
+            payload=event_payload_with_reference(
+                reference_type="evidence-support-finding",
+                reference_digest=finding.digest(),
             ),
         )
         return updated.with_event(event)
