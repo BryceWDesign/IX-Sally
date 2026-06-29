@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from ix_sally.actions import BoundedActionRecord
 from ix_sally.artifacts import AgentArtifact
 from ix_sally.authorization import AuthorityDecision
 from ix_sally.claims import ClaimRecord
@@ -78,6 +79,26 @@ class StateRecorder:
             payload=event_payload_with_reference(
                 reference_type="memory-record",
                 reference_digest=memory.digest(),
+            ),
+        )
+        return updated.with_event(event)
+
+    def record_action(
+        self,
+        state: NinefoldRunState,
+        action: BoundedActionRecord,
+    ) -> NinefoldRunState:
+        """Record a bounded action and emit an action transcript event."""
+        updated = state.with_action(action)
+        event = RuntimeEvent.create(
+            sequence=updated.next_event_sequence(),
+            cycle=action.cycle,
+            event_type=RuntimeEventType.JURISDICTION_DECIDED,
+            actor=action.proposed_by,
+            summary=f"Recorded bounded action from {action.proposed_by.value}: {action.status.value}.",
+            payload=event_payload_with_reference(
+                reference_type="bounded-action",
+                reference_digest=action.digest(),
             ),
         )
         return updated.with_event(event)
