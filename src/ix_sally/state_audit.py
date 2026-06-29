@@ -97,7 +97,9 @@ class StateAuditReport:
 
         for finding in normalized:
             if finding.finding_id.value in seen:
-                raise FoundationError(f"duplicate state audit finding id: {finding.finding_id.value}")
+                raise FoundationError(
+                    f"duplicate state audit finding id: {finding.finding_id.value}"
+                )
             seen.add(finding.finding_id.value)
 
         return cls(
@@ -171,7 +173,10 @@ class StateAuditor:
                 StateAuditFinding.create(
                     severity=StateAuditSeverity.INFO,
                     summary="Run state has no audit blockers.",
-                    detail="No proposed actions, queued executions, failed results, or unsupported claims remain.",
+                    detail=(
+                        "No proposed actions, queued executions, failed results, "
+                        "or unsupported claims remain."
+                    ),
                     reference="state",
                 )
             )
@@ -200,7 +205,10 @@ class StateAuditor:
                 StateAuditFinding.create(
                     severity=StateAuditSeverity.BLOCKING,
                     summary="Bounded actions require human review.",
-                    detail=f"{state.human_review_action_count()} bounded action(s) require human review.",
+                    detail=(
+                        f"{state.human_review_action_count()} bounded action(s) "
+                        "require human review."
+                    ),
                     reference="actions.human_review",
                 )
             )
@@ -231,14 +239,14 @@ class StateAuditor:
                 )
             )
 
-        if state.dispatched_execution_count() > state.forge_result_count:
+        if state.dispatched_execution_count() > len(state.forge_results.results):
             findings.append(
                 StateAuditFinding.create(
                     severity=StateAuditSeverity.WARNING,
                     summary="Dispatched executions may still need Forge results.",
                     detail=(
                         f"{state.dispatched_execution_count()} item(s) dispatched, "
-                        f"but only {state.forge_result_count()} Forge result(s) recorded."
+                        f"but only {len(state.forge_results.results)} Forge result(s) recorded."
                     ),
                     reference="execution_queue.dispatched",
                 )
@@ -265,7 +273,10 @@ class StateAuditor:
                 StateAuditFinding.create(
                     severity=StateAuditSeverity.BLOCKING,
                     summary="Forge results include boundary blocks.",
-                    detail=f"{state.blocked_forge_result_count()} Forge result(s) were boundary-blocked.",
+                    detail=(
+                        f"{state.blocked_forge_result_count()} Forge result(s) "
+                        "were boundary-blocked."
+                    ),
                     reference="forge_results.blocked",
                 )
             )
