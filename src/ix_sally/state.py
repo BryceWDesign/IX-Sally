@@ -12,6 +12,7 @@ from ix_sally.cycles import NinefoldCycleLedger, NinefoldCyclePacket
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.events import RuntimeEvent, RuntimeTranscript
 from ix_sally.evidence import EvidenceLedger, EvidenceRecord
+from ix_sally.execution_queue import ExecutionQueue, ExecutionQueueItem
 from ix_sally.memory import MemoryLedger, MemoryRecord
 from ix_sally.runtime import NinefoldRuntimeKit
 
@@ -28,6 +29,7 @@ class NinefoldRunState:
     memory: MemoryLedger
     actions: BoundedActionLedger
     authority_decisions: AuthorityDecisionLedger
+    execution_queue: ExecutionQueue
     cycles: NinefoldCycleLedger
 
     @classmethod
@@ -43,6 +45,7 @@ class NinefoldRunState:
             memory=MemoryLedger.create(()),
             actions=BoundedActionLedger.create(()),
             authority_decisions=AuthorityDecisionLedger.create(()),
+            execution_queue=ExecutionQueue.create(()),
             cycles=NinefoldCycleLedger.create(()),
         )
 
@@ -65,6 +68,7 @@ class NinefoldRunState:
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions,
+            execution_queue=self.execution_queue,
             cycles=self.cycles,
         )
 
@@ -79,6 +83,7 @@ class NinefoldRunState:
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions,
+            execution_queue=self.execution_queue,
             cycles=self.cycles,
         )
 
@@ -93,6 +98,7 @@ class NinefoldRunState:
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions,
+            execution_queue=self.execution_queue,
             cycles=self.cycles,
         )
 
@@ -107,6 +113,7 @@ class NinefoldRunState:
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions,
+            execution_queue=self.execution_queue,
             cycles=self.cycles,
         )
 
@@ -121,6 +128,7 @@ class NinefoldRunState:
             memory=self.memory.append(memory),
             actions=self.actions,
             authority_decisions=self.authority_decisions,
+            execution_queue=self.execution_queue,
             cycles=self.cycles,
         )
 
@@ -135,6 +143,7 @@ class NinefoldRunState:
             memory=self.memory,
             actions=self.actions.append(action),
             authority_decisions=self.authority_decisions,
+            execution_queue=self.execution_queue,
             cycles=self.cycles,
         )
 
@@ -149,6 +158,7 @@ class NinefoldRunState:
             memory=self.memory,
             actions=self.actions.replace(action),
             authority_decisions=self.authority_decisions,
+            execution_queue=self.execution_queue,
             cycles=self.cycles,
         )
 
@@ -163,6 +173,52 @@ class NinefoldRunState:
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions.append(decision),
+            execution_queue=self.execution_queue,
+            cycles=self.cycles,
+        )
+
+    def with_execution_queue_item(self, item: ExecutionQueueItem) -> NinefoldRunState:
+        """Return a new state with an appended execution queue item."""
+        return NinefoldRunState(
+            runtime_kit=self.runtime_kit,
+            transcript=self.transcript,
+            artifacts=self.artifacts,
+            claims=self.claims,
+            evidence=self.evidence,
+            memory=self.memory,
+            actions=self.actions,
+            authority_decisions=self.authority_decisions,
+            execution_queue=self.execution_queue.append(item),
+            cycles=self.cycles,
+        )
+
+    def replace_execution_queue_item(self, item: ExecutionQueueItem) -> NinefoldRunState:
+        """Return a new state with an existing execution queue item replaced."""
+        return NinefoldRunState(
+            runtime_kit=self.runtime_kit,
+            transcript=self.transcript,
+            artifacts=self.artifacts,
+            claims=self.claims,
+            evidence=self.evidence,
+            memory=self.memory,
+            actions=self.actions,
+            authority_decisions=self.authority_decisions,
+            execution_queue=self.execution_queue.replace(item),
+            cycles=self.cycles,
+        )
+
+    def with_execution_queue(self, queue: ExecutionQueue) -> NinefoldRunState:
+        """Return a new state with a replaced execution queue."""
+        return NinefoldRunState(
+            runtime_kit=self.runtime_kit,
+            transcript=self.transcript,
+            artifacts=self.artifacts,
+            claims=self.claims,
+            evidence=self.evidence,
+            memory=self.memory,
+            actions=self.actions,
+            authority_decisions=self.authority_decisions,
+            execution_queue=queue,
             cycles=self.cycles,
         )
 
@@ -177,6 +233,7 @@ class NinefoldRunState:
             memory=self.memory,
             actions=self.actions,
             authority_decisions=self.authority_decisions,
+            execution_queue=self.execution_queue,
             cycles=self.cycles.append(cycle),
         )
 
@@ -212,6 +269,18 @@ class NinefoldRunState:
         """Return the number of bounded actions waiting on human review."""
         return len(self.actions.human_review_actions())
 
+    def queued_execution_count(self) -> int:
+        """Return the number of execution queue items waiting for dispatch."""
+        return len(self.execution_queue.queued_items())
+
+    def dispatched_execution_count(self) -> int:
+        """Return the number of execution queue items already dispatched."""
+        return len(self.execution_queue.dispatched_items())
+
+    def skipped_execution_count(self) -> int:
+        """Return the number of skipped execution queue items."""
+        return len(self.execution_queue.skipped_items())
+
     def stop_condition_payload(self) -> JsonObject:
         """Return the current chamber stop condition as stable payload data."""
         return self.runtime_kit.chamber.stop_for_cycle(self.completed_cycles()).to_payload()
@@ -227,6 +296,7 @@ class NinefoldRunState:
             "memory_ledger_digest": self.memory.digest().value,
             "action_ledger_digest": self.actions.digest().value,
             "authority_decision_ledger_digest": self.authority_decisions.digest().value,
+            "execution_queue_digest": self.execution_queue.digest().value,
             "cycle_ledger_digest": self.cycles.digest().value,
             "event_count": len(self.transcript.events),
             "artifact_count": len(self.artifacts.artifacts),
@@ -241,6 +311,10 @@ class NinefoldRunState:
             "authority_decision_count": len(self.authority_decisions.decisions),
             "denied_authority_count": self.denied_authority_count(),
             "human_review_authority_count": self.human_review_authority_count(),
+            "execution_queue_count": len(self.execution_queue.items),
+            "queued_execution_count": self.queued_execution_count(),
+            "dispatched_execution_count": self.dispatched_execution_count(),
+            "skipped_execution_count": self.skipped_execution_count(),
             "completed_cycles": self.completed_cycles(),
             "requires_human_review": self.requires_human_review(),
             "stop_condition": self.stop_condition_payload(),
