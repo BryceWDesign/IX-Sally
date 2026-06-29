@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from ix_sally.agents import AgentRole
 from ix_sally.artifacts import AgentArtifact, AgentArtifactKind
+from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
 from ix_sally.claims import ClaimRecord
 from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.cycles import NinefoldCyclePacket
+from ix_sally.digest import DigestRecord
 from ix_sally.events import RuntimeEventType
 from ix_sally.evidence import EvidenceKind, EvidenceRecord, EvidenceStatus
 from ix_sally.memory import MemoryRecord
@@ -129,6 +131,27 @@ def test_state_recorder_records_memory_and_event() -> None:
     assert event.actor is AgentRole.MNEMOSYNE
     assert event.payload["reference_type"] == "memory-record"
     assert event.payload["reference_digest"] == memory.digest().value
+
+
+def test_state_recorder_records_authority_decision_and_event() -> None:
+    recorder = StateRecorder()
+    state = _runtime_state()
+    decision = AuthorityDecision.create(
+        cycle=1,
+        request_digest=DigestRecord.from_payload({"request": "tool"}),
+        status=AuthorityDecisionStatus.HUMAN_REVIEW_REQUIRED,
+        rationale="Human review required.",
+        human_review_note="Boundary review required.",
+    )
+
+    updated = recorder.record_authority_decision(state, decision)
+
+    assert len(updated.authority_decisions.decisions) == 1
+    event = updated.transcript.events[-1]
+    assert event.event_type is RuntimeEventType.JURISDICTION_DECIDED
+    assert event.actor is None
+    assert event.payload["reference_type"] == "authority-decision"
+    assert event.payload["reference_digest"] == decision.digest().value
 
 
 def test_state_recorder_records_cycle_and_event() -> None:
