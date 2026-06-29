@@ -38,6 +38,11 @@ from ix_sally.evidence_support import (
     EvidenceSupportStatus,
     VerityEvidenceSupportReview,
 )
+from ix_sally.evidence_support_processing import (
+    EvidenceSupportBatchProcessingResult,
+    EvidenceSupportProcessingResult,
+    EvidenceSupportProcessor,
+)
 from ix_sally.execution_dispatch import (
     ExecutionDispatchBatchResult,
     ExecutionDispatchResult,
@@ -129,8 +134,11 @@ __all__ = [
     "EvidenceLedger",
     "EvidenceRecord",
     "EvidenceStatus",
+    "EvidenceSupportBatchProcessingResult",
     "EvidenceSupportFinding",
     "EvidenceSupportLedger",
+    "EvidenceSupportProcessingResult",
+    "EvidenceSupportProcessor",
     "EvidenceSupportStatus",
     "ExecutionDispatchBatchResult",
     "ExecutionDispatchResult",
