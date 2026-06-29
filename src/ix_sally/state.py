@@ -293,6 +293,10 @@ class NinefoldRunState:
         """Return the number of bounded actions authorized for execution."""
         return len(self.actions.executable_actions())
 
+    def executed_action_count(self) -> int:
+        """Return the number of bounded actions marked executed by Forge results."""
+        return len(self.actions.executed_actions())
+
     def blocked_action_count(self) -> int:
         """Return the number of bounded actions blocking autonomous continuation."""
         return len(self.actions.blocked_actions())
@@ -355,6 +359,7 @@ class NinefoldRunState:
             "action_count": len(self.actions.actions),
             "proposed_action_count": self.proposed_action_count(),
             "executable_action_count": self.executable_action_count(),
+            "executed_action_count": self.executed_action_count(),
             "blocked_action_count": self.blocked_action_count(),
             "human_review_action_count": self.human_review_action_count(),
             "authority_decision_count": len(self.authority_decisions.decisions),
