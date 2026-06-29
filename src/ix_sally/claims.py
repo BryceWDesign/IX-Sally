@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Iterable
 
@@ -19,6 +19,7 @@ class ClaimStatus(StrEnum):
     PARTIAL = "partial"
     UNSUPPORTED = "unsupported"
     CONTRADICTED = "contradicted"
+    BLOCKED = "blocked"
 
 
 @dataclass(frozen=True, slots=True)
@@ -30,6 +31,7 @@ class ClaimRecord:
     author: AgentRole
     statement: str
     status: ClaimStatus = ClaimStatus.PROPOSED
+    support_digests: tuple[DigestRecord, ...] = field(default_factory=tuple)
 
     @classmethod
     def create(
@@ -39,6 +41,7 @@ class ClaimRecord:
         author: AgentRole,
         statement: str,
         status: ClaimStatus = ClaimStatus.PROPOSED,
+        support_digests: Iterable[DigestRecord] = (),
         claim_id: CanonicalKey | None = None,
     ) -> ClaimRecord:
         """Create a normalized claim record."""
@@ -46,6 +49,12 @@ class ClaimRecord:
             raise FoundationError("claim cycle must not be negative")
 
         normalized_statement = require_text(statement, field_name="statement")
+        normalized_support = tuple(support_digests)
+        for support_digest in normalized_support:
+            support_digest.require_algorithm("sha256")
+
+        if status is ClaimStatus.SUPPORTED and not normalized_support:
+            raise FoundationError("supported claims require support digests")
 
         return cls(
             claim_id=claim_id
@@ -57,9 +66,15 @@ class ClaimRecord:
             author=author,
             statement=normalized_statement,
             status=status,
+            support_digests=normalized_support,
         )
 
-    def with_status(self, status: ClaimStatus) -> ClaimRecord:
+    def with_status(
+        self,
+        status: ClaimStatus,
+        *,
+        support_digests: Iterable[DigestRecord] | None = None,
+    ) -> ClaimRecord:
         """Return this claim with an updated review status."""
         return ClaimRecord.create(
             claim_id=self.claim_id,
@@ -67,6 +82,7 @@ class ClaimRecord:
             author=self.author,
             statement=self.statement,
             status=status,
+            support_digests=self.support_digests if support_digests is None else support_digests,
         )
 
     def requires_human_review(self) -> bool:
@@ -75,16 +91,27 @@ class ClaimRecord:
             ClaimStatus.PARTIAL,
             ClaimStatus.UNSUPPORTED,
             ClaimStatus.CONTRADICTED,
+            ClaimStatus.BLOCKED,
         }
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible claim representation."""
+        support_payload: JsonArray = []
+        for support_digest in self.support_digests:
+            support_payload.append(
+                {
+                    "algorithm": support_digest.algorithm,
+                    "value": support_digest.value,
+                }
+            )
+
         return {
             "claim_id": self.claim_id.value,
             "cycle": self.cycle,
             "author": self.author.value,
             "statement": self.statement,
             "status": self.status.value,
+            "support_digests": support_payload,
             "requires_human_review": self.requires_human_review(),
         }
 
@@ -124,9 +151,13 @@ class ClaimLedger:
                 return claim
         raise FoundationError(f"unknown claim id: {requested.value}")
 
+    def by_status(self, status: ClaimStatus) -> tuple[ClaimRecord, ...]:
+        """Return claims with the requested status."""
+        return tuple(claim for claim in self.claims if claim.status is status)
+
     def supported_claims(self) -> tuple[ClaimRecord, ...]:
         """Return claims marked supported."""
-        return tuple(claim for claim in self.claims if claim.status is ClaimStatus.SUPPORTED)
+        return self.by_status(ClaimStatus.SUPPORTED)
 
     def human_review_claims(self) -> tuple[ClaimRecord, ...]:
         """Return claims requiring human review."""
