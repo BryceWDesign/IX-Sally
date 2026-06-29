@@ -297,6 +297,23 @@ class BoundedActionLedger:
         """Return a new ledger with an appended bounded action."""
         return BoundedActionLedger.create((*self.actions, action))
 
+    def replace(self, action: BoundedActionRecord) -> BoundedActionLedger:
+        """Return a new ledger with an existing action replaced by identifier."""
+        replaced = False
+        updated: list[BoundedActionRecord] = []
+
+        for existing in self.actions:
+            if existing.action_id == action.action_id:
+                updated.append(action)
+                replaced = True
+            else:
+                updated.append(existing)
+
+        if not replaced:
+            raise FoundationError(f"unknown bounded action id: {action.action_id.value}")
+
+        return BoundedActionLedger.create(tuple(updated))
+
     def require_action(self, action_id: str) -> BoundedActionRecord:
         """Return an action by identifier or raise a construction error."""
         requested = CanonicalKey.from_text(action_id, field_name="action_id")
@@ -308,6 +325,10 @@ class BoundedActionLedger:
     def executable_actions(self) -> tuple[BoundedActionRecord, ...]:
         """Return bounded actions authorized for execution."""
         return tuple(action for action in self.actions if action.allows_execution())
+
+    def proposed_actions(self) -> tuple[BoundedActionRecord, ...]:
+        """Return bounded actions still waiting for authority decisions."""
+        return tuple(action for action in self.actions if action.status is ActionStatus.PROPOSED)
 
     def human_review_actions(self) -> tuple[BoundedActionRecord, ...]:
         """Return bounded actions waiting on human review."""
