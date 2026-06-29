@@ -12,6 +12,7 @@ from ix_sally.cycles import NinefoldCyclePacket
 from ix_sally.events import RuntimeEvent, RuntimeEventType, event_payload_with_reference
 from ix_sally.evidence import EvidenceRecord
 from ix_sally.execution_queue import ExecutionQueueItem
+from ix_sally.forge_results import ForgeResultRecord
 from ix_sally.memory import MemoryRecord
 from ix_sally.state import NinefoldRunState
 
@@ -159,6 +160,26 @@ class StateRecorder:
             payload=event_payload_with_reference(
                 reference_type="execution-queue-item",
                 reference_digest=item.digest(),
+            ),
+        )
+        return updated.with_event(event)
+
+    def record_forge_result(
+        self,
+        state: NinefoldRunState,
+        result: ForgeResultRecord,
+    ) -> NinefoldRunState:
+        """Record a Forge result and emit a Forge-result transcript event."""
+        updated = state.with_forge_result(result)
+        event = RuntimeEvent.create(
+            sequence=updated.next_event_sequence(),
+            cycle=result.cycle,
+            event_type=RuntimeEventType.AGENT_ARTIFACT_RECORDED,
+            actor=result.executed_by,
+            summary=f"Recorded Forge result from {result.executed_by.value}: {result.status.value}.",
+            payload=event_payload_with_reference(
+                reference_type="forge-result",
+                reference_digest=result.digest(),
             ),
         )
         return updated.with_event(event)
