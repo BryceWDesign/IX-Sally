@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from ix_sally.actions import BoundedActionLedger, BoundedActionRecord
 from ix_sally.artifacts import AgentArtifact, AgentArtifactLedger
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionLedger
 from ix_sally.claims import ClaimLedger, ClaimRecord
@@ -25,6 +26,7 @@ class NinefoldRunState:
     claims: ClaimLedger
     evidence: EvidenceLedger
     memory: MemoryLedger
+    actions: BoundedActionLedger
     authority_decisions: AuthorityDecisionLedger
     cycles: NinefoldCycleLedger
 
@@ -39,6 +41,7 @@ class NinefoldRunState:
             claims=ClaimLedger.create(()),
             evidence=EvidenceLedger.create(()),
             memory=MemoryLedger.create(()),
+            actions=BoundedActionLedger.create(()),
             authority_decisions=AuthorityDecisionLedger.create(()),
             cycles=NinefoldCycleLedger.create(()),
         )
@@ -60,6 +63,7 @@ class NinefoldRunState:
             claims=self.claims,
             evidence=self.evidence,
             memory=self.memory,
+            actions=self.actions,
             authority_decisions=self.authority_decisions,
             cycles=self.cycles,
         )
@@ -73,6 +77,7 @@ class NinefoldRunState:
             claims=self.claims,
             evidence=self.evidence,
             memory=self.memory,
+            actions=self.actions,
             authority_decisions=self.authority_decisions,
             cycles=self.cycles,
         )
@@ -86,6 +91,7 @@ class NinefoldRunState:
             claims=self.claims.append(claim),
             evidence=self.evidence,
             memory=self.memory,
+            actions=self.actions,
             authority_decisions=self.authority_decisions,
             cycles=self.cycles,
         )
@@ -99,6 +105,7 @@ class NinefoldRunState:
             claims=self.claims,
             evidence=self.evidence.append(evidence),
             memory=self.memory,
+            actions=self.actions,
             authority_decisions=self.authority_decisions,
             cycles=self.cycles,
         )
@@ -112,6 +119,21 @@ class NinefoldRunState:
             claims=self.claims,
             evidence=self.evidence,
             memory=self.memory.append(memory),
+            actions=self.actions,
+            authority_decisions=self.authority_decisions,
+            cycles=self.cycles,
+        )
+
+    def with_action(self, action: BoundedActionRecord) -> NinefoldRunState:
+        """Return a new state with an appended bounded action record."""
+        return NinefoldRunState(
+            runtime_kit=self.runtime_kit,
+            transcript=self.transcript,
+            artifacts=self.artifacts,
+            claims=self.claims,
+            evidence=self.evidence,
+            memory=self.memory,
+            actions=self.actions.append(action),
             authority_decisions=self.authority_decisions,
             cycles=self.cycles,
         )
@@ -125,6 +147,7 @@ class NinefoldRunState:
             claims=self.claims,
             evidence=self.evidence,
             memory=self.memory,
+            actions=self.actions,
             authority_decisions=self.authority_decisions.append(decision),
             cycles=self.cycles,
         )
@@ -138,14 +161,16 @@ class NinefoldRunState:
             claims=self.claims,
             evidence=self.evidence,
             memory=self.memory,
+            actions=self.actions,
             authority_decisions=self.authority_decisions,
             cycles=self.cycles.append(cycle),
         )
 
     def requires_human_review(self) -> bool:
-        """Return whether the state contains any human-review decision or cycle."""
+        """Return whether the state contains any human-review action, decision, or cycle."""
         return bool(
-            self.authority_decisions.human_review_decisions()
+            self.actions.human_review_actions()
+            or self.authority_decisions.human_review_decisions()
             or self.cycles.human_review_cycles()
         )
 
@@ -156,6 +181,18 @@ class NinefoldRunState:
     def human_review_authority_count(self) -> int:
         """Return the number of authority decisions requiring human review."""
         return len(self.authority_decisions.human_review_decisions())
+
+    def executable_action_count(self) -> int:
+        """Return the number of bounded actions authorized for execution."""
+        return len(self.actions.executable_actions())
+
+    def blocked_action_count(self) -> int:
+        """Return the number of bounded actions blocking autonomous continuation."""
+        return len(self.actions.blocked_actions())
+
+    def human_review_action_count(self) -> int:
+        """Return the number of bounded actions waiting on human review."""
+        return len(self.actions.human_review_actions())
 
     def stop_condition_payload(self) -> JsonObject:
         """Return the current chamber stop condition as stable payload data."""
@@ -170,6 +207,7 @@ class NinefoldRunState:
             "claim_ledger_digest": self.claims.digest().value,
             "evidence_ledger_digest": self.evidence.digest().value,
             "memory_ledger_digest": self.memory.digest().value,
+            "action_ledger_digest": self.actions.digest().value,
             "authority_decision_ledger_digest": self.authority_decisions.digest().value,
             "cycle_ledger_digest": self.cycles.digest().value,
             "event_count": len(self.transcript.events),
@@ -177,6 +215,10 @@ class NinefoldRunState:
             "claim_count": len(self.claims.claims),
             "evidence_count": len(self.evidence.records),
             "memory_count": len(self.memory.records),
+            "action_count": len(self.actions.actions),
+            "executable_action_count": self.executable_action_count(),
+            "blocked_action_count": self.blocked_action_count(),
+            "human_review_action_count": self.human_review_action_count(),
             "authority_decision_count": len(self.authority_decisions.decisions),
             "denied_authority_count": self.denied_authority_count(),
             "human_review_authority_count": self.human_review_authority_count(),
