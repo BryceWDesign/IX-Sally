@@ -4,6 +4,7 @@ import pytest
 
 from ix_sally.actions import ActionStatus, BoundedActionRecord
 from ix_sally.agents import AgentRole
+from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
 from ix_sally.authority_processing import AuthorityProcessor
 from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.digest import DigestRecord
@@ -30,13 +31,17 @@ def _state(
     return NinefoldRunState.create(runtime_kit=NinefoldRuntimeKit.create(contract=contract))
 
 
-def _tool_action(*, tool_key: str = "test-runner") -> BoundedActionRecord:
+def _tool_action(
+    *,
+    tool_key: str = "test-runner",
+    description: str = "Run tests.",
+) -> BoundedActionRecord:
     return BoundedActionRecord.create(
         cycle=1,
         proposed_by=AgentRole.FORGE,
-        description="Run tests.",
+        description=description,
         requested_authority="tool-execution",
-        proposal_action_digest=DigestRecord.from_payload({"proposal_action": "run tests"}),
+        proposal_action_digest=DigestRecord.from_payload({"proposal_action": description}),
         tool_key=tool_key,
         requires_tool=True,
         requires_human_boundary=False,
@@ -46,24 +51,19 @@ def _tool_action(*, tool_key: str = "test-runner") -> BoundedActionRecord:
 def test_bounded_action_ledger_replace_updates_existing_action() -> None:
     action = _tool_action()
     state = _state().with_action(action)
-    updated_action = action.with_authority_decision(
-        state.runtime_kit.require_authority(
-            role=AgentRole.FORGE,
-            authority="tool-execution",
-        ).__class__(
-            role=AgentRole.FORGE,
-            authority=action.requested_authority,
-            status=state.runtime_kit.evaluate_authority(
-                role=AgentRole.FORGE,
-                authority="tool-execution",
-            ).status,
-            reason="manual test decision",
-        )
+    decision = AuthorityDecision.create(
+        cycle=1,
+        request_digest=action.to_authority_request().digest(),
+        status=AuthorityDecisionStatus.ALLOWED,
+        rationale="Allowed.",
     )
+    updated_action = action.with_authority_decision(decision)
 
     replaced = state.replace_action(updated_action)
 
     assert replaced.actions.require_action(action.action_id.value) == updated_action
+    assert replaced.proposed_action_count() == 0
+    assert replaced.executable_action_count() == 1
 
 
 def test_bounded_action_ledger_replace_rejects_unknown_action() -> None:
@@ -164,8 +164,8 @@ def test_authority_processor_records_decision_and_action_events() -> None:
 
 
 def test_authority_processor_processes_all_proposed_actions() -> None:
-    first = _tool_action(tool_key="test-runner")
-    second = _tool_action(tool_key="network-client")
+    first = _tool_action(tool_key="test-runner", description="Run allowed tests.")
+    second = _tool_action(tool_key="network-client", description="Run denied network client.")
     state = _state().with_action(first).with_action(second)
     processor = AuthorityProcessor(StateRecorder())
 
@@ -181,8 +181,8 @@ def test_authority_processor_processes_all_proposed_actions() -> None:
 
 
 def test_authority_batch_digest_changes_when_processing_changes() -> None:
-    first = _tool_action(tool_key="test-runner")
-    second = _tool_action(tool_key="network-client")
+    first = _tool_action(tool_key="test-runner", description="Run allowed tests.")
+    second = _tool_action(tool_key="network-client", description="Run denied network client.")
     processor = AuthorityProcessor(StateRecorder())
 
     allowed_result = processor.process_all_proposed(state=_state().with_action(first))
