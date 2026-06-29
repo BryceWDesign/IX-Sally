@@ -11,6 +11,7 @@ from ix_sally.claims import ClaimRecord
 from ix_sally.cycles import NinefoldCyclePacket
 from ix_sally.events import RuntimeEvent, RuntimeEventType, event_payload_with_reference
 from ix_sally.evidence import EvidenceRecord
+from ix_sally.execution_queue import ExecutionQueueItem
 from ix_sally.memory import MemoryRecord
 from ix_sally.state import NinefoldRunState
 
@@ -118,6 +119,46 @@ class StateRecorder:
             payload=event_payload_with_reference(
                 reference_type="authority-decision",
                 reference_digest=decision.digest(),
+            ),
+        )
+        return updated.with_event(event)
+
+    def record_execution_queue_item(
+        self,
+        state: NinefoldRunState,
+        item: ExecutionQueueItem,
+    ) -> NinefoldRunState:
+        """Record an execution queue item and emit a Forge-dispatch transcript event."""
+        updated = state.with_execution_queue_item(item)
+        event = RuntimeEvent.create(
+            sequence=updated.next_event_sequence(),
+            cycle=item.cycle,
+            event_type=RuntimeEventType.AGENT_ARTIFACT_RECORDED,
+            actor=item.dispatch_role,
+            summary=f"Recorded execution queue item for {item.dispatch_role.value}: {item.status.value}.",
+            payload=event_payload_with_reference(
+                reference_type="execution-queue-item",
+                reference_digest=item.digest(),
+            ),
+        )
+        return updated.with_event(event)
+
+    def replace_execution_queue_item(
+        self,
+        state: NinefoldRunState,
+        item: ExecutionQueueItem,
+    ) -> NinefoldRunState:
+        """Replace an execution queue item and emit a Forge-dispatch transcript event."""
+        updated = state.replace_execution_queue_item(item)
+        event = RuntimeEvent.create(
+            sequence=updated.next_event_sequence(),
+            cycle=item.cycle,
+            event_type=RuntimeEventType.AGENT_ARTIFACT_RECORDED,
+            actor=item.dispatch_role,
+            summary=f"Updated execution queue item for {item.dispatch_role.value}: {item.status.value}.",
+            payload=event_payload_with_reference(
+                reference_type="execution-queue-item",
+                reference_digest=item.digest(),
             ),
         )
         return updated.with_event(event)
