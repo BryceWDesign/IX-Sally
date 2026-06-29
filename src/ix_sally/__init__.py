@@ -47,6 +47,7 @@ from ix_sally.memory_decisions import (
     MnemosyneMemoryDecisionPacket,
 )
 from ix_sally.predictions import OraclePrediction, OraclePredictionPacket, PredictionStatus
+from ix_sally.proposal_intake import SallyProposalIntake, SallyProposalIntakeResult
 from ix_sally.proposals import ProposalAction, SallyProposalPacket
 from ix_sally.recording import StateRecorder
 from ix_sally.runtime import NinefoldRuntimeKit
@@ -123,6 +124,8 @@ __all__ = [
     "RuntimeEvent",
     "RuntimeEventType",
     "RuntimeTranscript",
+    "SallyProposalIntake",
+    "SallyProposalIntakeResult",
     "SallyProposalPacket",
     "SentinelBoundaryReport",
     "StateRecorder",
