@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from ix_sally.actions import ActionStatus, BoundedActionLedger, BoundedActionRecord
 from ix_sally.agents import (
     AgentRole,
     AgentRoleDefinition,
@@ -60,6 +61,7 @@ from ix_sally.transfer import TransferStatus, TransferTrial, TransferTrialPacket
 
 __all__ = [
     "__version__",
+    "ActionStatus",
     "AgentArtifact",
     "AgentArtifactKind",
     "AgentArtifactLedger",
@@ -74,6 +76,8 @@ __all__ = [
     "AutonomyMode",
     "BoundaryFinding",
     "BoundarySeverity",
+    "BoundedActionLedger",
+    "BoundedActionRecord",
     "ButchFalsificationPacket",
     "CanonicalKey",
     "ClaimLedger",
