@@ -13,6 +13,7 @@ from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.events import RuntimeEvent, RuntimeTranscript
 from ix_sally.evidence import EvidenceLedger, EvidenceRecord
 from ix_sally.execution_queue import ExecutionQueue, ExecutionQueueItem
+from ix_sally.forge_results import ForgeResultLedger, ForgeResultRecord
 from ix_sally.memory import MemoryLedger, MemoryRecord
 from ix_sally.runtime import NinefoldRuntimeKit
 
@@ -30,6 +31,7 @@ class NinefoldRunState:
     actions: BoundedActionLedger
     authority_decisions: AuthorityDecisionLedger
     execution_queue: ExecutionQueue
+    forge_results: ForgeResultLedger
     cycles: NinefoldCycleLedger
 
     @classmethod
@@ -46,6 +48,7 @@ class NinefoldRunState:
             actions=BoundedActionLedger.create(()),
             authority_decisions=AuthorityDecisionLedger.create(()),
             execution_queue=ExecutionQueue.create(()),
+            forge_results=ForgeResultLedger.create(()),
             cycles=NinefoldCycleLedger.create(()),
         )
 
@@ -69,6 +72,7 @@ class NinefoldRunState:
             actions=self.actions,
             authority_decisions=self.authority_decisions,
             execution_queue=self.execution_queue,
+            forge_results=self.forge_results,
             cycles=self.cycles,
         )
 
@@ -84,6 +88,7 @@ class NinefoldRunState:
             actions=self.actions,
             authority_decisions=self.authority_decisions,
             execution_queue=self.execution_queue,
+            forge_results=self.forge_results,
             cycles=self.cycles,
         )
 
@@ -99,6 +104,7 @@ class NinefoldRunState:
             actions=self.actions,
             authority_decisions=self.authority_decisions,
             execution_queue=self.execution_queue,
+            forge_results=self.forge_results,
             cycles=self.cycles,
         )
 
@@ -114,6 +120,7 @@ class NinefoldRunState:
             actions=self.actions,
             authority_decisions=self.authority_decisions,
             execution_queue=self.execution_queue,
+            forge_results=self.forge_results,
             cycles=self.cycles,
         )
 
@@ -129,6 +136,7 @@ class NinefoldRunState:
             actions=self.actions,
             authority_decisions=self.authority_decisions,
             execution_queue=self.execution_queue,
+            forge_results=self.forge_results,
             cycles=self.cycles,
         )
 
@@ -144,6 +152,7 @@ class NinefoldRunState:
             actions=self.actions.append(action),
             authority_decisions=self.authority_decisions,
             execution_queue=self.execution_queue,
+            forge_results=self.forge_results,
             cycles=self.cycles,
         )
 
@@ -159,6 +168,7 @@ class NinefoldRunState:
             actions=self.actions.replace(action),
             authority_decisions=self.authority_decisions,
             execution_queue=self.execution_queue,
+            forge_results=self.forge_results,
             cycles=self.cycles,
         )
 
@@ -174,6 +184,7 @@ class NinefoldRunState:
             actions=self.actions,
             authority_decisions=self.authority_decisions.append(decision),
             execution_queue=self.execution_queue,
+            forge_results=self.forge_results,
             cycles=self.cycles,
         )
 
@@ -189,6 +200,7 @@ class NinefoldRunState:
             actions=self.actions,
             authority_decisions=self.authority_decisions,
             execution_queue=self.execution_queue.append(item),
+            forge_results=self.forge_results,
             cycles=self.cycles,
         )
 
@@ -204,6 +216,7 @@ class NinefoldRunState:
             actions=self.actions,
             authority_decisions=self.authority_decisions,
             execution_queue=self.execution_queue.replace(item),
+            forge_results=self.forge_results,
             cycles=self.cycles,
         )
 
@@ -219,6 +232,23 @@ class NinefoldRunState:
             actions=self.actions,
             authority_decisions=self.authority_decisions,
             execution_queue=queue,
+            forge_results=self.forge_results,
+            cycles=self.cycles,
+        )
+
+    def with_forge_result(self, result: ForgeResultRecord) -> NinefoldRunState:
+        """Return a new state with an appended Forge result record."""
+        return NinefoldRunState(
+            runtime_kit=self.runtime_kit,
+            transcript=self.transcript,
+            artifacts=self.artifacts,
+            claims=self.claims,
+            evidence=self.evidence,
+            memory=self.memory,
+            actions=self.actions,
+            authority_decisions=self.authority_decisions,
+            execution_queue=self.execution_queue,
+            forge_results=self.forge_results.append(result),
             cycles=self.cycles,
         )
 
@@ -234,14 +264,16 @@ class NinefoldRunState:
             actions=self.actions,
             authority_decisions=self.authority_decisions,
             execution_queue=self.execution_queue,
+            forge_results=self.forge_results,
             cycles=self.cycles.append(cycle),
         )
 
     def requires_human_review(self) -> bool:
-        """Return whether the state contains any human-review action, decision, or cycle."""
+        """Return whether the state contains any human-review action, decision, result, or cycle."""
         return bool(
             self.actions.human_review_actions()
             or self.authority_decisions.human_review_decisions()
+            or self.forge_results.human_review_results()
             or self.cycles.human_review_cycles()
         )
 
@@ -281,6 +313,22 @@ class NinefoldRunState:
         """Return the number of skipped execution queue items."""
         return len(self.execution_queue.skipped_items())
 
+    def passed_forge_result_count(self) -> int:
+        """Return the number of passed Forge results."""
+        return len(self.forge_results.passed_results())
+
+    def failed_forge_result_count(self) -> int:
+        """Return the number of failed Forge results."""
+        return len(self.forge_results.failed_results())
+
+    def blocked_forge_result_count(self) -> int:
+        """Return the number of boundary-blocked Forge results."""
+        return len(self.forge_results.blocked_results())
+
+    def human_review_forge_result_count(self) -> int:
+        """Return the number of Forge results requiring human review."""
+        return len(self.forge_results.human_review_results())
+
     def stop_condition_payload(self) -> JsonObject:
         """Return the current chamber stop condition as stable payload data."""
         return self.runtime_kit.chamber.stop_for_cycle(self.completed_cycles()).to_payload()
@@ -297,6 +345,7 @@ class NinefoldRunState:
             "action_ledger_digest": self.actions.digest().value,
             "authority_decision_ledger_digest": self.authority_decisions.digest().value,
             "execution_queue_digest": self.execution_queue.digest().value,
+            "forge_result_ledger_digest": self.forge_results.digest().value,
             "cycle_ledger_digest": self.cycles.digest().value,
             "event_count": len(self.transcript.events),
             "artifact_count": len(self.artifacts.artifacts),
@@ -315,6 +364,11 @@ class NinefoldRunState:
             "queued_execution_count": self.queued_execution_count(),
             "dispatched_execution_count": self.dispatched_execution_count(),
             "skipped_execution_count": self.skipped_execution_count(),
+            "forge_result_count": len(self.forge_results.results),
+            "passed_forge_result_count": self.passed_forge_result_count(),
+            "failed_forge_result_count": self.failed_forge_result_count(),
+            "blocked_forge_result_count": self.blocked_forge_result_count(),
+            "human_review_forge_result_count": self.human_review_forge_result_count(),
             "completed_cycles": self.completed_cycles(),
             "requires_human_review": self.requires_human_review(),
             "stop_condition": self.stop_condition_payload(),
