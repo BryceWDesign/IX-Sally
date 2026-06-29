@@ -45,6 +45,7 @@ from ix_sally.falsifications import (
     FalsificationFinding,
     FalsificationSeverity,
 )
+from ix_sally.forge_results import ForgeResultLedger, ForgeResultRecord, ForgeResultStatus
 from ix_sally.foundation import CanonicalKey, FoundationError
 from ix_sally.judgments import (
     EvidenceJudgmentStatus,
@@ -125,6 +126,9 @@ __all__ = [
     "FalsificationSeverity",
     "ForgeExecutionPacket",
     "ForgeExecutionReceipt",
+    "ForgeResultLedger",
+    "ForgeResultRecord",
+    "ForgeResultStatus",
     "FoundationError",
     "JurisdictionDecision",
     "JurisdictionGate",
