@@ -92,6 +92,12 @@ from ix_sally.session_baseline import (
     session_one_runtime_kit,
 )
 from ix_sally.state import NinefoldRunState
+from ix_sally.state_audit import (
+    StateAuditFinding,
+    StateAuditReport,
+    StateAuditSeverity,
+    StateAuditor,
+)
 from ix_sally.transfer import TransferStatus, TransferTrial, TransferTrialPacket
 
 __all__ = [
@@ -188,6 +194,10 @@ __all__ = [
     "SallyProposalIntakeResult",
     "SallyProposalPacket",
     "SentinelBoundaryReport",
+    "StateAuditFinding",
+    "StateAuditReport",
+    "StateAuditSeverity",
+    "StateAuditor",
     "StateRecorder",
     "StopCondition",
     "StopReason",
