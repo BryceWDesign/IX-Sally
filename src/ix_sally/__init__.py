@@ -32,6 +32,12 @@ from ix_sally.dockets import ClerkDocketEntry, ClerkDocketPacket, DocketEntryKin
 from ix_sally.doctrine import DoctrineCatalog, DoctrineRule, DoctrineSeverity
 from ix_sally.events import RuntimeEvent, RuntimeEventType, RuntimeTranscript
 from ix_sally.evidence import EvidenceKind, EvidenceLedger, EvidenceRecord, EvidenceStatus
+from ix_sally.evidence_support import (
+    EvidenceSupportFinding,
+    EvidenceSupportLedger,
+    EvidenceSupportStatus,
+    VerityEvidenceSupportReview,
+)
 from ix_sally.execution_dispatch import (
     ExecutionDispatchBatchResult,
     ExecutionDispatchResult,
@@ -123,6 +129,9 @@ __all__ = [
     "EvidenceLedger",
     "EvidenceRecord",
     "EvidenceStatus",
+    "EvidenceSupportFinding",
+    "EvidenceSupportLedger",
+    "EvidenceSupportStatus",
     "ExecutionDispatchBatchResult",
     "ExecutionDispatchResult",
     "ExecutionDispatcher",
@@ -178,6 +187,7 @@ __all__ = [
     "TransferTrial",
     "TransferTrialPacket",
     "VerityEvidenceJudgment",
+    "VerityEvidenceSupportReview",
     "VerityJudgmentPacket",
     "decide_authority_request",
     "default_agent_role_registry",
