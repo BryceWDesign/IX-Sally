@@ -40,6 +40,11 @@ class HumanReviewControlPlaneReportStatus(StrEnum):
         "complete_reentry_waiting_for_external_input"
     )
     COMPLETE_REENTRY_FAILED = "complete_reentry_failed"
+    COMPLETE_REENTRY_CLOSEOUT_ACCEPTED = "complete_reentry_closeout_accepted"
+    COMPLETE_REENTRY_CLOSEOUT_WAITING_FOR_EXTERNAL_INPUT = (
+        "complete_reentry_closeout_waiting_for_external_input"
+    )
+    COMPLETE_REENTRY_CLOSEOUT_BLOCKED = "complete_reentry_closeout_blocked"
     REJECTION_BLOCKED = "rejection_blocked"
     DEFERRAL_OPEN = "deferral_open"
 
@@ -90,6 +95,12 @@ class HumanReviewControlPlaneReport:
     operator_attention_complete_reentry_count: int = 0
     changed_state_complete_reentry_count: int = 0
     latest_complete_reentry_digest: str | None = None
+    complete_reentry_closeout_count: int = 0
+    accepted_complete_reentry_closeout_count: int = 0
+    waiting_complete_reentry_closeout_count: int = 0
+    blocked_complete_reentry_closeout_count: int = 0
+    blocking_finding_complete_reentry_closeout_count: int = 0
+    latest_complete_reentry_closeout_digest: str | None = None
 
     @classmethod
     def create(
@@ -136,6 +147,12 @@ class HumanReviewControlPlaneReport:
         operator_attention_complete_reentry_count: int = 0,
         changed_state_complete_reentry_count: int = 0,
         latest_complete_reentry_digest: str | None = None,
+        complete_reentry_closeout_count: int = 0,
+        accepted_complete_reentry_closeout_count: int = 0,
+        waiting_complete_reentry_closeout_count: int = 0,
+        blocked_complete_reentry_closeout_count: int = 0,
+        blocking_finding_complete_reentry_closeout_count: int = 0,
+        latest_complete_reentry_closeout_digest: str | None = None,
         report_id: CanonicalKey | None = None,
     ) -> HumanReviewControlPlaneReport:
         """Create a normalized human-review control-plane report."""
@@ -174,6 +191,19 @@ class HumanReviewControlPlaneReport:
             ),
             "changed_state_complete_reentry_count": (
                 changed_state_complete_reentry_count
+            ),
+            "complete_reentry_closeout_count": complete_reentry_closeout_count,
+            "accepted_complete_reentry_closeout_count": (
+                accepted_complete_reentry_closeout_count
+            ),
+            "waiting_complete_reentry_closeout_count": (
+                waiting_complete_reentry_closeout_count
+            ),
+            "blocked_complete_reentry_closeout_count": (
+                blocked_complete_reentry_closeout_count
+            ),
+            "blocking_finding_complete_reentry_closeout_count": (
+                blocking_finding_complete_reentry_closeout_count
             ),
         }.items():
             if value < 0:
@@ -268,6 +298,24 @@ class HumanReviewControlPlaneReport:
                 "human-review control-plane report "
                 "changed_state_complete_reentry_count exceeds complete_reentry_count"
             )
+        if (
+            accepted_complete_reentry_closeout_count
+            + waiting_complete_reentry_closeout_count
+            + blocked_complete_reentry_closeout_count
+            > complete_reentry_closeout_count
+        ):
+            raise FoundationError(
+                "human-review control-plane report complete closeout subtotals "
+                "exceed complete_reentry_closeout_count"
+            )
+        if (
+            blocking_finding_complete_reentry_closeout_count
+            > complete_reentry_closeout_count
+        ):
+            raise FoundationError(
+                "human-review control-plane report complete closeout blocking "
+                "finding count exceeds complete_reentry_closeout_count"
+            )
 
         run_state_digest.require_algorithm("sha256")
         run_snapshot_digest.require_algorithm("sha256")
@@ -329,6 +377,22 @@ class HumanReviewControlPlaneReport:
             ),
             changed_state_complete_reentry_count=changed_state_complete_reentry_count,
             latest_complete_reentry_digest=latest_complete_reentry_digest,
+            complete_reentry_closeout_count=complete_reentry_closeout_count,
+            accepted_complete_reentry_closeout_count=(
+                accepted_complete_reentry_closeout_count
+            ),
+            waiting_complete_reentry_closeout_count=(
+                waiting_complete_reentry_closeout_count
+            ),
+            blocked_complete_reentry_closeout_count=(
+                blocked_complete_reentry_closeout_count
+            ),
+            blocking_finding_complete_reentry_closeout_count=(
+                blocking_finding_complete_reentry_closeout_count
+            ),
+            latest_complete_reentry_closeout_digest=(
+                latest_complete_reentry_closeout_digest
+            ),
         )
 
     @classmethod
@@ -398,6 +462,21 @@ class HumanReviewControlPlaneReport:
             changed_state_complete_reentry_count=(
                 control_status.changed_state_complete_reentry_count
             ),
+            complete_reentry_closeout_count=(
+                control_status.complete_reentry_closeout_count
+            ),
+            accepted_complete_reentry_closeout_count=(
+                control_status.accepted_complete_reentry_closeout_count
+            ),
+            waiting_complete_reentry_closeout_count=(
+                control_status.waiting_complete_reentry_closeout_count
+            ),
+            blocked_complete_reentry_closeout_count=(
+                control_status.blocked_complete_reentry_closeout_count
+            ),
+            blocking_finding_complete_reentry_closeout_count=(
+                control_status.blocking_finding_complete_reentry_closeout_count
+            ),
             latest_handoff_digest=control_plane_snapshot.state.latest_handoff_digest(),
             latest_decision_digest=control_plane_snapshot.state.latest_decision_digest(),
             latest_resume_digest=control_plane_snapshot.state.latest_resume_digest(),
@@ -411,6 +490,9 @@ class HumanReviewControlPlaneReport:
             latest_complete_reentry_digest=(
                 control_plane_snapshot.state.latest_complete_reentry_digest()
             ),
+            latest_complete_reentry_closeout_digest=(
+                control_plane_snapshot.state.latest_complete_reentry_closeout_digest()
+            ),
         )
 
     def requires_operator_attention(self) -> bool:
@@ -423,6 +505,7 @@ class HumanReviewControlPlaneReport:
             HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_FAILED,
             HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_FAILED,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_FAILED,
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_BLOCKED,
         }
 
     def cleared_resume_recorded(self) -> bool:
@@ -443,6 +526,9 @@ class HumanReviewControlPlaneReport:
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_ACCEPTED,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_FAILED,
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_ACCEPTED,
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_WAITING_FOR_EXTERNAL_INPUT,
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_BLOCKED,
         }
 
     def waiting_after_reentry(self) -> bool:
@@ -452,6 +538,7 @@ class HumanReviewControlPlaneReport:
             HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_WAITING_FOR_EXTERNAL_INPUT,
             HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_WAITING_FOR_EXTERNAL_INPUT,
         }
 
     def reentry_audit_recorded(self) -> bool:
@@ -464,6 +551,7 @@ class HumanReviewControlPlaneReport:
             HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_PASSED,
             HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_ACCEPTED,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_ACCEPTED,
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_ACCEPTED,
         }
 
     def reentry_audit_failed(self) -> bool:
@@ -472,6 +560,7 @@ class HumanReviewControlPlaneReport:
             HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_FAILED,
             HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_FAILED,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_FAILED,
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_BLOCKED,
         }
 
     def audited_reentry_recorded(self) -> bool:
@@ -485,6 +574,8 @@ class HumanReviewControlPlaneReport:
             HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_ACCEPTED,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_ACCEPTED,
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_WAITING_FOR_EXTERNAL_INPUT,
         }
 
     def audited_reentry_failed(self) -> bool:
@@ -492,6 +583,7 @@ class HumanReviewControlPlaneReport:
         return self.status in {
             HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_FAILED,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_FAILED,
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_BLOCKED,
         }
 
     def complete_reentry_recorded(self) -> bool:
@@ -503,11 +595,32 @@ class HumanReviewControlPlaneReport:
         return self.status in {
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_ACCEPTED,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_ACCEPTED,
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_WAITING_FOR_EXTERNAL_INPUT,
         }
 
     def complete_reentry_failed(self) -> bool:
         """Return whether the report status indicates failed complete reentry."""
-        return self.status is HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_FAILED
+        return self.status in {
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_FAILED,
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_BLOCKED,
+        }
+
+    def complete_reentry_closeout_recorded(self) -> bool:
+        """Return whether at least one complete reentry closeout is recorded."""
+        return self.complete_reentry_closeout_count > 0
+
+    def complete_reentry_closeout_accepted(self) -> bool:
+        """Return whether complete reentry closeout has accepted status."""
+        return self.status is (
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_ACCEPTED
+        )
+
+    def complete_reentry_closeout_blocked(self) -> bool:
+        """Return whether complete reentry closeout has blocked status."""
+        return self.status is (
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_BLOCKED
+        )
 
     def has_handoff(self) -> bool:
         """Return whether a handoff has been recorded."""
@@ -555,6 +668,7 @@ class HumanReviewControlPlaneReport:
             "reentry_audit_count": self.reentry_audit_count,
             "audited_reentry_count": self.audited_reentry_count,
             "complete_reentry_count": self.complete_reentry_count,
+            "complete_reentry_closeout_count": self.complete_reentry_closeout_count,
             "approved_decision_count": self.approved_decision_count,
             "rejected_decision_count": self.rejected_decision_count,
             "deferred_decision_count": self.deferred_decision_count,
@@ -583,6 +697,18 @@ class HumanReviewControlPlaneReport:
             "changed_state_complete_reentry_count": (
                 self.changed_state_complete_reentry_count
             ),
+            "accepted_complete_reentry_closeout_count": (
+                self.accepted_complete_reentry_closeout_count
+            ),
+            "waiting_complete_reentry_closeout_count": (
+                self.waiting_complete_reentry_closeout_count
+            ),
+            "blocked_complete_reentry_closeout_count": (
+                self.blocked_complete_reentry_closeout_count
+            ),
+            "blocking_finding_complete_reentry_closeout_count": (
+                self.blocking_finding_complete_reentry_closeout_count
+            ),
             "latest_handoff_digest": self.latest_handoff_digest,
             "latest_decision_digest": self.latest_decision_digest,
             "latest_resume_digest": self.latest_resume_digest,
@@ -590,6 +716,9 @@ class HumanReviewControlPlaneReport:
             "latest_reentry_audit_digest": self.latest_reentry_audit_digest,
             "latest_audited_reentry_digest": self.latest_audited_reentry_digest,
             "latest_complete_reentry_digest": self.latest_complete_reentry_digest,
+            "latest_complete_reentry_closeout_digest": (
+                self.latest_complete_reentry_closeout_digest
+            ),
             "requires_operator_attention": self.requires_operator_attention(),
             "cleared_resume_recorded": self.cleared_resume_recorded(),
             "reentry_recorded": self.reentry_recorded(),
@@ -603,6 +732,15 @@ class HumanReviewControlPlaneReport:
             "complete_reentry_recorded": self.complete_reentry_recorded(),
             "complete_reentry_accepted": self.complete_reentry_accepted(),
             "complete_reentry_failed": self.complete_reentry_failed(),
+            "complete_reentry_closeout_recorded": (
+                self.complete_reentry_closeout_recorded()
+            ),
+            "complete_reentry_closeout_accepted": (
+                self.complete_reentry_closeout_accepted()
+            ),
+            "complete_reentry_closeout_blocked": (
+                self.complete_reentry_closeout_blocked()
+            ),
             "has_handoff": self.has_handoff(),
             "has_decision": self.has_decision(),
             "has_resume": self.has_resume(),
@@ -647,6 +785,27 @@ def _select_report_status(
         return (
             HumanReviewControlPlaneReportStatus.DEFERRAL_OPEN,
             "At least one human-review decision deferred a target.",
+        )
+
+    if (
+        status.has_blocked_complete_reentry_closeout()
+        or status.complete_reentry_closeout_has_blocking_findings()
+    ):
+        return (
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_BLOCKED,
+            "A complete human-review reentry closeout is blocked.",
+        )
+
+    if status.is_waiting_after_complete_reentry_closeout():
+        return (
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_WAITING_FOR_EXTERNAL_INPUT,
+            "A complete human-review reentry closeout is waiting externally.",
+        )
+
+    if status.has_accepted_complete_reentry_closeout():
+        return (
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_ACCEPTED,
+            "Complete human-review reentry closeout was accepted and recorded.",
         )
 
     if (
