@@ -32,7 +32,8 @@ class DigestRecord:
         expected = require_text(expected_algorithm, field_name="expected_algorithm").lower()
         if self.algorithm.lower() != expected:
             raise FoundationError(
-                f"digest algorithm mismatch: expected {expected!r}, got {self.algorithm!r}"
+                f"digest algorithm mismatch: expected digest algorithm {expected}, "
+                f"got {self.algorithm.lower()}"
             )
 
 
