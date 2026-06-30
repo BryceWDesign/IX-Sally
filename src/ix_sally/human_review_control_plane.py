@@ -8,17 +8,19 @@ from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import FoundationError
 from ix_sally.human_review_bundle_ledger import HumanReviewBundleLedger
 from ix_sally.human_review_decision_ledger import HumanReviewDecisionLedger
+from ix_sally.human_review_reentry_ledger import HumanReviewReentryLedger
 from ix_sally.human_review_resume_ledger import HumanReviewResumeLedger
 from ix_sally.stage_readiness import RunStage
 
 
 @dataclass(frozen=True, slots=True)
 class HumanReviewControlPlaneState:
-    """Immutable aggregate of human-review handoff, decision, and resume ledgers."""
+    """Immutable aggregate of human-review handoff, decision, resume, and reentry ledgers."""
 
     handoff_ledger: HumanReviewBundleLedger
     decision_ledger: HumanReviewDecisionLedger
     resume_ledger: HumanReviewResumeLedger
+    reentry_ledger: HumanReviewReentryLedger
 
     @classmethod
     def create(
@@ -27,12 +29,14 @@ class HumanReviewControlPlaneState:
         handoff_ledger: HumanReviewBundleLedger | None = None,
         decision_ledger: HumanReviewDecisionLedger | None = None,
         resume_ledger: HumanReviewResumeLedger | None = None,
+        reentry_ledger: HumanReviewReentryLedger | None = None,
     ) -> HumanReviewControlPlaneState:
         """Create a human-review control-plane state with empty ledgers by default."""
         return cls(
             handoff_ledger=handoff_ledger or HumanReviewBundleLedger.create(()),
             decision_ledger=decision_ledger or HumanReviewDecisionLedger.create(()),
             resume_ledger=resume_ledger or HumanReviewResumeLedger.create(()),
+            reentry_ledger=reentry_ledger or HumanReviewReentryLedger.create(()),
         )
 
     def with_handoff_ledger(
@@ -44,6 +48,7 @@ class HumanReviewControlPlaneState:
             handoff_ledger=handoff_ledger,
             decision_ledger=self.decision_ledger,
             resume_ledger=self.resume_ledger,
+            reentry_ledger=self.reentry_ledger,
         )
 
     def with_decision_ledger(
@@ -55,6 +60,7 @@ class HumanReviewControlPlaneState:
             handoff_ledger=self.handoff_ledger,
             decision_ledger=decision_ledger,
             resume_ledger=self.resume_ledger,
+            reentry_ledger=self.reentry_ledger,
         )
 
     def with_resume_ledger(
@@ -66,6 +72,19 @@ class HumanReviewControlPlaneState:
             handoff_ledger=self.handoff_ledger,
             decision_ledger=self.decision_ledger,
             resume_ledger=resume_ledger,
+            reentry_ledger=self.reentry_ledger,
+        )
+
+    def with_reentry_ledger(
+        self,
+        reentry_ledger: HumanReviewReentryLedger,
+    ) -> HumanReviewControlPlaneState:
+        """Return a new control-plane state with an updated reentry ledger."""
+        return HumanReviewControlPlaneState.create(
+            handoff_ledger=self.handoff_ledger,
+            decision_ledger=self.decision_ledger,
+            resume_ledger=self.resume_ledger,
+            reentry_ledger=reentry_ledger,
         )
 
     def handoff_count(self) -> int:
@@ -80,6 +99,10 @@ class HumanReviewControlPlaneState:
         """Return how many human-review resumes have been recorded."""
         return len(self.resume_ledger.entries)
 
+    def reentry_count(self) -> int:
+        """Return how many human-review reentries have been recorded."""
+        return len(self.reentry_ledger.entries)
+
     def has_active_handoffs(self) -> bool:
         """Return whether at least one human-review handoff has been recorded."""
         return self.handoff_count() > 0
@@ -91,6 +114,10 @@ class HumanReviewControlPlaneState:
     def has_recorded_resumes(self) -> bool:
         """Return whether at least one human-review resume has been recorded."""
         return self.resume_count() > 0
+
+    def has_recorded_reentries(self) -> bool:
+        """Return whether at least one human-review reentry has been recorded."""
+        return self.reentry_count() > 0
 
     def latest_handoff_digest(self) -> str | None:
         """Return the latest human-review handoff entry digest, if present."""
@@ -107,21 +134,30 @@ class HumanReviewControlPlaneState:
         latest = self.resume_ledger.latest()
         return latest.digest().value if latest is not None else None
 
+    def latest_reentry_digest(self) -> str | None:
+        """Return the latest human-review reentry entry digest, if present."""
+        latest = self.reentry_ledger.latest()
+        return latest.digest().value if latest is not None else None
+
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible control-plane state payload."""
         return {
             "handoff_ledger_digest": self.handoff_ledger.digest().value,
             "decision_ledger_digest": self.decision_ledger.digest().value,
             "resume_ledger_digest": self.resume_ledger.digest().value,
+            "reentry_ledger_digest": self.reentry_ledger.digest().value,
             "handoff_count": self.handoff_count(),
             "decision_count": self.decision_count(),
             "resume_count": self.resume_count(),
+            "reentry_count": self.reentry_count(),
             "has_active_handoffs": self.has_active_handoffs(),
             "has_recorded_decisions": self.has_recorded_decisions(),
             "has_recorded_resumes": self.has_recorded_resumes(),
+            "has_recorded_reentries": self.has_recorded_reentries(),
             "latest_handoff_digest": self.latest_handoff_digest(),
             "latest_decision_digest": self.latest_decision_digest(),
             "latest_resume_digest": self.latest_resume_digest(),
+            "latest_reentry_digest": self.latest_reentry_digest(),
         }
 
     def digest(self) -> DigestRecord:
@@ -137,11 +173,14 @@ class HumanReviewControlPlaneStatus:
     handoff_count: int
     decision_count: int
     resume_count: int
+    reentry_count: int
     approved_decision_count: int
     rejected_decision_count: int
     deferred_decision_count: int
     cleared_resume_count: int
     execution_planning_resume_count: int
+    completed_reentry_count: int
+    waiting_reentry_count: int
 
     @classmethod
     def from_state(
@@ -154,12 +193,19 @@ class HumanReviewControlPlaneStatus:
             handoff_count=state.handoff_count(),
             decision_count=state.decision_count(),
             resume_count=state.resume_count(),
+            reentry_count=state.reentry_count(),
             approved_decision_count=len(state.decision_ledger.approved_entries()),
             rejected_decision_count=len(state.decision_ledger.rejected_entries()),
             deferred_decision_count=len(state.decision_ledger.deferred_entries()),
             cleared_resume_count=len(state.resume_ledger.cleared_entries()),
             execution_planning_resume_count=len(
                 state.resume_ledger.entries_for_stage(RunStage.EXECUTION_PLANNING)
+            ),
+            completed_reentry_count=len(state.reentry_ledger.changed_entries()),
+            waiting_reentry_count=len(
+                state.reentry_ledger.entries_by_status_value(
+                    "waiting_for_external_input"
+                )
             ),
         )
 
@@ -179,6 +225,14 @@ class HumanReviewControlPlaneStatus:
         """Return whether at least one cleared resume has been recorded."""
         return self.cleared_resume_count > 0
 
+    def has_successful_reentry(self) -> bool:
+        """Return whether at least one reentry advanced the run state."""
+        return self.completed_reentry_count > 0
+
+    def is_waiting_after_reentry(self) -> bool:
+        """Return whether any reentry ended waiting for external input."""
+        return self.waiting_reentry_count > 0
+
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible control-plane status payload."""
         return {
@@ -189,15 +243,20 @@ class HumanReviewControlPlaneStatus:
             "handoff_count": self.handoff_count,
             "decision_count": self.decision_count,
             "resume_count": self.resume_count,
+            "reentry_count": self.reentry_count,
             "approved_decision_count": self.approved_decision_count,
             "rejected_decision_count": self.rejected_decision_count,
             "deferred_decision_count": self.deferred_decision_count,
             "cleared_resume_count": self.cleared_resume_count,
             "execution_planning_resume_count": self.execution_planning_resume_count,
+            "completed_reentry_count": self.completed_reentry_count,
+            "waiting_reentry_count": self.waiting_reentry_count,
             "has_unresumed_decisions": self.has_unresumed_decisions(),
             "has_rejections": self.has_rejections(),
             "has_deferrals": self.has_deferrals(),
             "has_successful_resume": self.has_successful_resume(),
+            "has_successful_reentry": self.has_successful_reentry(),
+            "is_waiting_after_reentry": self.is_waiting_after_reentry(),
         }
 
     def digest(self) -> DigestRecord:
@@ -233,6 +292,8 @@ class HumanReviewControlPlaneSnapshot:
             raise FoundationError("human-review control-plane decision count mismatch")
         if self.status.resume_count != self.state.resume_count():
             raise FoundationError("human-review control-plane resume count mismatch")
+        if self.status.reentry_count != self.state.reentry_count():
+            raise FoundationError("human-review control-plane reentry count mismatch")
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible control-plane snapshot payload."""
@@ -243,6 +304,7 @@ class HumanReviewControlPlaneSnapshot:
             "handoff_ledger_digest": self.state.handoff_ledger.digest().value,
             "decision_ledger_digest": self.state.decision_ledger.digest().value,
             "resume_ledger_digest": self.state.resume_ledger.digest().value,
+            "reentry_ledger_digest": self.state.reentry_ledger.digest().value,
             "status": self.status.to_payload(),
         }
 
