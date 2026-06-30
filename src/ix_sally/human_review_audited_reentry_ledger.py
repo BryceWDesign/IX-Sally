@@ -7,15 +7,15 @@ from typing import TYPE_CHECKING, Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError
-from ix_sally.human_review_control_plane_report import (
-    HumanReviewControlPlaneReportStatus,
-)
-from ix_sally.human_review_reentry import HumanReviewReentryStatus
-from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditStatus
 from ix_sally.stage_readiness import RunStage
 
 if TYPE_CHECKING:
     from ix_sally.human_review_audited_reentry import AuditedHumanReviewReentryResult
+    from ix_sally.human_review_control_plane_report import (
+        HumanReviewControlPlaneReportStatus,
+    )
+    from ix_sally.human_review_reentry import HumanReviewReentryStatus
+    from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditStatus
 
 
 @dataclass(frozen=True, slots=True)
@@ -168,28 +168,25 @@ class AuditedHumanReviewReentryLedgerEntry:
 
     def accepted(self) -> bool:
         """Return whether the audited reentry was accepted."""
-        return self.audit_status in {
-            HumanReviewReentryAuditStatus.PASSED,
-            HumanReviewReentryAuditStatus.WAITING_FOR_EXTERNAL_INPUT,
+        return self.audit_status.value in {
+            "passed",
+            "waiting_for_external_input",
         }
 
     def failed(self) -> bool:
         """Return whether the audited reentry failed audit."""
-        return self.audit_status is HumanReviewReentryAuditStatus.FAILED
+        return self.audit_status.value == "failed"
 
     def waiting_for_external_input(self) -> bool:
         """Return whether audited reentry is valid but waiting externally."""
-        return (
-            self.audit_status
-            is HumanReviewReentryAuditStatus.WAITING_FOR_EXTERNAL_INPUT
-        )
+        return self.audit_status.value == "waiting_for_external_input"
 
     def requires_operator_attention(self) -> bool:
         """Return whether the final report status requires operator attention."""
-        return self.report_status in {
-            HumanReviewControlPlaneReportStatus.REJECTION_BLOCKED,
-            HumanReviewControlPlaneReportStatus.DEFERRAL_OPEN,
-            HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_FAILED,
+        return self.report_status.value in {
+            "rejection_blocked",
+            "deferral_open",
+            "reentry_audit_failed",
         }
 
     def reached_stage(self, stage: RunStage) -> bool:
@@ -201,21 +198,21 @@ class AuditedHumanReviewReentryLedgerEntry:
         status: HumanReviewReentryAuditStatus,
     ) -> bool:
         """Return whether this entry has the requested audit status."""
-        return self.audit_status is status
+        return self.audit_status.value == status.value
 
     def matches_reentry_status(
         self,
         status: HumanReviewReentryStatus,
     ) -> bool:
         """Return whether this entry has the requested reentry status."""
-        return self.reentry_status is status
+        return self.reentry_status.value == status.value
 
     def matches_report_status(
         self,
         status: HumanReviewControlPlaneReportStatus,
     ) -> bool:
         """Return whether this entry has the requested report status."""
-        return self.report_status is status
+        return self.report_status.value == status.value
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible audited reentry ledger entry."""
@@ -438,20 +435,32 @@ class AuditedHumanReviewReentryLedger:
                 self.entries_for_stage(RunStage.FORGE_RESULT_PROCESSING)
             ),
             "passed_audit_entry_count": len(
-                self.entries_for_audit_status(HumanReviewReentryAuditStatus.PASSED)
+                [
+                    entry
+                    for entry in self.entries
+                    if entry.audit_status.value == "passed"
+                ]
             ),
             "waiting_audit_entry_count": len(
-                self.entries_for_audit_status(
-                    HumanReviewReentryAuditStatus.WAITING_FOR_EXTERNAL_INPUT
-                )
+                [
+                    entry
+                    for entry in self.entries
+                    if entry.audit_status.value == "waiting_for_external_input"
+                ]
             ),
             "advanced_reentry_entry_count": len(
-                self.entries_for_reentry_status(HumanReviewReentryStatus.ADVANCED)
+                [
+                    entry
+                    for entry in self.entries
+                    if entry.reentry_status.value == "advanced"
+                ]
             ),
             "waiting_reentry_entry_count": len(
-                self.entries_for_reentry_status(
-                    HumanReviewReentryStatus.WAITING_FOR_EXTERNAL_INPUT
-                )
+                [
+                    entry
+                    for entry in self.entries
+                    if entry.reentry_status.value == "waiting_for_external_input"
+                ]
             ),
         }
 
