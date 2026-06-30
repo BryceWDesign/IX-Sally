@@ -27,6 +27,9 @@ from ix_sally.state import NinefoldRunState
 if TYPE_CHECKING:
     from ix_sally.human_review_audited_reentry import AuditedHumanReviewReentryResult
     from ix_sally.human_review_complete_reentry import CompleteHumanReviewReentryResult
+    from ix_sally.human_review_complete_reentry_report import (
+        CompleteHumanReviewReentryCloseoutReport,
+    )
     from ix_sally.human_review_reentry import HumanReviewReentryResult
     from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditReport
 
@@ -42,6 +45,7 @@ class HumanReviewWorkflowStage(StrEnum):
     REENTRY_AUDIT_RECORDED = "reentry_audit_recorded"
     AUDITED_REENTRY_RECORDED = "audited_reentry_recorded"
     COMPLETE_REENTRY_RECORDED = "complete_reentry_recorded"
+    COMPLETE_REENTRY_CLOSEOUT_RECORDED = "complete_reentry_closeout_recorded"
 
 
 @dataclass(frozen=True, slots=True)
@@ -218,6 +222,12 @@ class HumanReviewWorkflowOperation:
         """Return the complete reentry result for a complete workflow operation."""
         return self.operation_result.require_complete_reentry_result()
 
+    def require_complete_reentry_closeout_report(
+        self,
+    ) -> CompleteHumanReviewReentryCloseoutReport:
+        """Return the complete reentry closeout report for a workflow operation."""
+        return self.operation_result.require_complete_reentry_closeout_report()
+
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible workflow operation result."""
         return {
@@ -233,6 +243,9 @@ class HumanReviewWorkflowOperation:
             "reentry_audit_count": self.control_plane.reentry_audit_count(),
             "audited_reentry_count": self.control_plane.audited_reentry_count(),
             "complete_reentry_count": self.control_plane.complete_reentry_count(),
+            "complete_reentry_closeout_count": (
+                self.control_plane.complete_reentry_closeout_count()
+            ),
         }
 
     def digest(self) -> DigestRecord:
@@ -560,4 +573,35 @@ class HumanReviewWorkflowKit:
             report=report,
             workflow_stage=HumanReviewWorkflowStage.COMPLETE_REENTRY_RECORDED,
             detail="Complete human-review reentry was recorded.",
+        )
+
+    def record_complete_reentry_closeout(
+        self,
+        *,
+        run_state: NinefoldRunState,
+        closeout_report: CompleteHumanReviewReentryCloseoutReport,
+        control_plane: HumanReviewControlPlaneState,
+    ) -> HumanReviewWorkflowOperation:
+        """Record a complete human-review reentry closeout report."""
+        if run_state.digest() != closeout_report.state_digest:
+            raise FoundationError(
+                "workflow complete reentry closeout run state must match report"
+            )
+
+        operation = self.coordinator.record_complete_reentry_closeout(
+            closeout_report=closeout_report,
+            control_plane=control_plane,
+        )
+        report = self.reporter.report(
+            run_state=run_state,
+            control_plane=operation.after_control_plane,
+        )
+
+        return HumanReviewWorkflowOperation.create(
+            run_state=run_state,
+            control_plane=operation.after_control_plane,
+            operation_result=operation,
+            report=report,
+            workflow_stage=HumanReviewWorkflowStage.COMPLETE_REENTRY_CLOSEOUT_RECORDED,
+            detail="Complete human-review reentry closeout was recorded.",
         )
