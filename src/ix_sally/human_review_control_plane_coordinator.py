@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import TYPE_CHECKING
 
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError
@@ -24,6 +25,9 @@ from ix_sally.human_review_resume_coordination import (
 )
 from ix_sally.state import NinefoldRunState
 
+if TYPE_CHECKING:
+    from ix_sally.human_review_reentry import HumanReviewReentryResult
+
 
 class HumanReviewControlPlaneOperationKind(StrEnum):
     """Supported human-review control-plane operation kinds."""
@@ -31,6 +35,7 @@ class HumanReviewControlPlaneOperationKind(StrEnum):
     HANDOFF_RECORDED = "handoff_recorded"
     DECISION_RECORDED = "decision_recorded"
     RESUME_RECORDED = "resume_recorded"
+    REENTRY_RECORDED = "reentry_recorded"
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,6 +50,7 @@ class HumanReviewControlPlaneOperationReceipt:
     handoff_count: int
     decision_count: int
     resume_count: int
+    reentry_count: int
 
     @classmethod
     def create(
@@ -57,6 +63,7 @@ class HumanReviewControlPlaneOperationReceipt:
         handoff_count: int,
         decision_count: int,
         resume_count: int,
+        reentry_count: int = 0,
         receipt_id: CanonicalKey | None = None,
     ) -> HumanReviewControlPlaneOperationReceipt:
         """Create a normalized human-review control-plane operation receipt."""
@@ -71,6 +78,10 @@ class HumanReviewControlPlaneOperationReceipt:
         if resume_count < 0:
             raise FoundationError(
                 "human-review control-plane resume_count must not be negative"
+            )
+        if reentry_count < 0:
+            raise FoundationError(
+                "human-review control-plane reentry_count must not be negative"
             )
 
         before_control_plane_digest.require_algorithm("sha256")
@@ -92,6 +103,7 @@ class HumanReviewControlPlaneOperationReceipt:
             handoff_count=handoff_count,
             decision_count=decision_count,
             resume_count=resume_count,
+            reentry_count=reentry_count,
         )
 
     def changed_control_plane(self) -> bool:
@@ -118,6 +130,7 @@ class HumanReviewControlPlaneOperationReceipt:
             "handoff_count": self.handoff_count,
             "decision_count": self.decision_count,
             "resume_count": self.resume_count,
+            "reentry_count": self.reentry_count,
             "changed_control_plane": self.changed_control_plane(),
         }
 
@@ -136,6 +149,7 @@ class HumanReviewControlPlaneOperationResult:
     handoff_result: HumanReviewHandoffResult | None = None
     decision_result: HumanReviewDecisionCoordinationResult | None = None
     resume_result: HumanReviewResumeCoordinationResult | None = None
+    reentry_result: HumanReviewReentryResult | None = None
 
     def changed_control_plane(self) -> bool:
         """Return whether this operation changed control-plane state."""
@@ -163,6 +177,12 @@ class HumanReviewControlPlaneOperationResult:
             raise FoundationError("human-review control-plane result has no resume result")
         return self.resume_result
 
+    def require_reentry_result(self) -> HumanReviewReentryResult:
+        """Return the reentry result or raise if this was another operation kind."""
+        if self.reentry_result is None:
+            raise FoundationError("human-review control-plane result has no reentry result")
+        return self.reentry_result
+
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible control-plane operation result."""
         return {
@@ -173,6 +193,7 @@ class HumanReviewControlPlaneOperationResult:
             "handoff_count": self.after_control_plane.handoff_count(),
             "decision_count": self.after_control_plane.decision_count(),
             "resume_count": self.after_control_plane.resume_count(),
+            "reentry_count": self.after_control_plane.reentry_count(),
             "changed_control_plane": self.changed_control_plane(),
             "handoff_result_digest": (
                 self.handoff_result.digest().value
@@ -189,6 +210,11 @@ class HumanReviewControlPlaneOperationResult:
                 if self.resume_result is not None
                 else None
             ),
+            "reentry_result_digest": (
+                self.reentry_result.digest().value
+                if self.reentry_result is not None
+                else None
+            ),
         }
 
     def digest(self) -> DigestRecord:
@@ -198,7 +224,7 @@ class HumanReviewControlPlaneOperationResult:
 
 @dataclass(frozen=True, slots=True)
 class HumanReviewControlPlaneCoordinator:
-    """Applies handoff, decision, and resume operations to control-plane state."""
+    """Applies handoff, decision, resume, and reentry operations to control-plane state."""
 
     handoff_coordinator: HumanReviewHandoffCoordinator
     decision_coordinator: HumanReviewDecisionCoordinator
@@ -320,6 +346,36 @@ class HumanReviewControlPlaneCoordinator:
             resume_result=resume_result,
         )
 
+    def record_reentry(
+        self,
+        *,
+        reentry_result: HumanReviewReentryResult,
+        control_plane: HumanReviewControlPlaneState,
+    ) -> HumanReviewControlPlaneOperationResult:
+        """Record a certified human-review reentry result in the reentry ledger."""
+        if reentry_result.control_plane.digest() != control_plane.digest():
+            raise FoundationError(
+                "human-review control-plane reentry result must match current "
+                "control-plane state"
+            )
+
+        before_digest = control_plane.digest()
+        updated_ledger = control_plane.reentry_ledger.append_result(reentry_result)
+        updated_control_plane = control_plane.with_reentry_ledger(updated_ledger)
+        receipt = self._receipt(
+            operation_kind=HumanReviewControlPlaneOperationKind.REENTRY_RECORDED,
+            before_digest=before_digest,
+            after_control_plane=updated_control_plane,
+            operation_digest=reentry_result.digest(),
+        )
+
+        return HumanReviewControlPlaneOperationResult(
+            before_control_plane=control_plane,
+            after_control_plane=updated_control_plane,
+            receipt=receipt,
+            reentry_result=reentry_result,
+        )
+
     def _receipt(
         self,
         *,
@@ -337,4 +393,5 @@ class HumanReviewControlPlaneCoordinator:
             handoff_count=after_control_plane.handoff_count(),
             decision_count=after_control_plane.decision_count(),
             resume_count=after_control_plane.resume_count(),
+            reentry_count=after_control_plane.reentry_count(),
         )
