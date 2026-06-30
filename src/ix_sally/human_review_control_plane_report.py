@@ -30,6 +30,11 @@ class HumanReviewControlPlaneReportStatus(StrEnum):
         "reentry_audit_waiting_for_external_input"
     )
     REENTRY_AUDIT_FAILED = "reentry_audit_failed"
+    AUDITED_REENTRY_ACCEPTED = "audited_reentry_accepted"
+    AUDITED_REENTRY_WAITING_FOR_EXTERNAL_INPUT = (
+        "audited_reentry_waiting_for_external_input"
+    )
+    AUDITED_REENTRY_FAILED = "audited_reentry_failed"
     REJECTION_BLOCKED = "rejection_blocked"
     DEFERRAL_OPEN = "deferral_open"
 
@@ -66,6 +71,13 @@ class HumanReviewControlPlaneReport:
     waiting_reentry_audit_count: int = 0
     blocking_reentry_audit_count: int = 0
     latest_reentry_audit_digest: str | None = None
+    audited_reentry_count: int = 0
+    accepted_audited_reentry_count: int = 0
+    failed_audited_reentry_count: int = 0
+    waiting_audited_reentry_count: int = 0
+    operator_attention_audited_reentry_count: int = 0
+    changed_state_audited_reentry_count: int = 0
+    latest_audited_reentry_digest: str | None = None
 
     @classmethod
     def create(
@@ -98,6 +110,13 @@ class HumanReviewControlPlaneReport:
         waiting_reentry_audit_count: int = 0,
         blocking_reentry_audit_count: int = 0,
         latest_reentry_audit_digest: str | None = None,
+        audited_reentry_count: int = 0,
+        accepted_audited_reentry_count: int = 0,
+        failed_audited_reentry_count: int = 0,
+        waiting_audited_reentry_count: int = 0,
+        operator_attention_audited_reentry_count: int = 0,
+        changed_state_audited_reentry_count: int = 0,
+        latest_audited_reentry_digest: str | None = None,
         report_id: CanonicalKey | None = None,
     ) -> HumanReviewControlPlaneReport:
         """Create a normalized human-review control-plane report."""
@@ -117,6 +136,16 @@ class HumanReviewControlPlaneReport:
             "failed_reentry_audit_count": failed_reentry_audit_count,
             "waiting_reentry_audit_count": waiting_reentry_audit_count,
             "blocking_reentry_audit_count": blocking_reentry_audit_count,
+            "audited_reentry_count": audited_reentry_count,
+            "accepted_audited_reentry_count": accepted_audited_reentry_count,
+            "failed_audited_reentry_count": failed_audited_reentry_count,
+            "waiting_audited_reentry_count": waiting_audited_reentry_count,
+            "operator_attention_audited_reentry_count": (
+                operator_attention_audited_reentry_count
+            ),
+            "changed_state_audited_reentry_count": (
+                changed_state_audited_reentry_count
+            ),
         }.items():
             if value < 0:
                 raise FoundationError(
@@ -162,6 +191,30 @@ class HumanReviewControlPlaneReport:
                 "human-review control-plane report blocking_reentry_audit_count "
                 "exceeds reentry_audit_count"
             )
+        if (
+            accepted_audited_reentry_count
+            + failed_audited_reentry_count
+            > audited_reentry_count
+        ):
+            raise FoundationError(
+                "human-review control-plane report audited reentry subtotals exceed "
+                "audited_reentry_count"
+            )
+        if waiting_audited_reentry_count > accepted_audited_reentry_count:
+            raise FoundationError(
+                "human-review control-plane report waiting_audited_reentry_count "
+                "exceeds accepted_audited_reentry_count"
+            )
+        if operator_attention_audited_reentry_count > audited_reentry_count:
+            raise FoundationError(
+                "human-review control-plane report "
+                "operator_attention_audited_reentry_count exceeds audited_reentry_count"
+            )
+        if changed_state_audited_reentry_count > audited_reentry_count:
+            raise FoundationError(
+                "human-review control-plane report "
+                "changed_state_audited_reentry_count exceeds audited_reentry_count"
+            )
 
         run_state_digest.require_algorithm("sha256")
         run_snapshot_digest.require_algorithm("sha256")
@@ -203,6 +256,17 @@ class HumanReviewControlPlaneReport:
             waiting_reentry_audit_count=waiting_reentry_audit_count,
             blocking_reentry_audit_count=blocking_reentry_audit_count,
             latest_reentry_audit_digest=latest_reentry_audit_digest,
+            audited_reentry_count=audited_reentry_count,
+            accepted_audited_reentry_count=accepted_audited_reentry_count,
+            failed_audited_reentry_count=failed_audited_reentry_count,
+            waiting_audited_reentry_count=waiting_audited_reentry_count,
+            operator_attention_audited_reentry_count=(
+                operator_attention_audited_reentry_count
+            ),
+            changed_state_audited_reentry_count=(
+                changed_state_audited_reentry_count
+            ),
+            latest_audited_reentry_digest=latest_audited_reentry_digest,
         )
 
     @classmethod
@@ -242,12 +306,31 @@ class HumanReviewControlPlaneReport:
             blocking_reentry_audit_count=(
                 control_status.blocking_reentry_audit_count
             ),
+            audited_reentry_count=control_status.audited_reentry_count,
+            accepted_audited_reentry_count=(
+                control_status.accepted_audited_reentry_count
+            ),
+            failed_audited_reentry_count=(
+                control_status.failed_audited_reentry_count
+            ),
+            waiting_audited_reentry_count=(
+                control_status.waiting_audited_reentry_count
+            ),
+            operator_attention_audited_reentry_count=(
+                control_status.operator_attention_audited_reentry_count
+            ),
+            changed_state_audited_reentry_count=(
+                control_status.changed_state_audited_reentry_count
+            ),
             latest_handoff_digest=control_plane_snapshot.state.latest_handoff_digest(),
             latest_decision_digest=control_plane_snapshot.state.latest_decision_digest(),
             latest_resume_digest=control_plane_snapshot.state.latest_resume_digest(),
             latest_reentry_digest=control_plane_snapshot.state.latest_reentry_digest(),
             latest_reentry_audit_digest=(
                 control_plane_snapshot.state.latest_reentry_audit_digest()
+            ),
+            latest_audited_reentry_digest=(
+                control_plane_snapshot.state.latest_audited_reentry_digest()
             ),
         )
 
@@ -259,6 +342,7 @@ class HumanReviewControlPlaneReport:
             HumanReviewControlPlaneReportStatus.REJECTION_BLOCKED,
             HumanReviewControlPlaneReportStatus.DEFERRAL_OPEN,
             HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_FAILED,
+            HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_FAILED,
         }
 
     def cleared_resume_recorded(self) -> bool:
@@ -273,6 +357,9 @@ class HumanReviewControlPlaneReport:
             HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_PASSED,
             HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_WAITING_FOR_EXTERNAL_INPUT,
             HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_FAILED,
+            HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_ACCEPTED,
+            HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
+            HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_FAILED,
         }
 
     def waiting_after_reentry(self) -> bool:
@@ -280,6 +367,7 @@ class HumanReviewControlPlaneReport:
         return self.status in {
             HumanReviewControlPlaneReportStatus.REENTRY_WAITING_FOR_EXTERNAL_INPUT,
             HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_WAITING_FOR_EXTERNAL_INPUT,
+            HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
         }
 
     def reentry_audit_recorded(self) -> bool:
@@ -288,11 +376,32 @@ class HumanReviewControlPlaneReport:
 
     def reentry_audit_passed(self) -> bool:
         """Return whether the report status indicates a passed reentry audit."""
-        return self.status is HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_PASSED
+        return self.status in {
+            HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_PASSED,
+            HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_ACCEPTED,
+        }
 
     def reentry_audit_failed(self) -> bool:
         """Return whether the report status indicates a failed reentry audit."""
-        return self.status is HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_FAILED
+        return self.status in {
+            HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_FAILED,
+            HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_FAILED,
+        }
+
+    def audited_reentry_recorded(self) -> bool:
+        """Return whether at least one audited reentry has been recorded."""
+        return self.audited_reentry_count > 0
+
+    def audited_reentry_accepted(self) -> bool:
+        """Return whether the report status indicates accepted audited reentry."""
+        return self.status in {
+            HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_ACCEPTED,
+            HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
+        }
+
+    def audited_reentry_failed(self) -> bool:
+        """Return whether the report status indicates failed audited reentry."""
+        return self.status is HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_FAILED
 
     def has_handoff(self) -> bool:
         """Return whether a handoff has been recorded."""
@@ -338,6 +447,7 @@ class HumanReviewControlPlaneReport:
             "resume_count": self.resume_count,
             "reentry_count": self.reentry_count,
             "reentry_audit_count": self.reentry_audit_count,
+            "audited_reentry_count": self.audited_reentry_count,
             "approved_decision_count": self.approved_decision_count,
             "rejected_decision_count": self.rejected_decision_count,
             "deferred_decision_count": self.deferred_decision_count,
@@ -348,11 +458,21 @@ class HumanReviewControlPlaneReport:
             "failed_reentry_audit_count": self.failed_reentry_audit_count,
             "waiting_reentry_audit_count": self.waiting_reentry_audit_count,
             "blocking_reentry_audit_count": self.blocking_reentry_audit_count,
+            "accepted_audited_reentry_count": self.accepted_audited_reentry_count,
+            "failed_audited_reentry_count": self.failed_audited_reentry_count,
+            "waiting_audited_reentry_count": self.waiting_audited_reentry_count,
+            "operator_attention_audited_reentry_count": (
+                self.operator_attention_audited_reentry_count
+            ),
+            "changed_state_audited_reentry_count": (
+                self.changed_state_audited_reentry_count
+            ),
             "latest_handoff_digest": self.latest_handoff_digest,
             "latest_decision_digest": self.latest_decision_digest,
             "latest_resume_digest": self.latest_resume_digest,
             "latest_reentry_digest": self.latest_reentry_digest,
             "latest_reentry_audit_digest": self.latest_reentry_audit_digest,
+            "latest_audited_reentry_digest": self.latest_audited_reentry_digest,
             "requires_operator_attention": self.requires_operator_attention(),
             "cleared_resume_recorded": self.cleared_resume_recorded(),
             "reentry_recorded": self.reentry_recorded(),
@@ -360,6 +480,9 @@ class HumanReviewControlPlaneReport:
             "reentry_audit_recorded": self.reentry_audit_recorded(),
             "reentry_audit_passed": self.reentry_audit_passed(),
             "reentry_audit_failed": self.reentry_audit_failed(),
+            "audited_reentry_recorded": self.audited_reentry_recorded(),
+            "audited_reentry_accepted": self.audited_reentry_accepted(),
+            "audited_reentry_failed": self.audited_reentry_failed(),
             "has_handoff": self.has_handoff(),
             "has_decision": self.has_decision(),
             "has_resume": self.has_resume(),
@@ -404,6 +527,27 @@ def _select_report_status(
         return (
             HumanReviewControlPlaneReportStatus.DEFERRAL_OPEN,
             "At least one human-review decision deferred a target.",
+        )
+
+    if (
+        status.audited_reentry_requires_operator_attention()
+        or status.has_failed_audited_reentry()
+    ):
+        return (
+            HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_FAILED,
+            "A fully audited human-review reentry requires operator attention.",
+        )
+
+    if status.is_waiting_after_audited_reentry():
+        return (
+            HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
+            "A fully audited human-review reentry is valid and waiting externally.",
+        )
+
+    if status.has_accepted_audited_reentry():
+        return (
+            HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_ACCEPTED,
+            "Fully audited human-review reentry was accepted and recorded.",
         )
 
     if status.has_blocking_reentry_audit() or status.has_failed_reentry_audit():
