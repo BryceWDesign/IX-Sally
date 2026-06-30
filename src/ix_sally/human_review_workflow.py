@@ -26,6 +26,7 @@ from ix_sally.state import NinefoldRunState
 
 if TYPE_CHECKING:
     from ix_sally.human_review_reentry import HumanReviewReentryResult
+    from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditReport
 
 
 class HumanReviewWorkflowStage(StrEnum):
@@ -36,6 +37,7 @@ class HumanReviewWorkflowStage(StrEnum):
     CLEARANCE_ASSESSED = "clearance_assessed"
     RESUME_RECORDED = "resume_recorded"
     REENTRY_RECORDED = "reentry_recorded"
+    REENTRY_AUDIT_RECORDED = "reentry_audit_recorded"
 
 
 @dataclass(frozen=True, slots=True)
@@ -200,6 +202,10 @@ class HumanReviewWorkflowOperation:
         """Return the reentry result for a reentry workflow operation."""
         return self.operation_result.require_reentry_result()
 
+    def require_reentry_audit_report(self) -> HumanReviewReentryAuditReport:
+        """Return the reentry audit report for an audit workflow operation."""
+        return self.operation_result.require_reentry_audit_report()
+
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible workflow operation result."""
         return {
@@ -212,6 +218,7 @@ class HumanReviewWorkflowOperation:
             "operation_kind": self.operation_kind().value,
             "report_status": self.report.status.value,
             "reentry_count": self.control_plane.reentry_count(),
+            "reentry_audit_count": self.control_plane.reentry_audit_count(),
         }
 
     def digest(self) -> DigestRecord:
@@ -456,4 +463,35 @@ class HumanReviewWorkflowKit:
             report=report,
             workflow_stage=HumanReviewWorkflowStage.REENTRY_RECORDED,
             detail="Human-review reentry was advanced and recorded.",
+        )
+
+    def record_reentry_audit(
+        self,
+        *,
+        run_state: NinefoldRunState,
+        audit_report: HumanReviewReentryAuditReport,
+        control_plane: HumanReviewControlPlaneState,
+    ) -> HumanReviewWorkflowOperation:
+        """Record a human-review reentry audit and return updated workflow state."""
+        if run_state.digest() != audit_report.state_digest:
+            raise FoundationError(
+                "workflow reentry audit run state must match audit report"
+            )
+
+        operation = self.coordinator.record_reentry_audit(
+            audit_report=audit_report,
+            control_plane=control_plane,
+        )
+        report = self.reporter.report(
+            run_state=run_state,
+            control_plane=operation.after_control_plane,
+        )
+
+        return HumanReviewWorkflowOperation.create(
+            run_state=run_state,
+            control_plane=operation.after_control_plane,
+            operation_result=operation,
+            report=report,
+            workflow_stage=HumanReviewWorkflowStage.REENTRY_AUDIT_RECORDED,
+            detail="Human-review reentry audit was recorded.",
         )
