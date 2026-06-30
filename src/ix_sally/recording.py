@@ -55,7 +55,11 @@ class StateRecorder:
         )
         return updated.with_event(event)
 
-    def record_evidence(self, state: NinefoldRunState, evidence: EvidenceRecord) -> NinefoldRunState:
+    def record_evidence(
+        self,
+        state: NinefoldRunState,
+        evidence: EvidenceRecord,
+    ) -> NinefoldRunState:
         """Record evidence and emit an evidence transcript event."""
         updated = state.with_evidence(evidence)
         event = RuntimeEvent.create(
@@ -63,7 +67,10 @@ class StateRecorder:
             cycle=evidence.cycle,
             event_type=RuntimeEventType.EVIDENCE_RECORDED,
             actor=evidence.produced_by,
-            summary=f"Recorded evidence from {evidence.produced_by.value}: {evidence.status.value}.",
+            summary=(
+                f"Recorded evidence from {evidence.produced_by.value}: "
+                f"{evidence.status.value}."
+            ),
             payload=event_payload_with_reference(
                 reference_type="evidence-record",
                 reference_digest=evidence.digest(),
@@ -119,7 +126,10 @@ class StateRecorder:
             cycle=action.cycle,
             event_type=RuntimeEventType.JURISDICTION_DECIDED,
             actor=action.proposed_by,
-            summary=f"Recorded bounded action from {action.proposed_by.value}: {action.status.value}.",
+            summary=(
+                f"Recorded bounded action from {action.proposed_by.value}: "
+                f"{action.status.value}."
+            ),
             payload=event_payload_with_reference(
                 reference_type="bounded-action",
                 reference_digest=action.digest(),
@@ -133,7 +143,11 @@ class StateRecorder:
         action: BoundedActionRecord,
     ) -> NinefoldRunState:
         """Record a transcript event for an already-replaced bounded action."""
-        existing = state.actions.require_action(action.action_id.value)
+        try:
+            existing = state.actions.require_action(action.action_id.value)
+        except FoundationError as error:
+            raise FoundationError("bounded action update does not match state ledger") from error
+
         if existing != action:
             raise FoundationError("bounded action update does not match state ledger")
 
@@ -142,7 +156,10 @@ class StateRecorder:
             cycle=action.cycle,
             event_type=RuntimeEventType.JURISDICTION_DECIDED,
             actor=action.proposed_by,
-            summary=f"Updated bounded action from {action.proposed_by.value}: {action.status.value}.",
+            summary=(
+                f"Updated bounded action from {action.proposed_by.value}: "
+                f"{action.status.value}."
+            ),
             payload=event_payload_with_reference(
                 reference_type="bounded-action",
                 reference_digest=action.digest(),
@@ -181,7 +198,10 @@ class StateRecorder:
             cycle=item.cycle,
             event_type=RuntimeEventType.AGENT_ARTIFACT_RECORDED,
             actor=item.dispatch_role,
-            summary=f"Recorded execution queue item for {item.dispatch_role.value}: {item.status.value}.",
+            summary=(
+                f"Recorded execution queue item for {item.dispatch_role.value}: "
+                f"{item.status.value}."
+            ),
             payload=event_payload_with_reference(
                 reference_type="execution-queue-item",
                 reference_digest=item.digest(),
@@ -201,7 +221,10 @@ class StateRecorder:
             cycle=item.cycle,
             event_type=RuntimeEventType.AGENT_ARTIFACT_RECORDED,
             actor=item.dispatch_role,
-            summary=f"Updated execution queue item for {item.dispatch_role.value}: {item.status.value}.",
+            summary=(
+                f"Updated execution queue item for {item.dispatch_role.value}: "
+                f"{item.status.value}."
+            ),
             payload=event_payload_with_reference(
                 reference_type="execution-queue-item",
                 reference_digest=item.digest(),
@@ -221,7 +244,10 @@ class StateRecorder:
             cycle=result.cycle,
             event_type=RuntimeEventType.AGENT_ARTIFACT_RECORDED,
             actor=result.executed_by,
-            summary=f"Recorded Forge result from {result.executed_by.value}: {result.status.value}.",
+            summary=(
+                f"Recorded Forge result from {result.executed_by.value}: "
+                f"{result.status.value}."
+            ),
             payload=event_payload_with_reference(
                 reference_type="forge-result",
                 reference_digest=result.digest(),
