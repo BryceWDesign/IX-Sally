@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import TYPE_CHECKING
 
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
@@ -23,6 +24,9 @@ from ix_sally.human_review_handoff import HumanReviewHandoffResult
 from ix_sally.human_review_resume_coordination import HumanReviewResumeCoordinationResult
 from ix_sally.state import NinefoldRunState
 
+if TYPE_CHECKING:
+    from ix_sally.human_review_reentry import HumanReviewReentryResult
+
 
 class HumanReviewWorkflowStage(StrEnum):
     """High-level stage label for human-review workflow kit results."""
@@ -31,6 +35,7 @@ class HumanReviewWorkflowStage(StrEnum):
     DECISION_RECORDED = "decision_recorded"
     CLEARANCE_ASSESSED = "clearance_assessed"
     RESUME_RECORDED = "resume_recorded"
+    REENTRY_RECORDED = "reentry_recorded"
 
 
 @dataclass(frozen=True, slots=True)
@@ -191,6 +196,10 @@ class HumanReviewWorkflowOperation:
         """Return the resume result for a resume workflow operation."""
         return self.operation_result.require_resume_result()
 
+    def require_reentry(self) -> HumanReviewReentryResult:
+        """Return the reentry result for a reentry workflow operation."""
+        return self.operation_result.require_reentry_result()
+
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible workflow operation result."""
         return {
@@ -202,6 +211,7 @@ class HumanReviewWorkflowOperation:
             "workflow_stage": self.receipt.workflow_stage.value,
             "operation_kind": self.operation_kind().value,
             "report_status": self.report.status.value,
+            "reentry_count": self.control_plane.reentry_count(),
         }
 
     def digest(self) -> DigestRecord:
@@ -286,7 +296,7 @@ class HumanReviewWorkflowClearance:
 
 @dataclass(frozen=True, slots=True)
 class HumanReviewWorkflowKit:
-    """Facade for the Session-3 human-review control-plane workflow."""
+    """Facade for the IX-Sally human-review control-plane workflow."""
 
     coordinator: HumanReviewControlPlaneCoordinator
     reporter: HumanReviewControlPlaneReporter
@@ -420,4 +430,30 @@ class HumanReviewWorkflowKit:
             report=report,
             workflow_stage=HumanReviewWorkflowStage.RESUME_RECORDED,
             detail="Human-review resume was certified and recorded.",
+        )
+
+    def record_reentry(
+        self,
+        *,
+        reentry_result: HumanReviewReentryResult,
+        control_plane: HumanReviewControlPlaneState | None = None,
+    ) -> HumanReviewWorkflowOperation:
+        """Record certified human-review reentry and return updated workflow state."""
+        starting_plane = control_plane or reentry_result.control_plane
+        operation = self.coordinator.record_reentry(
+            reentry_result=reentry_result,
+            control_plane=starting_plane,
+        )
+        report = self.reporter.report(
+            run_state=reentry_result.state,
+            control_plane=operation.after_control_plane,
+        )
+
+        return HumanReviewWorkflowOperation.create(
+            run_state=reentry_result.state,
+            control_plane=operation.after_control_plane,
+            operation_result=operation,
+            report=report,
+            workflow_stage=HumanReviewWorkflowStage.REENTRY_RECORDED,
+            detail="Human-review reentry was advanced and recorded.",
         )
