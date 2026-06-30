@@ -92,6 +92,7 @@ def test_control_plane_snapshot_rejects_reentry_count_mismatch() -> None:
         decision_count=good_status.decision_count,
         resume_count=good_status.resume_count,
         reentry_count=0,
+        reentry_audit_count=good_status.reentry_audit_count,
         approved_decision_count=good_status.approved_decision_count,
         rejected_decision_count=good_status.rejected_decision_count,
         deferred_decision_count=good_status.deferred_decision_count,
@@ -99,6 +100,10 @@ def test_control_plane_snapshot_rejects_reentry_count_mismatch() -> None:
         execution_planning_resume_count=good_status.execution_planning_resume_count,
         completed_reentry_count=good_status.completed_reentry_count,
         waiting_reentry_count=good_status.waiting_reentry_count,
+        passed_reentry_audit_count=good_status.passed_reentry_audit_count,
+        failed_reentry_audit_count=good_status.failed_reentry_audit_count,
+        waiting_reentry_audit_count=good_status.waiting_reentry_audit_count,
+        blocking_reentry_audit_count=good_status.blocking_reentry_audit_count,
     )
 
     with pytest.raises(FoundationError, match="reentry count mismatch"):
