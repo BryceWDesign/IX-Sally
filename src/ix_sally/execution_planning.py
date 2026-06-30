@@ -64,9 +64,16 @@ class ExecutionPlanner:
         action: BoundedActionRecord,
     ) -> ExecutionPlanningResult:
         """Queue one authorized bounded action for execution."""
-        existing = state.actions.require_action(action.action_id.value)
+        try:
+            existing = state.actions.require_action(action.action_id.value)
+        except FoundationError as error:
+            raise FoundationError("action does not match state ledger") from error
+
         if existing != action:
-            raise FoundationError("execution planner action does not match state ledger")
+            raise FoundationError("action does not match state ledger")
+
+        if not action.allows_execution():
+            raise FoundationError("only authorized bounded actions may be queued for execution")
 
         if self._is_action_already_queued(state=state, action=action):
             return ExecutionPlanningResult(
