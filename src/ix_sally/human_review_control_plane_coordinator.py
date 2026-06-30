@@ -28,6 +28,9 @@ from ix_sally.state import NinefoldRunState
 if TYPE_CHECKING:
     from ix_sally.human_review_audited_reentry import AuditedHumanReviewReentryResult
     from ix_sally.human_review_complete_reentry import CompleteHumanReviewReentryResult
+    from ix_sally.human_review_complete_reentry_report import (
+        CompleteHumanReviewReentryCloseoutReport,
+    )
     from ix_sally.human_review_reentry import HumanReviewReentryResult
     from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditReport
 
@@ -42,6 +45,7 @@ class HumanReviewControlPlaneOperationKind(StrEnum):
     REENTRY_AUDIT_RECORDED = "reentry_audit_recorded"
     AUDITED_REENTRY_RECORDED = "audited_reentry_recorded"
     COMPLETE_REENTRY_RECORDED = "complete_reentry_recorded"
+    COMPLETE_REENTRY_CLOSEOUT_RECORDED = "complete_reentry_closeout_recorded"
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,6 +64,7 @@ class HumanReviewControlPlaneOperationReceipt:
     reentry_audit_count: int
     audited_reentry_count: int
     complete_reentry_count: int
+    complete_reentry_closeout_count: int
 
     @classmethod
     def create(
@@ -76,6 +81,7 @@ class HumanReviewControlPlaneOperationReceipt:
         reentry_audit_count: int = 0,
         audited_reentry_count: int = 0,
         complete_reentry_count: int = 0,
+        complete_reentry_closeout_count: int = 0,
         receipt_id: CanonicalKey | None = None,
     ) -> HumanReviewControlPlaneOperationReceipt:
         """Create a normalized human-review control-plane operation receipt."""
@@ -107,6 +113,11 @@ class HumanReviewControlPlaneOperationReceipt:
             raise FoundationError(
                 "human-review control-plane complete_reentry_count must not be negative"
             )
+        if complete_reentry_closeout_count < 0:
+            raise FoundationError(
+                "human-review control-plane complete_reentry_closeout_count "
+                "must not be negative"
+            )
 
         before_control_plane_digest.require_algorithm("sha256")
         after_control_plane_digest.require_algorithm("sha256")
@@ -131,6 +142,7 @@ class HumanReviewControlPlaneOperationReceipt:
             reentry_audit_count=reentry_audit_count,
             audited_reentry_count=audited_reentry_count,
             complete_reentry_count=complete_reentry_count,
+            complete_reentry_closeout_count=complete_reentry_closeout_count,
         )
 
     def changed_control_plane(self) -> bool:
@@ -161,6 +173,7 @@ class HumanReviewControlPlaneOperationReceipt:
             "reentry_audit_count": self.reentry_audit_count,
             "audited_reentry_count": self.audited_reentry_count,
             "complete_reentry_count": self.complete_reentry_count,
+            "complete_reentry_closeout_count": self.complete_reentry_closeout_count,
             "changed_control_plane": self.changed_control_plane(),
         }
 
@@ -183,6 +196,9 @@ class HumanReviewControlPlaneOperationResult:
     reentry_audit_report: HumanReviewReentryAuditReport | None = None
     audited_reentry_result: AuditedHumanReviewReentryResult | None = None
     complete_reentry_result: CompleteHumanReviewReentryResult | None = None
+    complete_reentry_closeout_report: (
+        CompleteHumanReviewReentryCloseoutReport | None
+    ) = None
 
     def changed_control_plane(self) -> bool:
         """Return whether this operation changed control-plane state."""
@@ -240,6 +256,17 @@ class HumanReviewControlPlaneOperationResult:
             )
         return self.complete_reentry_result
 
+    def require_complete_reentry_closeout_report(
+        self,
+    ) -> CompleteHumanReviewReentryCloseoutReport:
+        """Return the complete reentry closeout report or raise."""
+        if self.complete_reentry_closeout_report is None:
+            raise FoundationError(
+                "human-review control-plane result has no complete reentry "
+                "closeout report"
+            )
+        return self.complete_reentry_closeout_report
+
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible control-plane operation result."""
         return {
@@ -254,6 +281,9 @@ class HumanReviewControlPlaneOperationResult:
             "reentry_audit_count": self.after_control_plane.reentry_audit_count(),
             "audited_reentry_count": self.after_control_plane.audited_reentry_count(),
             "complete_reentry_count": self.after_control_plane.complete_reentry_count(),
+            "complete_reentry_closeout_count": (
+                self.after_control_plane.complete_reentry_closeout_count()
+            ),
             "changed_control_plane": self.changed_control_plane(),
             "handoff_result_digest": (
                 self.handoff_result.digest().value
@@ -288,6 +318,11 @@ class HumanReviewControlPlaneOperationResult:
             "complete_reentry_result_digest": (
                 self.complete_reentry_result.digest().value
                 if self.complete_reentry_result is not None
+                else None
+            ),
+            "complete_reentry_closeout_report_digest": (
+                self.complete_reentry_closeout_report.digest().value
+                if self.complete_reentry_closeout_report is not None
                 else None
             ),
         }
@@ -547,6 +582,44 @@ class HumanReviewControlPlaneCoordinator:
             complete_reentry_result=complete_reentry_result,
         )
 
+    def record_complete_reentry_closeout(
+        self,
+        *,
+        closeout_report: CompleteHumanReviewReentryCloseoutReport,
+        control_plane: HumanReviewControlPlaneState,
+    ) -> HumanReviewControlPlaneOperationResult:
+        """Record a complete human-review reentry closeout report."""
+        if closeout_report.control_plane_digest != control_plane.digest():
+            raise FoundationError(
+                "human-review control-plane complete reentry closeout must match "
+                "current control-plane state"
+            )
+
+        before_digest = control_plane.digest()
+        updated_ledger = (
+            control_plane.complete_reentry_closeout_ledger.append_report(
+                closeout_report
+            )
+        )
+        updated_control_plane = (
+            control_plane.with_complete_reentry_closeout_ledger(updated_ledger)
+        )
+        receipt = self._receipt(
+            operation_kind=(
+                HumanReviewControlPlaneOperationKind.COMPLETE_REENTRY_CLOSEOUT_RECORDED
+            ),
+            before_digest=before_digest,
+            after_control_plane=updated_control_plane,
+            operation_digest=closeout_report.digest(),
+        )
+
+        return HumanReviewControlPlaneOperationResult(
+            before_control_plane=control_plane,
+            after_control_plane=updated_control_plane,
+            receipt=receipt,
+            complete_reentry_closeout_report=closeout_report,
+        )
+
     def _receipt(
         self,
         *,
@@ -568,4 +641,7 @@ class HumanReviewControlPlaneCoordinator:
             reentry_audit_count=after_control_plane.reentry_audit_count(),
             audited_reentry_count=after_control_plane.audited_reentry_count(),
             complete_reentry_count=after_control_plane.complete_reentry_count(),
+            complete_reentry_closeout_count=(
+                after_control_plane.complete_reentry_closeout_count()
+            ),
         )
