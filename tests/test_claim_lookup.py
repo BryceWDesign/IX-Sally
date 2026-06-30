@@ -4,6 +4,7 @@ import pytest
 
 from ix_sally.agents import AgentRole
 from ix_sally.claims import ClaimLedger, ClaimRecord, ClaimStatus
+from ix_sally.digest import DigestRecord
 from ix_sally.foundation import FoundationError
 
 
@@ -26,11 +27,13 @@ def test_claim_ledger_rejects_unknown_claim_id() -> None:
 
 
 def test_claim_record_tracks_human_review_statuses() -> None:
+    support = DigestRecord.from_payload({"forge": "passed"})
     supported = ClaimRecord.create(
         cycle=1,
         author=AgentRole.SALLY,
         statement="Forge tests passed.",
         status=ClaimStatus.SUPPORTED,
+        support_digests=(support,),
     )
     unsupported = supported.with_status(ClaimStatus.UNSUPPORTED)
     contradicted = supported.with_status(ClaimStatus.CONTRADICTED)
@@ -41,11 +44,13 @@ def test_claim_record_tracks_human_review_statuses() -> None:
 
 
 def test_claim_ledger_filters_supported_and_human_review_claims() -> None:
+    support = DigestRecord.from_payload({"forge": "passed"})
     supported = ClaimRecord.create(
         cycle=1,
         author=AgentRole.SALLY,
         statement="Forge tests passed.",
         status=ClaimStatus.SUPPORTED,
+        support_digests=(support,),
     )
     partial = ClaimRecord.create(
         cycle=1,
