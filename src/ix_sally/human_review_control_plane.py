@@ -13,6 +13,9 @@ from ix_sally.human_review_bundle_ledger import HumanReviewBundleLedger
 from ix_sally.human_review_complete_reentry_ledger import (
     CompleteHumanReviewReentryLedger,
 )
+from ix_sally.human_review_complete_reentry_report_ledger import (
+    CompleteHumanReviewReentryCloseoutLedger,
+)
 from ix_sally.human_review_decision_ledger import HumanReviewDecisionLedger
 from ix_sally.human_review_reentry_audit_ledger import HumanReviewReentryAuditLedger
 from ix_sally.human_review_reentry_ledger import HumanReviewReentryLedger
@@ -35,6 +38,9 @@ class HumanReviewControlPlaneState:
     complete_reentry_ledger: CompleteHumanReviewReentryLedger = field(
         default_factory=lambda: CompleteHumanReviewReentryLedger.create(())
     )
+    complete_reentry_closeout_ledger: CompleteHumanReviewReentryCloseoutLedger = field(
+        default_factory=lambda: CompleteHumanReviewReentryCloseoutLedger.create(())
+    )
 
     @classmethod
     def create(
@@ -47,6 +53,9 @@ class HumanReviewControlPlaneState:
         reentry_audit_ledger: HumanReviewReentryAuditLedger | None = None,
         audited_reentry_ledger: AuditedHumanReviewReentryLedger | None = None,
         complete_reentry_ledger: CompleteHumanReviewReentryLedger | None = None,
+        complete_reentry_closeout_ledger: (
+            CompleteHumanReviewReentryCloseoutLedger | None
+        ) = None,
     ) -> HumanReviewControlPlaneState:
         """Create a human-review control-plane state with empty ledgers by default."""
         return cls(
@@ -63,6 +72,10 @@ class HumanReviewControlPlaneState:
             complete_reentry_ledger=(
                 complete_reentry_ledger or CompleteHumanReviewReentryLedger.create(())
             ),
+            complete_reentry_closeout_ledger=(
+                complete_reentry_closeout_ledger
+                or CompleteHumanReviewReentryCloseoutLedger.create(())
+            ),
         )
 
     def with_handoff_ledger(
@@ -78,6 +91,7 @@ class HumanReviewControlPlaneState:
             reentry_audit_ledger=self.reentry_audit_ledger,
             audited_reentry_ledger=self.audited_reentry_ledger,
             complete_reentry_ledger=self.complete_reentry_ledger,
+            complete_reentry_closeout_ledger=self.complete_reentry_closeout_ledger,
         )
 
     def with_decision_ledger(
@@ -93,6 +107,7 @@ class HumanReviewControlPlaneState:
             reentry_audit_ledger=self.reentry_audit_ledger,
             audited_reentry_ledger=self.audited_reentry_ledger,
             complete_reentry_ledger=self.complete_reentry_ledger,
+            complete_reentry_closeout_ledger=self.complete_reentry_closeout_ledger,
         )
 
     def with_resume_ledger(
@@ -108,6 +123,7 @@ class HumanReviewControlPlaneState:
             reentry_audit_ledger=self.reentry_audit_ledger,
             audited_reentry_ledger=self.audited_reentry_ledger,
             complete_reentry_ledger=self.complete_reentry_ledger,
+            complete_reentry_closeout_ledger=self.complete_reentry_closeout_ledger,
         )
 
     def with_reentry_ledger(
@@ -123,6 +139,7 @@ class HumanReviewControlPlaneState:
             reentry_audit_ledger=self.reentry_audit_ledger,
             audited_reentry_ledger=self.audited_reentry_ledger,
             complete_reentry_ledger=self.complete_reentry_ledger,
+            complete_reentry_closeout_ledger=self.complete_reentry_closeout_ledger,
         )
 
     def with_reentry_audit_ledger(
@@ -138,6 +155,7 @@ class HumanReviewControlPlaneState:
             reentry_audit_ledger=reentry_audit_ledger,
             audited_reentry_ledger=self.audited_reentry_ledger,
             complete_reentry_ledger=self.complete_reentry_ledger,
+            complete_reentry_closeout_ledger=self.complete_reentry_closeout_ledger,
         )
 
     def with_audited_reentry_ledger(
@@ -153,6 +171,7 @@ class HumanReviewControlPlaneState:
             reentry_audit_ledger=self.reentry_audit_ledger,
             audited_reentry_ledger=audited_reentry_ledger,
             complete_reentry_ledger=self.complete_reentry_ledger,
+            complete_reentry_closeout_ledger=self.complete_reentry_closeout_ledger,
         )
 
     def with_complete_reentry_ledger(
@@ -168,6 +187,23 @@ class HumanReviewControlPlaneState:
             reentry_audit_ledger=self.reentry_audit_ledger,
             audited_reentry_ledger=self.audited_reentry_ledger,
             complete_reentry_ledger=complete_reentry_ledger,
+            complete_reentry_closeout_ledger=self.complete_reentry_closeout_ledger,
+        )
+
+    def with_complete_reentry_closeout_ledger(
+        self,
+        complete_reentry_closeout_ledger: CompleteHumanReviewReentryCloseoutLedger,
+    ) -> HumanReviewControlPlaneState:
+        """Return a state with an updated complete reentry closeout ledger."""
+        return HumanReviewControlPlaneState.create(
+            handoff_ledger=self.handoff_ledger,
+            decision_ledger=self.decision_ledger,
+            resume_ledger=self.resume_ledger,
+            reentry_ledger=self.reentry_ledger,
+            reentry_audit_ledger=self.reentry_audit_ledger,
+            audited_reentry_ledger=self.audited_reentry_ledger,
+            complete_reentry_ledger=self.complete_reentry_ledger,
+            complete_reentry_closeout_ledger=complete_reentry_closeout_ledger,
         )
 
     def handoff_count(self) -> int:
@@ -198,6 +234,10 @@ class HumanReviewControlPlaneState:
         """Return how many complete human-review reentries are recorded."""
         return len(self.complete_reentry_ledger.entries)
 
+    def complete_reentry_closeout_count(self) -> int:
+        """Return how many complete reentry closeout reports are recorded."""
+        return len(self.complete_reentry_closeout_ledger.entries)
+
     def has_active_handoffs(self) -> bool:
         """Return whether at least one human-review handoff has been recorded."""
         return self.handoff_count() > 0
@@ -225,6 +265,10 @@ class HumanReviewControlPlaneState:
     def has_recorded_complete_reentries(self) -> bool:
         """Return whether at least one complete reentry has been recorded."""
         return self.complete_reentry_count() > 0
+
+    def has_recorded_complete_reentry_closeouts(self) -> bool:
+        """Return whether at least one complete reentry closeout is recorded."""
+        return self.complete_reentry_closeout_count() > 0
 
     def latest_handoff_digest(self) -> str | None:
         """Return the latest human-review handoff entry digest, if present."""
@@ -261,6 +305,11 @@ class HumanReviewControlPlaneState:
         latest = self.complete_reentry_ledger.latest()
         return latest.digest().value if latest is not None else None
 
+    def latest_complete_reentry_closeout_digest(self) -> str | None:
+        """Return the latest complete reentry closeout entry digest, if present."""
+        latest = self.complete_reentry_closeout_ledger.latest()
+        return latest.digest().value if latest is not None else None
+
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible control-plane state payload."""
         return {
@@ -271,6 +320,9 @@ class HumanReviewControlPlaneState:
             "reentry_audit_ledger_digest": self.reentry_audit_ledger.digest().value,
             "audited_reentry_ledger_digest": self.audited_reentry_ledger.digest().value,
             "complete_reentry_ledger_digest": self.complete_reentry_ledger.digest().value,
+            "complete_reentry_closeout_ledger_digest": (
+                self.complete_reentry_closeout_ledger.digest().value
+            ),
             "handoff_count": self.handoff_count(),
             "decision_count": self.decision_count(),
             "resume_count": self.resume_count(),
@@ -278,6 +330,9 @@ class HumanReviewControlPlaneState:
             "reentry_audit_count": self.reentry_audit_count(),
             "audited_reentry_count": self.audited_reentry_count(),
             "complete_reentry_count": self.complete_reentry_count(),
+            "complete_reentry_closeout_count": (
+                self.complete_reentry_closeout_count()
+            ),
             "has_active_handoffs": self.has_active_handoffs(),
             "has_recorded_decisions": self.has_recorded_decisions(),
             "has_recorded_resumes": self.has_recorded_resumes(),
@@ -289,6 +344,9 @@ class HumanReviewControlPlaneState:
             "has_recorded_complete_reentries": (
                 self.has_recorded_complete_reentries()
             ),
+            "has_recorded_complete_reentry_closeouts": (
+                self.has_recorded_complete_reentry_closeouts()
+            ),
             "latest_handoff_digest": self.latest_handoff_digest(),
             "latest_decision_digest": self.latest_decision_digest(),
             "latest_resume_digest": self.latest_resume_digest(),
@@ -296,6 +354,9 @@ class HumanReviewControlPlaneState:
             "latest_reentry_audit_digest": self.latest_reentry_audit_digest(),
             "latest_audited_reentry_digest": self.latest_audited_reentry_digest(),
             "latest_complete_reentry_digest": self.latest_complete_reentry_digest(),
+            "latest_complete_reentry_closeout_digest": (
+                self.latest_complete_reentry_closeout_digest()
+            ),
         }
 
     def digest(self) -> DigestRecord:
@@ -336,6 +397,11 @@ class HumanReviewControlPlaneStatus:
     waiting_complete_reentry_count: int = 0
     operator_attention_complete_reentry_count: int = 0
     changed_state_complete_reentry_count: int = 0
+    complete_reentry_closeout_count: int = 0
+    accepted_complete_reentry_closeout_count: int = 0
+    waiting_complete_reentry_closeout_count: int = 0
+    blocked_complete_reentry_closeout_count: int = 0
+    blocking_finding_complete_reentry_closeout_count: int = 0
 
     @classmethod
     def from_state(
@@ -406,6 +472,21 @@ class HumanReviewControlPlaneStatus:
             ),
             changed_state_complete_reentry_count=len(
                 state.complete_reentry_ledger.changed_state_entries()
+            ),
+            complete_reentry_closeout_count=(
+                state.complete_reentry_closeout_count()
+            ),
+            accepted_complete_reentry_closeout_count=len(
+                state.complete_reentry_closeout_ledger.accepted_entries()
+            ),
+            waiting_complete_reentry_closeout_count=len(
+                state.complete_reentry_closeout_ledger.waiting_entries()
+            ),
+            blocked_complete_reentry_closeout_count=len(
+                state.complete_reentry_closeout_ledger.blocked_entries()
+            ),
+            blocking_finding_complete_reentry_closeout_count=len(
+                state.complete_reentry_closeout_ledger.blocking_finding_entries()
             ),
         )
 
@@ -493,6 +574,26 @@ class HumanReviewControlPlaneStatus:
         """Return whether any complete reentry requires operator attention."""
         return self.operator_attention_complete_reentry_count > 0
 
+    def has_complete_reentry_closeout(self) -> bool:
+        """Return whether at least one complete reentry closeout is recorded."""
+        return self.complete_reentry_closeout_count > 0
+
+    def has_accepted_complete_reentry_closeout(self) -> bool:
+        """Return whether at least one complete reentry closeout was accepted."""
+        return self.accepted_complete_reentry_closeout_count > 0
+
+    def is_waiting_after_complete_reentry_closeout(self) -> bool:
+        """Return whether any complete reentry closeout is waiting externally."""
+        return self.waiting_complete_reentry_closeout_count > 0
+
+    def has_blocked_complete_reentry_closeout(self) -> bool:
+        """Return whether any complete reentry closeout is blocked."""
+        return self.blocked_complete_reentry_closeout_count > 0
+
+    def complete_reentry_closeout_has_blocking_findings(self) -> bool:
+        """Return whether any complete reentry closeout has blocking findings."""
+        return self.blocking_finding_complete_reentry_closeout_count > 0
+
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible control-plane status payload."""
         return {
@@ -507,6 +608,7 @@ class HumanReviewControlPlaneStatus:
             "reentry_audit_count": self.reentry_audit_count,
             "audited_reentry_count": self.audited_reentry_count,
             "complete_reentry_count": self.complete_reentry_count,
+            "complete_reentry_closeout_count": self.complete_reentry_closeout_count,
             "approved_decision_count": self.approved_decision_count,
             "rejected_decision_count": self.rejected_decision_count,
             "deferred_decision_count": self.deferred_decision_count,
@@ -535,6 +637,18 @@ class HumanReviewControlPlaneStatus:
             ),
             "changed_state_complete_reentry_count": (
                 self.changed_state_complete_reentry_count
+            ),
+            "accepted_complete_reentry_closeout_count": (
+                self.accepted_complete_reentry_closeout_count
+            ),
+            "waiting_complete_reentry_closeout_count": (
+                self.waiting_complete_reentry_closeout_count
+            ),
+            "blocked_complete_reentry_closeout_count": (
+                self.blocked_complete_reentry_closeout_count
+            ),
+            "blocking_finding_complete_reentry_closeout_count": (
+                self.blocking_finding_complete_reentry_closeout_count
             ),
             "has_unresumed_decisions": self.has_unresumed_decisions(),
             "has_rejections": self.has_rejections(),
@@ -566,6 +680,19 @@ class HumanReviewControlPlaneStatus:
             ),
             "complete_reentry_requires_operator_attention": (
                 self.complete_reentry_requires_operator_attention()
+            ),
+            "has_complete_reentry_closeout": self.has_complete_reentry_closeout(),
+            "has_accepted_complete_reentry_closeout": (
+                self.has_accepted_complete_reentry_closeout()
+            ),
+            "is_waiting_after_complete_reentry_closeout": (
+                self.is_waiting_after_complete_reentry_closeout()
+            ),
+            "has_blocked_complete_reentry_closeout": (
+                self.has_blocked_complete_reentry_closeout()
+            ),
+            "complete_reentry_closeout_has_blocking_findings": (
+                self.complete_reentry_closeout_has_blocking_findings()
             ),
         }
 
@@ -616,6 +743,13 @@ class HumanReviewControlPlaneSnapshot:
             raise FoundationError(
                 "human-review control-plane complete reentry count mismatch"
             )
+        if (
+            self.status.complete_reentry_closeout_count
+            != self.state.complete_reentry_closeout_count()
+        ):
+            raise FoundationError(
+                "human-review control-plane complete reentry closeout count mismatch"
+            )
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible control-plane snapshot payload."""
@@ -635,6 +769,9 @@ class HumanReviewControlPlaneSnapshot:
             ),
             "complete_reentry_ledger_digest": (
                 self.state.complete_reentry_ledger.digest().value
+            ),
+            "complete_reentry_closeout_ledger_digest": (
+                self.state.complete_reentry_closeout_ledger.digest().value
             ),
             "status": self.status.to_payload(),
         }
