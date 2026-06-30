@@ -26,6 +26,7 @@ from ix_sally.state import NinefoldRunState
 
 if TYPE_CHECKING:
     from ix_sally.human_review_audited_reentry import AuditedHumanReviewReentryResult
+    from ix_sally.human_review_complete_reentry import CompleteHumanReviewReentryResult
     from ix_sally.human_review_reentry import HumanReviewReentryResult
     from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditReport
 
@@ -40,6 +41,7 @@ class HumanReviewWorkflowStage(StrEnum):
     REENTRY_RECORDED = "reentry_recorded"
     REENTRY_AUDIT_RECORDED = "reentry_audit_recorded"
     AUDITED_REENTRY_RECORDED = "audited_reentry_recorded"
+    COMPLETE_REENTRY_RECORDED = "complete_reentry_recorded"
 
 
 @dataclass(frozen=True, slots=True)
@@ -212,6 +214,10 @@ class HumanReviewWorkflowOperation:
         """Return the audited reentry result for an audited workflow operation."""
         return self.operation_result.require_audited_reentry_result()
 
+    def require_complete_reentry_result(self) -> CompleteHumanReviewReentryResult:
+        """Return the complete reentry result for a complete workflow operation."""
+        return self.operation_result.require_complete_reentry_result()
+
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible workflow operation result."""
         return {
@@ -226,6 +232,7 @@ class HumanReviewWorkflowOperation:
             "reentry_count": self.control_plane.reentry_count(),
             "reentry_audit_count": self.control_plane.reentry_audit_count(),
             "audited_reentry_count": self.control_plane.audited_reentry_count(),
+            "complete_reentry_count": self.control_plane.complete_reentry_count(),
         }
 
     def digest(self) -> DigestRecord:
@@ -527,4 +534,30 @@ class HumanReviewWorkflowKit:
             report=report,
             workflow_stage=HumanReviewWorkflowStage.AUDITED_REENTRY_RECORDED,
             detail="Fully audited human-review reentry was recorded.",
+        )
+
+    def record_complete_reentry(
+        self,
+        *,
+        complete_reentry_result: CompleteHumanReviewReentryResult,
+        control_plane: HumanReviewControlPlaneState | None = None,
+    ) -> HumanReviewWorkflowOperation:
+        """Record a complete human-review reentry result."""
+        starting_plane = control_plane or complete_reentry_result.control_plane
+        operation = self.coordinator.record_complete_reentry(
+            complete_reentry_result=complete_reentry_result,
+            control_plane=starting_plane,
+        )
+        report = self.reporter.report(
+            run_state=complete_reentry_result.state,
+            control_plane=operation.after_control_plane,
+        )
+
+        return HumanReviewWorkflowOperation.create(
+            run_state=complete_reentry_result.state,
+            control_plane=operation.after_control_plane,
+            operation_result=operation,
+            report=report,
+            workflow_stage=HumanReviewWorkflowStage.COMPLETE_REENTRY_RECORDED,
+            detail="Complete human-review reentry was recorded.",
         )
