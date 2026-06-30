@@ -92,7 +92,13 @@ class EvidenceSupportProcessor:
         claim: ClaimRecord,
     ) -> EvidenceSupportProcessingResult:
         """Review one claim against current evidence and record the support finding."""
-        existing = state.claims.require_claim(claim.claim_id.value)
+        try:
+            existing = state.claims.require_claim(claim.claim_id.value)
+        except FoundationError as error:
+            if state.claims.claims:
+                raise FoundationError("claim does not match state ledger") from error
+            raise
+
         if existing != claim:
             raise FoundationError("claim does not match state ledger")
 
@@ -111,7 +117,11 @@ class EvidenceSupportProcessor:
             finding=finding,
         )
 
-    def process_all_unreviewed(self, *, state: NinefoldRunState) -> EvidenceSupportBatchProcessingResult:
+    def process_all_unreviewed(
+        self,
+        *,
+        state: NinefoldRunState,
+    ) -> EvidenceSupportBatchProcessingResult:
         """Review every claim that does not already have an evidence support finding."""
         current = state
         processed: list[EvidenceSupportProcessingResult] = []
