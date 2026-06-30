@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError
-from ix_sally.human_review_reentry import HumanReviewReentryResult, HumanReviewReentryStatus
 from ix_sally.orchestration_loop import StageLoopStopReason
 from ix_sally.stage_readiness import RunStage
+
+if TYPE_CHECKING:
+    from ix_sally.human_review_reentry import (
+        HumanReviewReentryResult,
+        HumanReviewReentryStatus,
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -258,6 +263,13 @@ class HumanReviewReentryLedger:
         """Return reentry entries matching the requested status."""
         return tuple(entry for entry in self.entries if entry.matches_status(status))
 
+    def entries_by_status_value(
+        self,
+        status_value: str,
+    ) -> tuple[HumanReviewReentryLedgerEntry, ...]:
+        """Return reentry entries whose status value matches the requested value."""
+        return tuple(entry for entry in self.entries if entry.status.value == status_value)
+
     def entries_for_stage(
         self,
         stage: RunStage,
@@ -280,11 +292,9 @@ class HumanReviewReentryLedger:
             "latest_entry_digest": latest.digest().value if latest is not None else None,
             "changed_entry_count": len(self.changed_entries()),
             "external_input_entry_count": len(self.external_input_entries()),
-            "advanced_entry_count": len(
-                self.entries_by_status(HumanReviewReentryStatus.ADVANCED)
-            ),
+            "advanced_entry_count": len(self.entries_by_status_value("advanced")),
             "waiting_entry_count": len(
-                self.entries_by_status(HumanReviewReentryStatus.WAITING_FOR_EXTERNAL_INPUT)
+                self.entries_by_status_value("waiting_for_external_input")
             ),
             "forge_result_processing_entry_count": len(
                 self.entries_for_stage(RunStage.FORGE_RESULT_PROCESSING)
