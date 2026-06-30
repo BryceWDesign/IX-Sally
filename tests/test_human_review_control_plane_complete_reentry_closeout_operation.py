@@ -10,6 +10,7 @@ from ix_sally.digest import DigestRecord
 from ix_sally.foundation import FoundationError
 from ix_sally.human_review_complete_reentry import (
     CompleteHumanReviewReentryCoordinator,
+    CompleteHumanReviewReentryResult,
 )
 from ix_sally.human_review_complete_reentry_report import (
     CompleteHumanReviewReentryCloseoutReport,
@@ -83,33 +84,31 @@ def _resume_operation():
     return kit.record_resume(clearance=clearance)
 
 
-def _closeout_report(max_steps: int = 1) -> CompleteHumanReviewReentryCloseoutReport:
-    complete_reentry = (
+def _complete_reentry(max_steps: int = 1) -> CompleteHumanReviewReentryResult:
+    return (
         CompleteHumanReviewReentryCoordinator.create()
         .resume_audit_record_and_finalize(
             resume_operation=_resume_operation(),
             max_steps=max_steps,
         )
     )
+
+
+def _closeout_report(
+    complete_reentry: CompleteHumanReviewReentryResult,
+) -> CompleteHumanReviewReentryCloseoutReport:
     return CompleteHumanReviewReentryCloseoutReport.from_result(complete_reentry)
 
 
 def test_control_plane_coordinator_records_complete_reentry_closeout_operation() -> None:
-    closeout_report = _closeout_report()
+    complete_reentry = _complete_reentry()
+    closeout_report = _closeout_report(complete_reentry)
 
     result = (
         HumanReviewControlPlaneCoordinator.create()
         .record_complete_reentry_closeout(
             closeout_report=closeout_report,
-            control_plane=HumanReviewControlPlaneState.create()
-            .with_complete_reentry_ledger(
-                CompleteHumanReviewReentryCoordinator.create()
-                .resume_audit_record_and_finalize(
-                    resume_operation=_resume_operation(),
-                    max_steps=1,
-                )
-                .control_plane.complete_reentry_ledger
-            ),
+            control_plane=complete_reentry.control_plane,
         )
     )
 
@@ -117,6 +116,7 @@ def test_control_plane_coordinator_records_complete_reentry_closeout_operation()
         HumanReviewControlPlaneOperationKind.COMPLETE_REENTRY_CLOSEOUT_RECORDED
     )
     assert result.changed_control_plane() is True
+    assert result.before_control_plane.complete_reentry_closeout_count() == 0
     assert result.after_control_plane.complete_reentry_closeout_count() == 1
     assert result.after_control_plane.latest_complete_reentry_closeout_digest() == (
         result.after_control_plane.complete_reentry_closeout_ledger.latest()
@@ -130,16 +130,8 @@ def test_control_plane_coordinator_records_complete_reentry_closeout_operation()
 
 
 def test_control_plane_complete_reentry_closeout_payload_links_report() -> None:
-    complete_reentry = (
-        CompleteHumanReviewReentryCoordinator.create()
-        .resume_audit_record_and_finalize(
-            resume_operation=_resume_operation(),
-            max_steps=1,
-        )
-    )
-    closeout_report = CompleteHumanReviewReentryCloseoutReport.from_result(
-        complete_reentry
-    )
+    complete_reentry = _complete_reentry()
+    closeout_report = _closeout_report(complete_reentry)
 
     result = (
         HumanReviewControlPlaneCoordinator.create()
@@ -162,7 +154,8 @@ def test_control_plane_complete_reentry_closeout_payload_links_report() -> None:
 
 
 def test_control_plane_complete_reentry_closeout_rejects_mismatched_plane() -> None:
-    closeout_report = _closeout_report()
+    complete_reentry = _complete_reentry()
+    closeout_report = _closeout_report(complete_reentry)
 
     with pytest.raises(FoundationError, match="closeout must match current"):
         HumanReviewControlPlaneCoordinator.create().record_complete_reentry_closeout(
