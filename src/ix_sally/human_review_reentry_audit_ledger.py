@@ -3,16 +3,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError
-from ix_sally.human_review_reentry import HumanReviewReentryStatus
-from ix_sally.human_review_reentry_audit import (
-    HumanReviewReentryAuditReport,
-    HumanReviewReentryAuditStatus,
-)
 from ix_sally.stage_readiness import RunStage
+
+if TYPE_CHECKING:
+    from ix_sally.human_review_reentry import HumanReviewReentryStatus
+    from ix_sally.human_review_reentry_audit import (
+        HumanReviewReentryAuditReport,
+        HumanReviewReentryAuditStatus,
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -59,7 +61,9 @@ class HumanReviewReentryAuditLedgerEntry:
     ) -> HumanReviewReentryAuditLedgerEntry:
         """Create a normalized human-review reentry audit ledger entry."""
         if sequence <= 0:
-            raise FoundationError("human-review reentry audit ledger sequence must be positive")
+            raise FoundationError(
+                "human-review reentry audit ledger sequence must be positive"
+            )
 
         for field_name, value in {
             "finding_count": finding_count,
@@ -69,10 +73,14 @@ class HumanReviewReentryAuditLedgerEntry:
         }.items():
             if value < 0:
                 raise FoundationError(
-                    f"human-review reentry audit ledger {field_name} must not be negative"
+                    f"human-review reentry audit ledger {field_name} "
+                    "must not be negative"
                 )
 
-        if blocking_finding_count + warning_finding_count + info_finding_count != finding_count:
+        if (
+            blocking_finding_count + warning_finding_count + info_finding_count
+            != finding_count
+        ):
             raise FoundationError(
                 "human-review reentry audit ledger finding subtotals must equal "
                 "finding_count"
@@ -138,18 +146,15 @@ class HumanReviewReentryAuditLedgerEntry:
 
     def passed(self) -> bool:
         """Return whether this ledger entry records a passed audit."""
-        return self.audit_status is HumanReviewReentryAuditStatus.PASSED
+        return self.audit_status.value == "passed"
 
     def failed(self) -> bool:
         """Return whether this ledger entry records a failed audit."""
-        return self.audit_status is HumanReviewReentryAuditStatus.FAILED
+        return self.audit_status.value == "failed"
 
     def waiting_for_external_input(self) -> bool:
         """Return whether this ledger entry records valid waiting reentry."""
-        return (
-            self.audit_status
-            is HumanReviewReentryAuditStatus.WAITING_FOR_EXTERNAL_INPUT
-        )
+        return self.audit_status.value == "waiting_for_external_input"
 
     def has_blocking_findings(self) -> bool:
         """Return whether the audit entry contains blocking findings."""
@@ -165,7 +170,11 @@ class HumanReviewReentryAuditLedgerEntry:
 
     def matches_reentry_status(self, status: HumanReviewReentryStatus) -> bool:
         """Return whether the audited reentry had the requested reentry status."""
-        return self.reentry_status is status
+        return self.reentry_status.value == status.value
+
+    def matches_audit_status_value(self, status_value: str) -> bool:
+        """Return whether this entry has the requested audit status value."""
+        return self.audit_status.value == status_value
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible reentry audit ledger entry."""
@@ -330,6 +339,15 @@ class HumanReviewReentryAuditLedger:
         """Return audit entries whose reentry had the requested status."""
         return tuple(entry for entry in self.entries if entry.matches_reentry_status(status))
 
+    def entries_by_audit_status_value(
+        self,
+        status_value: str,
+    ) -> tuple[HumanReviewReentryAuditLedgerEntry, ...]:
+        """Return audit entries whose audit status value matches."""
+        return tuple(
+            entry for entry in self.entries if entry.matches_audit_status_value(status_value)
+        )
+
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible human-review reentry audit ledger."""
         entry_payload: JsonArray = []
@@ -355,12 +373,10 @@ class HumanReviewReentryAuditLedger:
                 self.entries_for_stage(RunStage.FORGE_RESULT_PROCESSING)
             ),
             "advanced_reentry_entry_count": len(
-                self.entries_for_reentry_status(HumanReviewReentryStatus.ADVANCED)
+                self.entries_by_audit_status_value("passed")
             ),
             "waiting_reentry_entry_count": len(
-                self.entries_for_reentry_status(
-                    HumanReviewReentryStatus.WAITING_FOR_EXTERNAL_INPUT
-                )
+                self.entries_by_audit_status_value("waiting_for_external_input")
             ),
         }
 
