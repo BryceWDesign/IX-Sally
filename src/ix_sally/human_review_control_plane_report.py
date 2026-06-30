@@ -23,6 +23,8 @@ class HumanReviewControlPlaneReportStatus(StrEnum):
     HANDOFF_OPEN = "handoff_open"
     DECISION_OPEN = "decision_open"
     RESUME_RECORDED = "resume_recorded"
+    REENTRY_RECORDED = "reentry_recorded"
+    REENTRY_WAITING_FOR_EXTERNAL_INPUT = "reentry_waiting_for_external_input"
     REJECTION_BLOCKED = "rejection_blocked"
     DEFERRAL_OPEN = "deferral_open"
 
@@ -49,6 +51,10 @@ class HumanReviewControlPlaneReport:
     latest_handoff_digest: str | None
     latest_decision_digest: str | None
     latest_resume_digest: str | None
+    reentry_count: int = 0
+    completed_reentry_count: int = 0
+    waiting_reentry_count: int = 0
+    latest_reentry_digest: str | None = None
 
     @classmethod
     def create(
@@ -71,6 +77,10 @@ class HumanReviewControlPlaneReport:
         latest_handoff_digest: str | None,
         latest_decision_digest: str | None,
         latest_resume_digest: str | None,
+        reentry_count: int = 0,
+        completed_reentry_count: int = 0,
+        waiting_reentry_count: int = 0,
+        latest_reentry_digest: str | None = None,
         report_id: CanonicalKey | None = None,
     ) -> HumanReviewControlPlaneReport:
         """Create a normalized human-review control-plane report."""
@@ -82,19 +92,35 @@ class HumanReviewControlPlaneReport:
             "rejected_decision_count": rejected_decision_count,
             "deferred_decision_count": deferred_decision_count,
             "cleared_resume_count": cleared_resume_count,
+            "reentry_count": reentry_count,
+            "completed_reentry_count": completed_reentry_count,
+            "waiting_reentry_count": waiting_reentry_count,
         }.items():
             if value < 0:
                 raise FoundationError(
                     f"human-review control-plane report {field_name} must not be negative"
                 )
 
-        if approved_decision_count + rejected_decision_count + deferred_decision_count > decision_count:
+        if (
+            approved_decision_count + rejected_decision_count + deferred_decision_count
+            > decision_count
+        ):
             raise FoundationError(
                 "human-review control-plane report decision subtotals exceed decision_count"
             )
         if cleared_resume_count > resume_count:
             raise FoundationError(
                 "human-review control-plane report cleared_resume_count exceeds resume_count"
+            )
+        if completed_reentry_count > reentry_count:
+            raise FoundationError(
+                "human-review control-plane report completed_reentry_count exceeds "
+                "reentry_count"
+            )
+        if waiting_reentry_count > reentry_count:
+            raise FoundationError(
+                "human-review control-plane report waiting_reentry_count exceeds "
+                "reentry_count"
             )
 
         run_state_digest.require_algorithm("sha256")
@@ -127,6 +153,10 @@ class HumanReviewControlPlaneReport:
             latest_handoff_digest=latest_handoff_digest,
             latest_decision_digest=latest_decision_digest,
             latest_resume_digest=latest_resume_digest,
+            reentry_count=reentry_count,
+            completed_reentry_count=completed_reentry_count,
+            waiting_reentry_count=waiting_reentry_count,
+            latest_reentry_digest=latest_reentry_digest,
         )
 
     @classmethod
@@ -156,9 +186,13 @@ class HumanReviewControlPlaneReport:
             rejected_decision_count=control_status.rejected_decision_count,
             deferred_decision_count=control_status.deferred_decision_count,
             cleared_resume_count=control_status.cleared_resume_count,
+            reentry_count=control_status.reentry_count,
+            completed_reentry_count=control_status.completed_reentry_count,
+            waiting_reentry_count=control_status.waiting_reentry_count,
             latest_handoff_digest=control_plane_snapshot.state.latest_handoff_digest(),
             latest_decision_digest=control_plane_snapshot.state.latest_decision_digest(),
             latest_resume_digest=control_plane_snapshot.state.latest_resume_digest(),
+            latest_reentry_digest=control_plane_snapshot.state.latest_reentry_digest(),
         )
 
     def requires_operator_attention(self) -> bool:
@@ -174,6 +208,20 @@ class HumanReviewControlPlaneReport:
         """Return whether at least one cleared resume has been recorded."""
         return self.status is HumanReviewControlPlaneReportStatus.RESUME_RECORDED
 
+    def reentry_recorded(self) -> bool:
+        """Return whether at least one post-review reentry has been recorded."""
+        return self.status in {
+            HumanReviewControlPlaneReportStatus.REENTRY_RECORDED,
+            HumanReviewControlPlaneReportStatus.REENTRY_WAITING_FOR_EXTERNAL_INPUT,
+        }
+
+    def waiting_after_reentry(self) -> bool:
+        """Return whether reentry advanced and then stopped for external input."""
+        return (
+            self.status
+            is HumanReviewControlPlaneReportStatus.REENTRY_WAITING_FOR_EXTERNAL_INPUT
+        )
+
     def has_handoff(self) -> bool:
         """Return whether a handoff has been recorded."""
         return self.handoff_count > 0
@@ -185,6 +233,10 @@ class HumanReviewControlPlaneReport:
     def has_resume(self) -> bool:
         """Return whether a resume has been recorded."""
         return self.resume_count > 0
+
+    def has_reentry(self) -> bool:
+        """Return whether a reentry has been recorded."""
+        return self.reentry_count > 0
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible control-plane report."""
@@ -212,18 +264,25 @@ class HumanReviewControlPlaneReport:
             "handoff_count": self.handoff_count,
             "decision_count": self.decision_count,
             "resume_count": self.resume_count,
+            "reentry_count": self.reentry_count,
             "approved_decision_count": self.approved_decision_count,
             "rejected_decision_count": self.rejected_decision_count,
             "deferred_decision_count": self.deferred_decision_count,
             "cleared_resume_count": self.cleared_resume_count,
+            "completed_reentry_count": self.completed_reentry_count,
+            "waiting_reentry_count": self.waiting_reentry_count,
             "latest_handoff_digest": self.latest_handoff_digest,
             "latest_decision_digest": self.latest_decision_digest,
             "latest_resume_digest": self.latest_resume_digest,
+            "latest_reentry_digest": self.latest_reentry_digest,
             "requires_operator_attention": self.requires_operator_attention(),
             "cleared_resume_recorded": self.cleared_resume_recorded(),
+            "reentry_recorded": self.reentry_recorded(),
+            "waiting_after_reentry": self.waiting_after_reentry(),
             "has_handoff": self.has_handoff(),
             "has_decision": self.has_decision(),
             "has_resume": self.has_resume(),
+            "has_reentry": self.has_reentry(),
         }
 
     def digest(self) -> DigestRecord:
@@ -262,6 +321,18 @@ def _select_report_status(
         return (
             HumanReviewControlPlaneReportStatus.DEFERRAL_OPEN,
             "At least one human-review decision deferred a target.",
+        )
+
+    if status.is_waiting_after_reentry():
+        return (
+            HumanReviewControlPlaneReportStatus.REENTRY_WAITING_FOR_EXTERNAL_INPUT,
+            "Human-review reentry advanced the run and now awaits external input.",
+        )
+
+    if status.has_successful_reentry():
+        return (
+            HumanReviewControlPlaneReportStatus.REENTRY_RECORDED,
+            "Human-review reentry advanced staged orchestration after clearance.",
         )
 
     if status.has_successful_resume():
