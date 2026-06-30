@@ -35,6 +35,11 @@ class RunStageCounts:
     claims: int
     unreviewed_claims: int
     evidence_support_findings: int
+    blocking_actions: int
+    human_review_actions: int
+    human_review_evidence_findings: int
+    human_review_forge_results: int
+    human_review_cycles: int
     human_review_required: bool
     completed_cycles: int
 
@@ -60,8 +65,16 @@ class RunStageCounts:
             finding.claim_digest.value for finding in state.evidence_support.findings
         }
         unreviewed_claims = sum(
-            1 for claim in state.claims.claims if claim.digest().value not in reviewed_claim_digests
+            1
+            for claim in state.claims.claims
+            if claim.digest().value not in reviewed_claim_digests
         )
+
+        blocking_actions = state.blocked_action_count()
+        human_review_actions = state.human_review_action_count()
+        human_review_evidence_findings = state.human_review_evidence_finding_count()
+        human_review_forge_results = state.human_review_forge_result_count()
+        human_review_cycles = len(state.cycles.human_review_cycles())
 
         return cls(
             proposed_actions=state.proposed_action_count(),
@@ -73,7 +86,18 @@ class RunStageCounts:
             claims=len(state.claims.claims),
             unreviewed_claims=unreviewed_claims,
             evidence_support_findings=len(state.evidence_support.findings),
-            human_review_required=state.requires_human_review(),
+            blocking_actions=blocking_actions,
+            human_review_actions=human_review_actions,
+            human_review_evidence_findings=human_review_evidence_findings,
+            human_review_forge_results=human_review_forge_results,
+            human_review_cycles=human_review_cycles,
+            human_review_required=(
+                blocking_actions > 0
+                or human_review_actions > 0
+                or human_review_evidence_findings > 0
+                or human_review_forge_results > 0
+                or human_review_cycles > 0
+            ),
             completed_cycles=state.completed_cycles(),
         )
 
@@ -89,6 +113,11 @@ class RunStageCounts:
             "claims": self.claims,
             "unreviewed_claims": self.unreviewed_claims,
             "evidence_support_findings": self.evidence_support_findings,
+            "blocking_actions": self.blocking_actions,
+            "human_review_actions": self.human_review_actions,
+            "human_review_evidence_findings": self.human_review_evidence_findings,
+            "human_review_forge_results": self.human_review_forge_results,
+            "human_review_cycles": self.human_review_cycles,
             "human_review_required": self.human_review_required,
             "completed_cycles": self.completed_cycles,
         }
@@ -115,7 +144,10 @@ class RunStageSnapshot:
         state_digest = state.digest()
         counts = RunStageCounts.from_state(state)
         stop_condition = state.runtime_kit.chamber.stop_for_cycle(state.completed_cycles())
-        stage, detail = _select_stage(counts=counts, stop_condition_active=stop_condition.should_stop)
+        stage, detail = _select_stage(
+            counts=counts,
+            stop_condition_active=stop_condition.should_stop,
+        )
 
         return cls(
             state_digest=state_digest,
@@ -164,7 +196,7 @@ def _select_stage(
     if counts.human_review_required:
         return (
             RunStage.HUMAN_REVIEW,
-            "Run state contains a human-boundary or blocker record.",
+            "Run state contains an unresolved human-boundary or blocker record.",
         )
 
     if counts.proposed_actions > 0:
