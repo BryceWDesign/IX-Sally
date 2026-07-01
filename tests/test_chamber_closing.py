@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
-from ix_sally.chamber_closing import ChamberCloseStatus, ChamberCloser
+from ix_sally.chamber_closing import ChamberCloser, ChamberCloseStatus
 from ix_sally.claims import ClaimRecord
 from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.digest import DigestRecord
+from ix_sally.events import RuntimeEventType
 from ix_sally.evidence import EvidenceKind, EvidenceRecord, EvidenceStatus
 from ix_sally.evidence_support import VerityEvidenceSupportReview
-from ix_sally.events import RuntimeEventType
 from ix_sally.recording import StateRecorder
 from ix_sally.runtime import NinefoldRuntimeKit
 from ix_sally.state import NinefoldRunState
