@@ -3,13 +3,13 @@ from __future__ import annotations
 from ix_sally.agents import AgentRole
 from ix_sally.claims import ClaimRecord
 from ix_sally.contracts import AutonomyContract, AutonomyMode
+from ix_sally.events import RuntimeEventType
 from ix_sally.evidence import EvidenceKind, EvidenceRecord, EvidenceStatus
 from ix_sally.evidence_support import (
     EvidenceSupportFinding,
     EvidenceSupportStatus,
     VerityEvidenceSupportReview,
 )
-from ix_sally.events import RuntimeEventType
 from ix_sally.recording import StateRecorder
 from ix_sally.runtime import NinefoldRuntimeKit
 from ix_sally.state import NinefoldRunState
@@ -121,6 +121,7 @@ def test_evidence_support_state_digest_changes_when_finding_is_recorded() -> Non
     updated = state.with_evidence_support_finding(finding)
 
     assert state.digest().value != updated.digest().value
-    assert state.to_payload()["evidence_support_ledger_digest"] != updated.to_payload()[
-        "evidence_support_ledger_digest"
-    ]
+    assert (
+        state.to_payload()["evidence_support_ledger_digest"]
+        != updated.to_payload()["evidence_support_ledger_digest"]
+    )
