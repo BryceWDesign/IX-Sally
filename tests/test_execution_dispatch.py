@@ -130,11 +130,7 @@ def test_execution_dispatcher_dispatches_all_queued_items() -> None:
 def test_execution_dispatcher_ignores_already_dispatched_items_in_batch() -> None:
     first = _queue_item(description="Run tests.")
     second = _queue_item(description="Run static checks.")
-    state = (
-        _state()
-        .with_execution_queue_item(first.dispatched())
-        .with_execution_queue_item(second)
-    )
+    state = _state().with_execution_queue_item(first.dispatched()).with_execution_queue_item(second)
     dispatcher = ExecutionDispatcher(StateRecorder())
 
     result = dispatcher.dispatch_all_queued(state=state)
