@@ -152,6 +152,7 @@ def test_forge_result_state_digest_changes_when_result_is_recorded() -> None:
     updated = state.with_forge_result(result)
 
     assert state.digest().value != updated.digest().value
-    assert state.to_payload()["forge_result_ledger_digest"] != updated.to_payload()[
-        "forge_result_ledger_digest"
-    ]
+    assert (
+        state.to_payload()["forge_result_ledger_digest"]
+        != updated.to_payload()["forge_result_ledger_digest"]
+    )
