@@ -129,7 +129,10 @@ def test_forge_result_processor_records_passed_result_and_marks_action_executed(
     assert processed.forge_result == result
     assert processed.updated_action.status is ActionStatus.EXECUTED
     assert processed.updated_action.execution_digest == result.digest()
-    assert processed.state.actions.require_action(action.action_id.value).status is ActionStatus.EXECUTED
+    assert (
+        processed.state.actions.require_action(action.action_id.value).status
+        is ActionStatus.EXECUTED
+    )
     assert processed.state.executed_action_count() == 1
     assert processed.state.passed_forge_result_count() == 1
     assert processed.state.requires_human_review() is False
