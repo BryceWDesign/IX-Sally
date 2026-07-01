@@ -4,8 +4,8 @@ import pytest
 
 from ix_sally.actions import ActionStatus, BoundedActionRecord
 from ix_sally.agents import AgentRole
-from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
 from ix_sally.authority_processing import AuthorityProcessor
+from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
 from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.digest import DigestRecord
 from ix_sally.events import RuntimeEventType
