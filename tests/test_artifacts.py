@@ -144,6 +144,7 @@ def test_agent_artifact_ledger_digest_changes_when_artifact_changes() -> None:
         summary="Proposal two.",
     )
 
-    assert AgentArtifactLedger.create((first,)).digest().value != AgentArtifactLedger.create(
-        (second,)
-    ).digest().value
+    assert (
+        AgentArtifactLedger.create((first,)).digest().value
+        != AgentArtifactLedger.create((second,)).digest().value
+    )
