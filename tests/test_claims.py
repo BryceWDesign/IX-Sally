@@ -143,6 +143,7 @@ def test_claim_ledger_digest_changes_when_claim_status_changes() -> None:
     )
     blocked = proposed.with_status(ClaimStatus.BLOCKED)
 
-    assert ClaimLedger.create((proposed,)).digest().value != ClaimLedger.create(
-        (blocked,)
-    ).digest().value
+    assert (
+        ClaimLedger.create((proposed,)).digest().value
+        != ClaimLedger.create((blocked,)).digest().value
+    )
