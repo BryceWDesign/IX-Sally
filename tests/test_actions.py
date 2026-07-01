@@ -412,6 +412,7 @@ def test_bounded_action_ledger_digest_changes_when_status_changes() -> None:
         boundary_note="Denied.",
     )
 
-    assert BoundedActionLedger.create((proposed,)).digest().value != BoundedActionLedger.create(
-        (denied,)
-    ).digest().value
+    assert (
+        BoundedActionLedger.create((proposed,)).digest().value
+        != BoundedActionLedger.create((denied,)).digest().value
+    )
