@@ -5,10 +5,10 @@ import pytest
 from ix_sally.agents import AgentRole
 from ix_sally.claims import ClaimRecord
 from ix_sally.contracts import AutonomyContract, AutonomyMode
+from ix_sally.events import RuntimeEventType
 from ix_sally.evidence import EvidenceKind, EvidenceRecord, EvidenceStatus
 from ix_sally.evidence_support import EvidenceSupportStatus
 from ix_sally.evidence_support_processing import EvidenceSupportProcessor
-from ix_sally.events import RuntimeEventType
 from ix_sally.foundation import FoundationError
 from ix_sally.recording import StateRecorder
 from ix_sally.runtime import NinefoldRuntimeKit
