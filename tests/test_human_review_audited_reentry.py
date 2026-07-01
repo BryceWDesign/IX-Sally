@@ -139,9 +139,7 @@ def test_audited_reentry_payload_links_all_layers() -> None:
     receipt_payload = result.receipt.to_payload()
 
     assert payload["resume_operation_digest"] == resume.digest().value
-    assert payload["reentry_coordination_digest"] == (
-        result.reentry_coordination.digest().value
-    )
+    assert payload["reentry_coordination_digest"] == (result.reentry_coordination.digest().value)
     assert payload["audit_report_digest"] == result.audit_report.digest().value
     assert payload["audit_workflow_operation_digest"] == (
         result.audit_workflow_operation.digest().value
