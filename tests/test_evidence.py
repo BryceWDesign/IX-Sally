@@ -146,6 +146,7 @@ def test_evidence_ledger_digest_changes_when_evidence_status_changes() -> None:
         summary="Test passed.",
     )
 
-    assert EvidenceLedger.create((first,)).digest().value != EvidenceLedger.create(
-        (second,)
-    ).digest().value
+    assert (
+        EvidenceLedger.create((first,)).digest().value
+        != EvidenceLedger.create((second,)).digest().value
+    )
