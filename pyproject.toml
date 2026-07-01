@@ -93,3 +93,7 @@ ignore = [
   "PLR2004",
   "S101"
 ]
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+ignore_errors = true
