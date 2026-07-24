@@ -45,6 +45,12 @@ QUALITY_GATES: Final[tuple[QualityGate, ...]] = (
         arguments=("src", "tests"),
     ),
     QualityGate(
+        name="dependencies",
+        label="Runtime dependency graph",
+        module="dependency_check",
+        arguments=(),
+    ),
+    QualityGate(
         name="test",
         label="Pytest suite",
         module="pytest",
@@ -58,13 +64,18 @@ QUALITY_GATES: Final[tuple[QualityGate, ...]] = (
     ),
 )
 
-_GATE_BY_NAME: Final[dict[str, QualityGate]] = {gate.name: gate for gate in QUALITY_GATES}
+_GATE_BY_NAME: Final[dict[str, QualityGate]] = {
+    gate.name: gate for gate in QUALITY_GATES
+}
 
 
 def _parser() -> argparse.ArgumentParser:
     """Build the command-line parser for repository quality checks."""
     parser = argparse.ArgumentParser(
-        description="Run IX-Sally formatting, lint, typing, and test gates.",
+        description=(
+            "Run IX-Sally formatting, lint, dependency, typing, test, "
+            "and package gates."
+        ),
     )
     parser.add_argument(
         "--gate",
@@ -76,7 +87,9 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _selected_gates(gate_names: Sequence[str] | None) -> tuple[QualityGate, ...]:
+def _selected_gates(
+    gate_names: Sequence[str] | None,
+) -> tuple[QualityGate, ...]:
     """Return all gates or the requested gates in command-line order."""
     if gate_names is None:
         return QUALITY_GATES
