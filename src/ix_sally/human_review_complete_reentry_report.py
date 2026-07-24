@@ -8,6 +8,9 @@ from typing import TYPE_CHECKING
 
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
+from ix_sally.human_review_complete_reentry_ledger import (
+    CompleteHumanReviewReentryLedgerEntry,
+)
 from ix_sally.human_review_control_plane_report_status import (
     HumanReviewControlPlaneReportStatus,
 )
@@ -92,6 +95,7 @@ class CompleteHumanReviewReentryCloseoutReport:
     audited_reentry_count: int
     complete_reentry_count: int
     findings: tuple[CompleteHumanReviewReentryCloseoutFinding, ...]
+    complete_reentry_ledger_entry: CompleteHumanReviewReentryLedgerEntry | None = None
 
     @classmethod
     def create(
@@ -114,6 +118,7 @@ class CompleteHumanReviewReentryCloseoutReport:
         audited_reentry_count: int,
         complete_reentry_count: int,
         findings: tuple[CompleteHumanReviewReentryCloseoutFinding, ...],
+        complete_reentry_ledger_entry: CompleteHumanReviewReentryLedgerEntry | None = None,
         report_id: CanonicalKey | None = None,
     ) -> CompleteHumanReviewReentryCloseoutReport:
         """Create a normalized complete reentry closeout report."""
@@ -150,7 +155,11 @@ class CompleteHumanReviewReentryCloseoutReport:
         control_plane_digest.require_algorithm("sha256")
 
         has_blocking = any(finding.blocking for finding in findings)
-        if has_blocking and closeout_status is not CompleteHumanReviewReentryCloseoutStatus.BLOCKED:
+        if (
+            has_blocking
+            and closeout_status
+            is not CompleteHumanReviewReentryCloseoutStatus.BLOCKED
+        ):
             raise FoundationError(
                 "complete human-review reentry closeout with blocking findings "
                 "must be blocked"
@@ -163,6 +172,33 @@ class CompleteHumanReviewReentryCloseoutReport:
                 "complete human-review reentry closeout blocked status requires "
                 "blocking findings"
             )
+
+        if complete_reentry_ledger_entry is not None:
+            if (
+                complete_reentry_ledger_entry.complete_reentry_result_digest
+                != complete_reentry_result_digest
+            ):
+                raise FoundationError(
+                    "complete human-review reentry closeout ledger entry result mismatch"
+                )
+            if (
+                complete_reentry_ledger_entry.complete_reentry_receipt_digest
+                != complete_reentry_receipt_digest
+            ):
+                raise FoundationError(
+                    "complete human-review reentry closeout ledger entry receipt mismatch"
+                )
+            if (
+                complete_reentry_ledger_entry.final_workflow_operation_digest
+                != final_workflow_operation_digest
+            ):
+                raise FoundationError(
+                    "complete human-review reentry closeout ledger entry workflow mismatch"
+                )
+            if complete_reentry_ledger_entry.after_state_digest != state_digest:
+                raise FoundationError(
+                    "complete human-review reentry closeout ledger entry state mismatch"
+                )
 
         return cls(
             report_id=report_id
@@ -189,6 +225,7 @@ class CompleteHumanReviewReentryCloseoutReport:
             audited_reentry_count=audited_reentry_count,
             complete_reentry_count=complete_reentry_count,
             findings=findings,
+            complete_reentry_ledger_entry=complete_reentry_ledger_entry,
         )
 
     @classmethod
@@ -197,7 +234,16 @@ class CompleteHumanReviewReentryCloseoutReport:
         result: CompleteHumanReviewReentryResult,
     ) -> CompleteHumanReviewReentryCloseoutReport:
         """Create a closeout report from a complete human-review reentry result."""
-        recorded_control_plane = _recorded_control_plane_for_result(result)
+        complete_reentry_ledger_entry = (
+            CompleteHumanReviewReentryLedgerEntry.from_result(
+                sequence=result.control_plane.complete_reentry_ledger.next_sequence(),
+                result=result,
+            )
+        )
+        recorded_control_plane = _recorded_control_plane_for_result(
+            result,
+            complete_reentry_ledger_entry,
+        )
         findings = _findings_for_result(result, recorded_control_plane)
         closeout_status = _select_closeout_status(result, findings)
 
@@ -219,6 +265,7 @@ class CompleteHumanReviewReentryCloseoutReport:
             audited_reentry_count=recorded_control_plane.audited_reentry_count(),
             complete_reentry_count=recorded_control_plane.complete_reentry_count(),
             findings=findings,
+            complete_reentry_ledger_entry=complete_reentry_ledger_entry,
         )
 
     def blocking_findings(
@@ -282,6 +329,11 @@ class CompleteHumanReviewReentryCloseoutReport:
             "accepted": self.accepted(),
             "waiting_for_external_input": self.waiting_for_external_input(),
             "blocked": self.blocked(),
+            "complete_reentry_ledger_entry_digest": (
+                self.complete_reentry_ledger_entry.digest().value
+                if self.complete_reentry_ledger_entry is not None
+                else None
+            ),
             "findings": [finding.to_payload() for finding in self.findings],
         }
 
@@ -306,9 +358,10 @@ def _select_closeout_status(
 
 def _recorded_control_plane_for_result(
     result: CompleteHumanReviewReentryResult,
+    ledger_entry: CompleteHumanReviewReentryLedgerEntry,
 ) -> HumanReviewControlPlaneState:
     """Return the control-plane state after recording the complete reentry result."""
-    updated_ledger = result.control_plane.complete_reentry_ledger.append_result(result)
+    updated_ledger = result.control_plane.complete_reentry_ledger.append(ledger_entry)
     return result.control_plane.with_complete_reentry_ledger(updated_ledger)
 
 
