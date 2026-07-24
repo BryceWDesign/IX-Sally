@@ -8,13 +8,13 @@ from typing import TYPE_CHECKING
 
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
-from ix_sally.human_review_control_plane_report import (
-    HumanReviewControlPlaneReportStatus,
-)
 from ix_sally.stage_readiness import RunStage
 
 if TYPE_CHECKING:
     from ix_sally.human_review_complete_reentry import CompleteHumanReviewReentryResult
+    from ix_sally.human_review_control_plane_report import (
+        HumanReviewControlPlaneReportStatus,
+    )
     from ix_sally.human_review_reentry import HumanReviewReentryStatus
     from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditStatus
 
@@ -149,7 +149,11 @@ class CompleteHumanReviewReentryCloseoutReport:
         control_plane_digest.require_algorithm("sha256")
 
         has_blocking = any(finding.blocking for finding in findings)
-        if has_blocking and closeout_status is not CompleteHumanReviewReentryCloseoutStatus.BLOCKED:
+        if (
+            has_blocking
+            and closeout_status
+            is not CompleteHumanReviewReentryCloseoutStatus.BLOCKED
+        ):
             raise FoundationError(
                 "complete human-review reentry closeout with blocking findings "
                 "must be blocked"
