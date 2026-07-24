@@ -10,13 +10,15 @@ import check_green
 def test_quality_gate_commands_match_ci_tools() -> None:
     """The shared runner must retain every declared repository gate."""
     commands = {
-        gate.name: gate.command()[1:] for gate in check_green.QUALITY_GATES
+        gate.name: gate.command()[1:]
+        for gate in check_green.QUALITY_GATES
     }
 
     assert commands == {
         "format": ("-m", "ruff", "format", "--check", "."),
         "lint": ("-m", "ruff", "check", "."),
         "type-check": ("-m", "mypy", "src", "tests"),
+        "repository": ("-m", "repository_check"),
         "dependencies": ("-m", "dependency_check"),
         "architecture": ("-m", "architecture_check"),
         "test": ("-m", "pytest"),
@@ -24,7 +26,9 @@ def test_quality_gate_commands_match_ci_tools() -> None:
     }
 
 
-def test_main_runs_all_gates_in_declared_order(monkeypatch: object) -> None:
+def test_main_runs_all_gates_in_declared_order(
+    monkeypatch: object,
+) -> None:
     """Running without selectors must execute the complete gate sequence."""
     observed: list[str] = []
 
@@ -33,17 +37,24 @@ def test_main_runs_all_gates_in_declared_order(monkeypatch: object) -> None:
         *,
         repository_root: Path,
     ) -> int:
-        assert repository_root == Path(check_green.__file__).resolve().parent
+        assert repository_root == Path(
+            check_green.__file__
+        ).resolve().parent
         observed.append(gate.name)
         return 0
 
-    monkeypatch.setattr(check_green, "_run_gate", fake_run_gate)
+    monkeypatch.setattr(
+        check_green,
+        "_run_gate",
+        fake_run_gate,
+    )
 
     assert check_green.main([]) == 0
     assert observed == [
         "format",
         "lint",
         "type-check",
+        "repository",
         "dependencies",
         "architecture",
         "test",
@@ -51,7 +62,9 @@ def test_main_runs_all_gates_in_declared_order(monkeypatch: object) -> None:
     ]
 
 
-def test_main_runs_only_requested_gates(monkeypatch: object) -> None:
+def test_main_runs_only_requested_gates(
+    monkeypatch: object,
+) -> None:
     """Repeated gate selectors must preserve their requested order."""
     observed: list[str] = []
 
@@ -64,14 +77,23 @@ def test_main_runs_only_requested_gates(monkeypatch: object) -> None:
         observed.append(gate.name)
         return 0
 
-    monkeypatch.setattr(check_green, "_run_gate", fake_run_gate)
+    monkeypatch.setattr(
+        check_green,
+        "_run_gate",
+        fake_run_gate,
+    )
 
     result = check_green.main(
-        ["--gate", "architecture", "--gate", "format"]
+        [
+            "--gate",
+            "repository",
+            "--gate",
+            "format",
+        ]
     )
 
     assert result == 0
-    assert observed == ["architecture", "format"]
+    assert observed == ["repository", "format"]
 
 
 def test_main_returns_failure_after_running_selected_gates(
@@ -90,13 +112,18 @@ def test_main_returns_failure_after_running_selected_gates(
         observed.append(gate.name)
         return 1 if gate.name == "lint" else 0
 
-    monkeypatch.setattr(check_green, "_run_gate", fake_run_gate)
+    monkeypatch.setattr(
+        check_green,
+        "_run_gate",
+        fake_run_gate,
+    )
 
     assert check_green.main([]) == 1
     assert observed == [
         "format",
         "lint",
         "type-check",
+        "repository",
         "dependencies",
         "architecture",
         "test",
@@ -116,6 +143,7 @@ def test_ci_workflow_delegates_each_gate_to_shared_runner() -> None:
         "format",
         "lint",
         "type-check",
+        "repository",
         "dependencies",
         "architecture",
         "test",
