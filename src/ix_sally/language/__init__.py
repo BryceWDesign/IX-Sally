@@ -1,5 +1,16 @@
 """Embedded IX language kernel for IX-Sally Genesis."""
 
+from ix_sally.language.ast import (
+    BinaryExpression,
+    BinaryOperator,
+    Expression,
+    GroupExpression,
+    LanguageNode,
+    LiteralExpression,
+    NameExpression,
+    UnaryExpression,
+    UnaryOperator,
+)
 from ix_sally.language.errors import (
     DiagnosticSeverity,
     IXExecutionError,
@@ -20,7 +31,11 @@ from ix_sally.language.tokens import (
 
 __all__ = [
     "KEYWORDS_BY_LEXEME",
+    "BinaryExpression",
+    "BinaryOperator",
     "DiagnosticSeverity",
+    "Expression",
+    "GroupExpression",
     "IXExecutionError",
     "IXLanguageError",
     "IXLexer",
@@ -28,10 +43,15 @@ __all__ = [
     "IXValidationError",
     "Keyword",
     "LanguageDiagnostic",
+    "LanguageNode",
     "LanguageToken",
+    "LiteralExpression",
+    "NameExpression",
     "SourcePosition",
     "SourceSpan",
     "TokenKind",
     "TokenLiteral",
+    "UnaryExpression",
+    "UnaryOperator",
     "tokenize_ix",
 ]
