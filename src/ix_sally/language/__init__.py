@@ -25,6 +25,10 @@ from ix_sally.language.expression_parser import (
 )
 from ix_sally.language.lexer import IXLexer, tokenize_ix
 from ix_sally.language.source import SourcePosition, SourceSpan
+from ix_sally.language.statement_parser import (
+    IXStatementParser,
+    parse_ix_program,
+)
 from ix_sally.language.statements import (
     AssertStatement,
     LetStatement,
@@ -56,6 +60,7 @@ __all__ = [
     "IXExpressionParser",
     "IXLanguageError",
     "IXLexer",
+    "IXStatementParser",
     "IXSyntaxError",
     "IXValidationError",
     "Keyword",
@@ -79,5 +84,6 @@ __all__ = [
     "UnaryExpression",
     "UnaryOperator",
     "parse_ix_expression",
+    "parse_ix_program",
     "tokenize_ix",
 ]
