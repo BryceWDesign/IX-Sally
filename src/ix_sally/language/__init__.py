@@ -25,6 +25,17 @@ from ix_sally.language.expression_parser import (
 )
 from ix_sally.language.lexer import IXLexer, tokenize_ix
 from ix_sally.language.source import SourcePosition, SourceSpan
+from ix_sally.language.statements import (
+    AssertStatement,
+    LetStatement,
+    PrintStatement,
+    Program,
+    RecallStatement,
+    RememberStatement,
+    ReplyStatement,
+    Statement,
+    TraceStatement,
+)
 from ix_sally.language.tokens import (
     KEYWORDS_BY_LEXEME,
     Keyword,
@@ -35,6 +46,7 @@ from ix_sally.language.tokens import (
 
 __all__ = [
     "KEYWORDS_BY_LEXEME",
+    "AssertStatement",
     "BinaryExpression",
     "BinaryOperator",
     "DiagnosticSeverity",
@@ -50,12 +62,20 @@ __all__ = [
     "LanguageDiagnostic",
     "LanguageNode",
     "LanguageToken",
+    "LetStatement",
     "LiteralExpression",
     "NameExpression",
+    "PrintStatement",
+    "Program",
+    "RecallStatement",
+    "RememberStatement",
+    "ReplyStatement",
     "SourcePosition",
     "SourceSpan",
+    "Statement",
     "TokenKind",
     "TokenLiteral",
+    "TraceStatement",
     "UnaryExpression",
     "UnaryOperator",
     "parse_ix_expression",
