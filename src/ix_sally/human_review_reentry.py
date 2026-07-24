@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import StrEnum
 
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError
 from ix_sally.human_review_control_plane import HumanReviewControlPlaneState
+from ix_sally.human_review_reentry_status import HumanReviewReentryStatus
 from ix_sally.human_review_workflow import (
     HumanReviewWorkflowOperation,
     HumanReviewWorkflowStage,
@@ -15,15 +15,6 @@ from ix_sally.human_review_workflow import (
 from ix_sally.orchestration_loop import StageLoopResult, StageLoopRunner, StageLoopStopReason
 from ix_sally.stage_readiness import RunStage
 from ix_sally.state import NinefoldRunState
-
-
-class HumanReviewReentryStatus(StrEnum):
-    """Outcome status for a human-review reentry run."""
-
-    ADVANCED = "advanced"
-    WAITING_FOR_EXTERNAL_INPUT = "waiting_for_external_input"
-    CHAMBER_CLOSE_ATTEMPTED = "chamber_close_attempted"
-    STEP_LIMIT_REACHED = "step_limit_reached"
 
 
 @dataclass(frozen=True, slots=True)
@@ -231,18 +222,32 @@ class HumanReviewReentryRunner:
         resume_operation: HumanReviewWorkflowOperation,
     ) -> None:
         """Raise unless the workflow operation is a cleared resume operation."""
-        if resume_operation.receipt.workflow_stage is not HumanReviewWorkflowStage.RESUME_RECORDED:
-            raise FoundationError("human-review reentry requires a resume-recorded operation")
+        if (
+            resume_operation.receipt.workflow_stage
+            is not HumanReviewWorkflowStage.RESUME_RECORDED
+        ):
+            raise FoundationError(
+                "human-review reentry requires a resume-recorded operation"
+            )
 
         resume_result = resume_operation.require_resume()
         if not resume_result.cleared_to_resume():
-            raise FoundationError("human-review reentry requires cleared resume authority")
+            raise FoundationError(
+                "human-review reentry requires cleared resume authority"
+            )
         if resume_result.next_stage() is RunStage.HUMAN_REVIEW:
-            raise FoundationError("human-review reentry cannot resume to human_review")
+            raise FoundationError(
+                "human-review reentry cannot resume to human_review"
+            )
         if resume_result.state.digest() != resume_operation.run_state.digest():
-            raise FoundationError("human-review reentry resume state mismatch")
+            raise FoundationError(
+                "human-review reentry resume state mismatch"
+            )
 
-    def _status_from_loop(self, loop_result: StageLoopResult) -> HumanReviewReentryStatus:
+    def _status_from_loop(
+        self,
+        loop_result: StageLoopResult,
+    ) -> HumanReviewReentryStatus:
         """Map a stage-loop stop reason to a reentry status."""
         if loop_result.stop_reason is StageLoopStopReason.EXTERNAL_INPUT_REQUIRED:
             return HumanReviewReentryStatus.WAITING_FOR_EXTERNAL_INPUT
@@ -254,5 +259,6 @@ class HumanReviewReentryRunner:
             return HumanReviewReentryStatus.STEP_LIMIT_REACHED
 
         raise FoundationError(
-            f"unsupported human-review reentry stop reason: {loop_result.stop_reason.value}"
+            f"unsupported human-review reentry stop reason: "
+            f"{loop_result.stop_reason.value}"
         )
