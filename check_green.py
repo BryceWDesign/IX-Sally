@@ -50,6 +50,12 @@ QUALITY_GATES: Final[tuple[QualityGate, ...]] = (
         module="pytest",
         arguments=(),
     ),
+    QualityGate(
+        name="package",
+        label="Installed wheel smoke test",
+        module="package_smoke",
+        arguments=(),
+    ),
 )
 
 _GATE_BY_NAME: Final[dict[str, QualityGate]] = {gate.name: gate for gate in QUALITY_GATES}
