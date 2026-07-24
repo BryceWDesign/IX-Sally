@@ -5,6 +5,8 @@ import sys
 
 import pytest
 
+from tests.subprocess_support import repository_subprocess_environment
+
 
 @pytest.mark.parametrize(
     "modules",
@@ -30,6 +32,7 @@ def test_control_plane_modules_import_in_either_order(
         check=False,
         capture_output=True,
         text=True,
+        env=repository_subprocess_environment(),
     )
 
     assert completed.returncode == 0, completed.stderr
