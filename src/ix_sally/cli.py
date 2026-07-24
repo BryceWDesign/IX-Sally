@@ -6,9 +6,12 @@ import argparse
 import sys
 from collections.abc import Sequence
 
-from ix_sally import __version__
 from ix_sally.digest import stable_json
-from ix_sally.session_baseline import session_one_baseline_digest, session_one_baseline_payload
+from ix_sally.session_baseline import (
+    session_one_baseline_digest,
+    session_one_baseline_payload,
+)
+from ix_sally.version import __version__
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -36,15 +39,21 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.runtime_baseline:
-        sys.stdout.write(f"{stable_json(session_one_baseline_payload())}\n")
+        sys.stdout.write(
+            f"{stable_json(session_one_baseline_payload())}\n"
+        )
         return 0
 
     if args.baseline_digest:
         digest = session_one_baseline_digest()
-        sys.stdout.write(f"{digest.algorithm}:{digest.value}\n")
+        sys.stdout.write(
+            f"{digest.algorithm}:{digest.value}\n"
+        )
         return 0
 
-    sys.stdout.write(f"IX-Sally {__version__}\n")
+    sys.stdout.write(
+        f"IX-Sally {__version__}\n"
+    )
     return 0
 
 
