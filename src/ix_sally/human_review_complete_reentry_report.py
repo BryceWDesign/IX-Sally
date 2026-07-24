@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
 from ix_sally.human_review_complete_reentry_ledger import (
     CompleteHumanReviewReentryLedgerEntry,
+)
+from ix_sally.human_review_complete_reentry_closeout_status import (
+    CompleteHumanReviewReentryCloseoutStatus,
 )
 from ix_sally.human_review_control_plane_report_status import (
     HumanReviewControlPlaneReportStatus,
@@ -19,16 +21,10 @@ from ix_sally.stage_readiness import RunStage
 if TYPE_CHECKING:
     from ix_sally.human_review_complete_reentry import CompleteHumanReviewReentryResult
     from ix_sally.human_review_control_plane import HumanReviewControlPlaneState
-    from ix_sally.human_review_reentry import HumanReviewReentryStatus
-    from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditStatus
-
-
-class CompleteHumanReviewReentryCloseoutStatus(StrEnum):
-    """Closeout status for a complete human-review reentry result."""
-
-    ACCEPTED = "accepted"
-    WAITING_FOR_EXTERNAL_INPUT = "waiting_for_external_input"
-    BLOCKED = "blocked"
+    from ix_sally.human_review_reentry_audit_status import (
+        HumanReviewReentryAuditStatus,
+    )
+    from ix_sally.human_review_reentry_status import HumanReviewReentryStatus
 
 
 @dataclass(frozen=True, slots=True)
@@ -155,11 +151,7 @@ class CompleteHumanReviewReentryCloseoutReport:
         control_plane_digest.require_algorithm("sha256")
 
         has_blocking = any(finding.blocking for finding in findings)
-        if (
-            has_blocking
-            and closeout_status
-            is not CompleteHumanReviewReentryCloseoutStatus.BLOCKED
-        ):
+        if has_blocking and closeout_status is not CompleteHumanReviewReentryCloseoutStatus.BLOCKED:
             raise FoundationError(
                 "complete human-review reentry closeout with blocking findings "
                 "must be blocked"
@@ -199,8 +191,7 @@ class CompleteHumanReviewReentryCloseoutReport:
                 raise FoundationError(
                     "complete human-review reentry closeout ledger entry state mismatch"
                 )
-
-        return cls(
+                        return cls(
             report_id=report_id
             or CanonicalKey.from_text(
                 f"complete-human-review-reentry-closeout-"
@@ -252,7 +243,7 @@ class CompleteHumanReviewReentryCloseoutReport:
             complete_reentry_receipt_digest=result.receipt.digest(),
             final_workflow_operation_digest=result.final_workflow_operation.digest(),
             state_digest=result.state.digest(),
-                    control_plane_digest=recorded_control_plane.digest(),
+            control_plane_digest=recorded_control_plane.digest(),
             final_stage=result.final_stage(),
             reentry_status=result.reentry_status(),
             audit_status=result.audit_status(),
@@ -340,8 +331,7 @@ class CompleteHumanReviewReentryCloseoutReport:
     def digest(self) -> DigestRecord:
         """Return a deterministic digest for this complete reentry closeout report."""
         return DigestRecord.from_payload(self.to_payload())
-
-
+        
 def _select_closeout_status(
     result: CompleteHumanReviewReentryResult,
     findings: tuple[CompleteHumanReviewReentryCloseoutFinding, ...],
