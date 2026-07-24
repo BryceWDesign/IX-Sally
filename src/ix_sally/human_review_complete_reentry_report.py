@@ -11,14 +11,14 @@ from ix_sally.foundation import CanonicalKey, FoundationError, require_text
 from ix_sally.human_review_complete_reentry_ledger import (
     CompleteHumanReviewReentryLedgerEntry,
 )
-from ix_sally.human_review_control_plane_report_status import (
-    HumanReviewControlPlaneReportStatus,
-)
 from ix_sally.stage_readiness import RunStage
 
 if TYPE_CHECKING:
     from ix_sally.human_review_complete_reentry import CompleteHumanReviewReentryResult
     from ix_sally.human_review_control_plane import HumanReviewControlPlaneState
+    from ix_sally.human_review_control_plane_report import (
+        HumanReviewControlPlaneReportStatus,
+    )
     from ix_sally.human_review_reentry import HumanReviewReentryStatus
     from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditStatus
 
@@ -242,7 +242,7 @@ class CompleteHumanReviewReentryCloseoutReport:
         )
         recorded_control_plane = _recorded_control_plane_for_result(
             result,
-            complete_reentry_ledger_entry,
+                    complete_reentry_ledger_entry,
         )
         findings = _findings_for_result(result, recorded_control_plane)
         closeout_status = _select_closeout_status(result, findings)
@@ -369,6 +369,10 @@ def _complete_reentry_report_status(
     result: CompleteHumanReviewReentryResult,
 ) -> HumanReviewControlPlaneReportStatus:
     """Promote an audited-reentry report status to its complete-reentry status."""
+    from ix_sally.human_review_control_plane_report import (
+        HumanReviewControlPlaneReportStatus,
+    )
+
     status = result.report_status()
     if status is HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_ACCEPTED:
         return HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_ACCEPTED
