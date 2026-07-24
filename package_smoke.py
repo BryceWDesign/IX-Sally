@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import fnmatch
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -15,6 +17,19 @@ from typing import Final
 _PACKAGE_NAME: Final = "ix-sally"
 _PACKAGE_VERSION: Final = "0.1.0"
 _SHA256_HEX_LENGTH: Final = 64
+_IGNORED_SOURCE_PATTERNS: Final[tuple[str, ...]] = (
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "__pycache__",
+    "*.egg-info",
+    "*.pyc",
+    "*.pyo",
+    "build",
+    "dist",
+)
 
 
 def _run(
@@ -56,8 +71,30 @@ def _venv_console_script(environment_root: Path) -> Path:
     return environment_root / "bin" / "ix-sally"
 
 
-def _build_wheel(*, repository_root: Path, wheel_directory: Path) -> Path:
-    """Build one dependency-free wheel from the current repository."""
+def _ignored_source_entries(_directory: str, names: list[str]) -> set[str]:
+    """Return generated or repository-local entries excluded from smoke builds."""
+    return {
+        name
+        for name in names
+        if any(
+            fnmatch.fnmatchcase(name, pattern)
+            for pattern in _IGNORED_SOURCE_PATTERNS
+        )
+    }
+
+
+def _copy_source_tree(*, repository_root: Path, source_root: Path) -> None:
+    """Copy build inputs into disposable storage without generated artifacts."""
+    shutil.copytree(
+        repository_root,
+        source_root,
+        ignore=_ignored_source_entries,
+    )
+
+
+def _build_wheel(*, source_root: Path, wheel_directory: Path) -> Path:
+    """Build one dependency-free wheel from a disposable source tree."""
+    wheel_directory.mkdir(parents=True, exist_ok=True)
     _run(
         (
             sys.executable,
@@ -70,7 +107,7 @@ def _build_wheel(*, repository_root: Path, wheel_directory: Path) -> Path:
             "--wheel-dir",
             str(wheel_directory),
         ),
-        cwd=repository_root,
+        cwd=source_root,
     )
     wheels = tuple(sorted(wheel_directory.glob("ix_sally-*.whl")))
     if len(wheels) != 1:
@@ -82,7 +119,7 @@ def _build_wheel(*, repository_root: Path, wheel_directory: Path) -> Path:
 
 def _install_wheel(
     *,
-    repository_root: Path,
+    working_root: Path,
     environment_root: Path,
     wheel_path: Path,
 ) -> Path:
@@ -98,7 +135,7 @@ def _install_wheel(
             "--no-index",
             str(wheel_path),
         ),
-        cwd=repository_root,
+        cwd=working_root,
         environment=_isolated_environment(),
     )
     return python_executable
@@ -106,7 +143,7 @@ def _install_wheel(
 
 def _verify_installed_package(
     *,
-    repository_root: Path,
+    working_root: Path,
     environment_root: Path,
     python_executable: Path,
 ) -> None:
@@ -119,7 +156,7 @@ def _verify_installed_package(
     )
     import_check = _run(
         (str(python_executable), "-c", import_statement),
-        cwd=repository_root,
+        cwd=working_root,
         environment=environment,
     )
     if import_check.stderr:
@@ -127,7 +164,7 @@ def _verify_installed_package(
 
     module_result = _run(
         (str(python_executable), "-m", "ix_sally", "--runtime-baseline"),
-        cwd=repository_root,
+        cwd=working_root,
         environment=environment,
     )
     payload = json.loads(module_result.stdout)
@@ -138,13 +175,19 @@ def _verify_installed_package(
 
     console_result = _run(
         (str(_venv_console_script(environment_root)), "--baseline-digest"),
-        cwd=repository_root,
+        cwd=working_root,
         environment=environment,
     )
     digest_line = console_result.stdout.strip()
     prefix, separator, digest_value = digest_line.partition(":")
-    if prefix != "sha256" or separator != ":" or len(digest_value) != _SHA256_HEX_LENGTH:
-        raise RuntimeError("installed console script returned an invalid baseline digest")
+    if (
+        prefix != "sha256"
+        or separator != ":"
+        or len(digest_value) != _SHA256_HEX_LENGTH
+    ):
+        raise RuntimeError(
+            "installed console script returned an invalid baseline digest"
+        )
 
 
 def main() -> int:
@@ -152,18 +195,23 @@ def main() -> int:
     repository_root = Path(__file__).resolve().parent
     with tempfile.TemporaryDirectory(prefix="ix-sally-package-smoke-") as directory:
         temporary_root = Path(directory)
-        wheel_path = _build_wheel(
+        source_root = temporary_root / "source"
+        _copy_source_tree(
             repository_root=repository_root,
+            source_root=source_root,
+        )
+        wheel_path = _build_wheel(
+            source_root=source_root,
             wheel_directory=temporary_root / "dist",
         )
         environment_root = temporary_root / "venv"
         python_executable = _install_wheel(
-            repository_root=repository_root,
+            working_root=temporary_root,
             environment_root=environment_root,
             wheel_path=wheel_path,
         )
         _verify_installed_package(
-            repository_root=repository_root,
+            working_root=temporary_root,
             environment_root=environment_root,
             python_executable=python_executable,
         )
