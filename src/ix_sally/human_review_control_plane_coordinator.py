@@ -589,20 +589,48 @@ class HumanReviewControlPlaneCoordinator:
         control_plane: HumanReviewControlPlaneState,
     ) -> HumanReviewControlPlaneOperationResult:
         """Record a complete human-review reentry closeout report."""
-        if closeout_report.control_plane_digest != control_plane.digest():
+        closeout_control_plane = control_plane
+
+        if closeout_report.control_plane_digest != closeout_control_plane.digest():
+            ledger_entry = closeout_report.complete_reentry_ledger_entry
+            if ledger_entry is None:
+                raise FoundationError(
+                    "human-review control-plane complete reentry closeout must match "
+                    "current control-plane state"
+                )
+
+            expected_sequence = (
+                closeout_control_plane.complete_reentry_ledger.next_sequence()
+            )
+            if ledger_entry.sequence != expected_sequence:
+                raise FoundationError(
+                    "human-review control-plane complete reentry closeout must match "
+                    "current control-plane state"
+                )
+
+            complete_reentry_ledger = (
+                closeout_control_plane.complete_reentry_ledger.append(ledger_entry)
+            )
+            closeout_control_plane = (
+                closeout_control_plane.with_complete_reentry_ledger(
+                    complete_reentry_ledger
+                )
+            )
+
+        if closeout_report.control_plane_digest != closeout_control_plane.digest():
             raise FoundationError(
                 "human-review control-plane complete reentry closeout must match "
                 "current control-plane state"
             )
 
-        before_digest = control_plane.digest()
+        before_digest = closeout_control_plane.digest()
         updated_ledger = (
-            control_plane.complete_reentry_closeout_ledger.append_report(
+            closeout_control_plane.complete_reentry_closeout_ledger.append_report(
                 closeout_report
             )
         )
         updated_control_plane = (
-            control_plane.with_complete_reentry_closeout_ledger(updated_ledger)
+            closeout_control_plane.with_complete_reentry_closeout_ledger(updated_ledger)
         )
         receipt = self._receipt(
             operation_kind=(
@@ -614,7 +642,7 @@ class HumanReviewControlPlaneCoordinator:
         )
 
         return HumanReviewControlPlaneOperationResult(
-            before_control_plane=control_plane,
+            before_control_plane=closeout_control_plane,
             after_control_plane=updated_control_plane,
             receipt=receipt,
             complete_reentry_closeout_report=closeout_report,
