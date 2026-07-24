@@ -8,13 +8,14 @@ from typing import TYPE_CHECKING
 
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
+from ix_sally.human_review_control_plane_report_status import (
+    HumanReviewControlPlaneReportStatus,
+)
 from ix_sally.stage_readiness import RunStage
 
 if TYPE_CHECKING:
     from ix_sally.human_review_complete_reentry import CompleteHumanReviewReentryResult
-    from ix_sally.human_review_control_plane_report import (
-        HumanReviewControlPlaneReportStatus,
-    )
+    from ix_sally.human_review_control_plane import HumanReviewControlPlaneState
     from ix_sally.human_review_reentry import HumanReviewReentryStatus
     from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditStatus
 
@@ -149,11 +150,7 @@ class CompleteHumanReviewReentryCloseoutReport:
         control_plane_digest.require_algorithm("sha256")
 
         has_blocking = any(finding.blocking for finding in findings)
-        if (
-            has_blocking
-            and closeout_status
-            is not CompleteHumanReviewReentryCloseoutStatus.BLOCKED
-        ):
+        if has_blocking and closeout_status is not CompleteHumanReviewReentryCloseoutStatus.BLOCKED:
             raise FoundationError(
                 "complete human-review reentry closeout with blocking findings "
                 "must be blocked"
@@ -200,7 +197,8 @@ class CompleteHumanReviewReentryCloseoutReport:
         result: CompleteHumanReviewReentryResult,
     ) -> CompleteHumanReviewReentryCloseoutReport:
         """Create a closeout report from a complete human-review reentry result."""
-        findings = _findings_for_result(result)
+        recorded_control_plane = _recorded_control_plane_for_result(result)
+        findings = _findings_for_result(result, recorded_control_plane)
         closeout_status = _select_closeout_status(result, findings)
 
         return cls.create(
@@ -208,18 +206,18 @@ class CompleteHumanReviewReentryCloseoutReport:
             complete_reentry_receipt_digest=result.receipt.digest(),
             final_workflow_operation_digest=result.final_workflow_operation.digest(),
             state_digest=result.state.digest(),
-            control_plane_digest=result.control_plane.digest(),
+            control_plane_digest=recorded_control_plane.digest(),
             final_stage=result.final_stage(),
             reentry_status=result.reentry_status(),
             audit_status=result.audit_status(),
-            report_status=result.report_status(),
+            report_status=_complete_reentry_report_status(result),
             closeout_status=closeout_status,
             max_steps=result.receipt.max_steps,
             executed_steps=result.receipt.executed_steps,
-            reentry_count=result.control_plane.reentry_count(),
-            reentry_audit_count=result.control_plane.reentry_audit_count(),
-            audited_reentry_count=result.control_plane.audited_reentry_count(),
-            complete_reentry_count=result.control_plane.complete_reentry_count(),
+            reentry_count=recorded_control_plane.reentry_count(),
+            reentry_audit_count=recorded_control_plane.reentry_audit_count(),
+            audited_reentry_count=recorded_control_plane.audited_reentry_count(),
+            complete_reentry_count=recorded_control_plane.complete_reentry_count(),
             findings=findings,
         )
 
@@ -306,8 +304,36 @@ def _select_closeout_status(
     return CompleteHumanReviewReentryCloseoutStatus.ACCEPTED
 
 
+def _recorded_control_plane_for_result(
+    result: CompleteHumanReviewReentryResult,
+) -> HumanReviewControlPlaneState:
+    """Return the control-plane state after recording the complete reentry result."""
+    updated_ledger = result.control_plane.complete_reentry_ledger.append_result(result)
+    return result.control_plane.with_complete_reentry_ledger(updated_ledger)
+
+
+def _complete_reentry_report_status(
+    result: CompleteHumanReviewReentryResult,
+) -> HumanReviewControlPlaneReportStatus:
+    """Promote an audited-reentry report status to its complete-reentry status."""
+    status = result.report_status()
+    if status is HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_ACCEPTED:
+        return HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_ACCEPTED
+    if (
+        status
+        is HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_WAITING_FOR_EXTERNAL_INPUT
+    ):
+        return (
+            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_WAITING_FOR_EXTERNAL_INPUT
+        )
+    if status is HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_FAILED:
+        return HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_FAILED
+    return status
+
+
 def _findings_for_result(
     result: CompleteHumanReviewReentryResult,
+    recorded_control_plane: HumanReviewControlPlaneState,
 ) -> tuple[CompleteHumanReviewReentryCloseoutFinding, ...]:
     """Build deterministic findings for complete human-review reentry closeout."""
     findings: list[CompleteHumanReviewReentryCloseoutFinding] = []
@@ -326,7 +352,7 @@ def _findings_for_result(
             )
         )
 
-    if result.control_plane.reentry_count() > 0:
+    if recorded_control_plane.reentry_count() > 0:
         findings.append(
             CompleteHumanReviewReentryCloseoutFinding.create(
                 message="Reentry result was recorded in the control plane.",
@@ -340,7 +366,7 @@ def _findings_for_result(
             )
         )
 
-    if result.control_plane.reentry_audit_count() > 0:
+    if recorded_control_plane.reentry_audit_count() > 0:
         findings.append(
             CompleteHumanReviewReentryCloseoutFinding.create(
                 message="Reentry audit was recorded in the control plane.",
@@ -354,7 +380,7 @@ def _findings_for_result(
             )
         )
 
-    if result.control_plane.audited_reentry_count() > 0:
+    if recorded_control_plane.audited_reentry_count() > 0:
         findings.append(
             CompleteHumanReviewReentryCloseoutFinding.create(
                 message="Audited reentry result was recorded in the control plane.",
@@ -368,7 +394,7 @@ def _findings_for_result(
             )
         )
 
-    if result.control_plane.complete_reentry_count() > 0:
+    if recorded_control_plane.complete_reentry_count() > 0:
         findings.append(
             CompleteHumanReviewReentryCloseoutFinding.create(
                 message="Complete reentry result was recorded in the control plane.",
