@@ -53,3 +53,6 @@ jobs:
 
       - name: Test
         run: python check_green.py --gate test
+
+      - name: Verify installed wheel
+        run: python check_green.py --gate package
