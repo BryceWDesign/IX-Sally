@@ -9,6 +9,7 @@ from typing import Iterable
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
 from ix_sally.human_review_reentry import HumanReviewReentryStatus
+from ix_sally.human_review_reentry_audit_status import HumanReviewReentryAuditStatus
 from ix_sally.human_review_reentry_coordination import (
     HumanReviewReentryCoordinationResult,
 )
@@ -22,14 +23,6 @@ class HumanReviewReentryAuditSeverity(StrEnum):
     INFO = "info"
     WARNING = "warning"
     BLOCKING = "blocking"
-
-
-class HumanReviewReentryAuditStatus(StrEnum):
-    """Overall status for a human-review reentry audit report."""
-
-    PASSED = "passed"
-    WAITING_FOR_EXTERNAL_INPUT = "waiting_for_external_input"
-    FAILED = "failed"
 
 
 @dataclass(frozen=True, slots=True)
@@ -187,8 +180,7 @@ class HumanReviewReentryAuditReport:
             status=status,
             findings=findings,
         )
-
-    def blocking_findings(self) -> tuple[HumanReviewReentryAuditFinding, ...]:
+            def blocking_findings(self) -> tuple[HumanReviewReentryAuditFinding, ...]:
         """Return blocking findings."""
         return tuple(finding for finding in self.findings if finding.is_blocking())
 
@@ -363,8 +355,7 @@ def _findings_from_coordination(
                 detail="Human-review reentry was not recorded in control-plane state.",
             )
         )
-
-    if coordination.recorded_reentry() and coordination.control_plane.reentry_count() > 0:
+            if coordination.recorded_reentry() and coordination.control_plane.reentry_count() > 0:
         findings.append(
             _finding(
                 severity=HumanReviewReentryAuditSeverity.INFO,
