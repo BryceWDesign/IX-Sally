@@ -2,20 +2,32 @@
 
 from __future__ import annotations
 
-from ix_sally.agents import AgentRole, default_agent_role_registry
-from ix_sally.contracts import AutonomyContract, AutonomyMode
-from ix_sally.digest import DigestRecord, JsonArray, JsonObject
+from ix_sally.agents import (
+    AgentRole,
+    default_agent_role_registry,
+)
+from ix_sally.contracts import (
+    AutonomyContract,
+    AutonomyMode,
+)
+from ix_sally.digest import (
+    DigestRecord,
+    JsonArray,
+    JsonObject,
+)
 from ix_sally.doctrine import default_doctrine_catalog
 from ix_sally.events import RuntimeEventType
 from ix_sally.runtime import NinefoldRuntimeKit
+from ix_sally.version import __version__
 
 
 def session_one_contract() -> AutonomyContract:
     """Return the baseline contract used to verify the session-one runtime."""
     return AutonomyContract.create(
         goal=(
-            "Verify IX-Sally session-one foundation: doctrine, chamber, ninefold roles, "
-            "jurisdiction, records, artifacts, cycles, and CLI baseline."
+            "Verify IX-Sally session-one foundation: doctrine, chamber, "
+            "ninefold roles, jurisdiction, records, artifacts, cycles, "
+            "and CLI baseline."
         ),
         mode=AutonomyMode.OBSERVE,
         max_cycles=1,
@@ -55,20 +67,25 @@ def session_one_baseline_payload() -> JsonObject:
                 "role": definition.role.value,
                 "title": definition.title,
                 "prohibited_authorities": [
-                    authority.value for authority in definition.prohibited_authorities
+                    authority.value
+                    for authority in definition.prohibited_authorities
                 ],
             }
         )
 
     return {
         "package": "ix-sally",
-        "version": "0.1.0",
+        "version": __version__,
         "baseline": "session-one",
         "runtime": kit.to_payload(),
         "opening_event_type": opening_event.event_type.value,
         "opening_event_digest": opening_event.digest().value,
-        "doctrine_rule_count": len(kit.chamber.doctrine_catalog.rules),
-        "role_count": len(kit.role_registry.definitions),
+        "doctrine_rule_count": len(
+            kit.chamber.doctrine_catalog.rules
+        ),
+        "role_count": len(
+            kit.role_registry.definitions
+        ),
         "roles": roles_payload,
         "contract_mode": kit.chamber.contract.mode.value,
         "max_cycles": kit.chamber.contract.max_cycles,
@@ -79,4 +96,6 @@ def session_one_baseline_payload() -> JsonObject:
 
 def session_one_baseline_digest() -> DigestRecord:
     """Return a deterministic digest for the session-one baseline payload."""
-    return DigestRecord.from_payload(session_one_baseline_payload())
+    return DigestRecord.from_payload(
+        session_one_baseline_payload()
+    )
