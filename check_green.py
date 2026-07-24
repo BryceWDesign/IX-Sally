@@ -45,6 +45,12 @@ QUALITY_GATES: Final[tuple[QualityGate, ...]] = (
         arguments=("src", "tests"),
     ),
     QualityGate(
+        name="repository",
+        label="Cross-platform repository integrity",
+        module="repository_check",
+        arguments=(),
+    ),
+    QualityGate(
         name="dependencies",
         label="Runtime dependency graph",
         module="dependency_check",
@@ -79,8 +85,8 @@ def _parser() -> argparse.ArgumentParser:
     """Build the command-line parser for repository quality checks."""
     parser = argparse.ArgumentParser(
         description=(
-            "Run IX-Sally formatting, lint, typing, dependency, architecture, "
-            "test, and package gates."
+            "Run IX-Sally formatting, lint, typing, repository, dependency, "
+            "architecture, test, and package gates."
         ),
     )
     parser.add_argument(
@@ -121,12 +127,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     failures: list[str] = []
 
     for gate in _selected_gates(arguments.gate_names):
-        return_code = _run_gate(gate, repository_root=repository_root)
+        return_code = _run_gate(
+            gate,
+            repository_root=repository_root,
+        )
         if return_code != 0:
             failures.append(gate.name)
 
     if failures:
-        sys.stderr.write(f"Failed quality gates: {', '.join(failures)}\n")
+        sys.stderr.write(
+            f"Failed quality gates: {', '.join(failures)}\n"
+        )
         return 1
 
     sys.stdout.write("All selected quality gates passed.\n")
