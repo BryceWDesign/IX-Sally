@@ -48,6 +48,9 @@ jobs:
       - name: Lint
         run: python check_green.py --gate lint
 
+      - name: Check runtime dependencies
+        run: python check_green.py --gate dependencies
+
       - name: Type check
         run: python check_green.py --gate type-check
 
