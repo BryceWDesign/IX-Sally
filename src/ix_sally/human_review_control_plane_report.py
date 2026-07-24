@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import StrEnum
 
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
@@ -12,41 +11,15 @@ from ix_sally.human_review_control_plane import (
     HumanReviewControlPlaneState,
     HumanReviewControlPlaneStatus,
 )
+from ix_sally.human_review_control_plane_report_status import (
+    HumanReviewControlPlaneReportStatus,
+)
 from ix_sally.stage_readiness import RunStage, RunStageSnapshot
 from ix_sally.state import NinefoldRunState
 
-
-class HumanReviewControlPlaneReportStatus(StrEnum):
-    """Operator-facing status for human-review control-plane reporting."""
-
-    NO_HANDOFFS = "no_handoffs"
-    HANDOFF_OPEN = "handoff_open"
-    DECISION_OPEN = "decision_open"
-    RESUME_RECORDED = "resume_recorded"
-    REENTRY_RECORDED = "reentry_recorded"
-    REENTRY_WAITING_FOR_EXTERNAL_INPUT = "reentry_waiting_for_external_input"
-    REENTRY_AUDIT_PASSED = "reentry_audit_passed"
-    REENTRY_AUDIT_WAITING_FOR_EXTERNAL_INPUT = (
-        "reentry_audit_waiting_for_external_input"
-    )
-    REENTRY_AUDIT_FAILED = "reentry_audit_failed"
-    AUDITED_REENTRY_ACCEPTED = "audited_reentry_accepted"
-    AUDITED_REENTRY_WAITING_FOR_EXTERNAL_INPUT = (
-        "audited_reentry_waiting_for_external_input"
-    )
-    AUDITED_REENTRY_FAILED = "audited_reentry_failed"
-    COMPLETE_REENTRY_ACCEPTED = "complete_reentry_accepted"
-    COMPLETE_REENTRY_WAITING_FOR_EXTERNAL_INPUT = (
-        "complete_reentry_waiting_for_external_input"
-    )
-    COMPLETE_REENTRY_FAILED = "complete_reentry_failed"
-    COMPLETE_REENTRY_CLOSEOUT_ACCEPTED = "complete_reentry_closeout_accepted"
-    COMPLETE_REENTRY_CLOSEOUT_WAITING_FOR_EXTERNAL_INPUT = (
-        "complete_reentry_closeout_waiting_for_external_input"
-    )
-    COMPLETE_REENTRY_CLOSEOUT_BLOCKED = "complete_reentry_closeout_blocked"
-    REJECTION_BLOCKED = "rejection_blocked"
-    DEFERRAL_OPEN = "deferral_open"
+_COMPLETE_REENTRY_CLOSEOUT_WAITING_STATUS = (
+    HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_WAITING_FOR_EXTERNAL_INPUT
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -245,7 +218,7 @@ class HumanReviewControlPlaneReport:
                 "human-review control-plane report reentry audit subtotals exceed "
                 "reentry_audit_count"
             )
-        if blocking_reentry_audit_count > reentry_audit_count:
+                    if blocking_reentry_audit_count > reentry_audit_count:
             raise FoundationError(
                 "human-review control-plane report blocking_reentry_audit_count "
                 "exceeds reentry_audit_count"
@@ -465,7 +438,7 @@ class HumanReviewControlPlaneReport:
             complete_reentry_closeout_count=(
                 control_status.complete_reentry_closeout_count
             ),
-            accepted_complete_reentry_closeout_count=(
+                    accepted_complete_reentry_closeout_count=(
                 control_status.accepted_complete_reentry_closeout_count
             ),
             waiting_complete_reentry_closeout_count=(
@@ -527,7 +500,7 @@ class HumanReviewControlPlaneReport:
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_FAILED,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_ACCEPTED,
-            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_WAITING_FOR_EXTERNAL_INPUT,
+            _COMPLETE_REENTRY_CLOSEOUT_WAITING_STATUS,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_BLOCKED,
         }
 
@@ -538,7 +511,7 @@ class HumanReviewControlPlaneReport:
             HumanReviewControlPlaneReportStatus.REENTRY_AUDIT_WAITING_FOR_EXTERNAL_INPUT,
             HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
-            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_WAITING_FOR_EXTERNAL_INPUT,
+            _COMPLETE_REENTRY_CLOSEOUT_WAITING_STATUS,
         }
 
     def reentry_audit_recorded(self) -> bool:
@@ -575,7 +548,7 @@ class HumanReviewControlPlaneReport:
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_ACCEPTED,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_ACCEPTED,
-            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_WAITING_FOR_EXTERNAL_INPUT,
+            _COMPLETE_REENTRY_CLOSEOUT_WAITING_STATUS,
         }
 
     def audited_reentry_failed(self) -> bool:
@@ -596,7 +569,7 @@ class HumanReviewControlPlaneReport:
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_ACCEPTED,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_WAITING_FOR_EXTERNAL_INPUT,
             HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_ACCEPTED,
-            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_WAITING_FOR_EXTERNAL_INPUT,
+            _COMPLETE_REENTRY_CLOSEOUT_WAITING_STATUS,
         }
 
     def complete_reentry_failed(self) -> bool:
@@ -685,7 +658,7 @@ class HumanReviewControlPlaneReport:
             "operator_attention_audited_reentry_count": (
                 self.operator_attention_audited_reentry_count
             ),
-            "changed_state_audited_reentry_count": (
+                    "changed_state_audited_reentry_count": (
                 self.changed_state_audited_reentry_count
             ),
             "accepted_complete_reentry_count": self.accepted_complete_reentry_count,
@@ -798,7 +771,7 @@ def _select_report_status(
 
     if status.is_waiting_after_complete_reentry_closeout():
         return (
-            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_CLOSEOUT_WAITING_FOR_EXTERNAL_INPUT,
+            _COMPLETE_REENTRY_CLOSEOUT_WAITING_STATUS,
             "A complete human-review reentry closeout is waiting externally.",
         )
 
