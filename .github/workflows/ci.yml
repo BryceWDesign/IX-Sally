@@ -51,6 +51,9 @@ jobs:
       - name: Type check
         run: python check_green.py --gate type-check
 
+      - name: Check repository integrity
+        run: python check_green.py --gate repository
+
       - name: Check runtime dependencies
         run: python check_green.py --gate dependencies
 
