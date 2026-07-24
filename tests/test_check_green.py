@@ -9,12 +9,15 @@ import check_green
 
 def test_quality_gate_commands_match_ci_tools() -> None:
     """The shared runner must retain every declared repository gate."""
-    commands = {gate.name: gate.command()[1:] for gate in check_green.QUALITY_GATES}
+    commands = {
+        gate.name: gate.command()[1:] for gate in check_green.QUALITY_GATES
+    }
 
     assert commands == {
         "format": ("-m", "ruff", "format", "--check", "."),
         "lint": ("-m", "ruff", "check", "."),
         "type-check": ("-m", "mypy", "src", "tests"),
+        "dependencies": ("-m", "dependency_check"),
         "test": ("-m", "pytest"),
         "package": ("-m", "package_smoke"),
     }
@@ -36,7 +39,14 @@ def test_main_runs_all_gates_in_declared_order(monkeypatch: object) -> None:
     monkeypatch.setattr(check_green, "_run_gate", fake_run_gate)
 
     assert check_green.main([]) == 0
-    assert observed == ["format", "lint", "type-check", "test", "package"]
+    assert observed == [
+        "format",
+        "lint",
+        "type-check",
+        "dependencies",
+        "test",
+        "package",
+    ]
 
 
 def test_main_runs_only_requested_gates(monkeypatch: object) -> None:
@@ -79,16 +89,30 @@ def test_main_returns_failure_after_running_selected_gates(
     monkeypatch.setattr(check_green, "_run_gate", fake_run_gate)
 
     assert check_green.main([]) == 1
-    assert observed == ["format", "lint", "type-check", "test", "package"]
+    assert observed == [
+        "format",
+        "lint",
+        "type-check",
+        "dependencies",
+        "test",
+        "package",
+    ]
     assert "Failed quality gates: lint" in capsys.readouterr().err
 
 
 def test_ci_workflow_delegates_each_gate_to_shared_runner() -> None:
     """GitHub CI must use the repository-owned gate definitions."""
     repository_root = Path(check_green.__file__).resolve().parent
-    workflow = (repository_root / ".github" / "workflows" / "ci.yml").read_text(
-        encoding="utf-8"
-    )
+    workflow = (
+        repository_root / ".github" / "workflows" / "ci.yml"
+    ).read_text(encoding="utf-8")
 
-    for gate_name in ("format", "lint", "type-check", "test", "package"):
+    for gate_name in (
+        "format",
+        "lint",
+        "type-check",
+        "dependencies",
+        "test",
+        "package",
+    ):
         assert f"python check_green.py --gate {gate_name}" in workflow
