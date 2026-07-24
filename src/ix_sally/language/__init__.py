@@ -23,6 +23,13 @@ from ix_sally.language.expression_parser import (
     IXExpressionParser,
     parse_ix_expression,
 )
+from ix_sally.language.frontend import (
+    IXFrontendAnalysis,
+    IXFrontendAnalyzer,
+    IXFrontendContext,
+    analyze_ix_source,
+    require_accepted_ix_source,
+)
 from ix_sally.language.lexer import IXLexer, tokenize_ix
 from ix_sally.language.source import SourcePosition, SourceSpan
 from ix_sally.language.statement_parser import (
@@ -75,6 +82,9 @@ __all__ = [
     "GroupExpression",
     "IXExecutionError",
     "IXExpressionParser",
+    "IXFrontendAnalysis",
+    "IXFrontendAnalyzer",
+    "IXFrontendContext",
     "IXLanguageError",
     "IXLexer",
     "IXSemanticValidator",
@@ -108,10 +118,12 @@ __all__ = [
     "TraceStatement",
     "UnaryExpression",
     "UnaryOperator",
+    "analyze_ix_source",
     "check_ix_program_types",
     "infer_ix_expression_type",
     "parse_ix_expression",
     "parse_ix_program",
+    "require_accepted_ix_source",
     "require_typed_ix_program",
     "require_valid_ix_program",
     "tokenize_ix",
