@@ -51,6 +51,12 @@ QUALITY_GATES: Final[tuple[QualityGate, ...]] = (
         arguments=(),
     ),
     QualityGate(
+        name="architecture",
+        label="Runtime architecture boundaries",
+        module="architecture_check",
+        arguments=(),
+    ),
+    QualityGate(
         name="test",
         label="Pytest suite",
         module="pytest",
@@ -73,8 +79,8 @@ def _parser() -> argparse.ArgumentParser:
     """Build the command-line parser for repository quality checks."""
     parser = argparse.ArgumentParser(
         description=(
-            "Run IX-Sally formatting, lint, dependency, typing, test, "
-            "and package gates."
+            "Run IX-Sally formatting, lint, typing, dependency, architecture, "
+            "test, and package gates."
         ),
     )
     parser.add_argument(
