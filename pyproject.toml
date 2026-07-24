@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ix-sally"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Governed multi-agent autonomy habitat with doctrine, evidence gates, memory law, sandboxed action, transfer testing, and human boundary authority."
 requires-python = ">=3.11"
 license = { text = "LicenseRef-IX-Sally-Source-Available-Evaluation-1.0" }
@@ -42,6 +42,9 @@ dev = [
 
 [project.scripts]
 ix-sally = "ix_sally.cli:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "ix_sally.version.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
