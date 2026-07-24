@@ -43,6 +43,44 @@ def test_virtual_environment_paths_match_platform() -> None:
         )
 
 
+def test_source_copy_excludes_generated_artifacts(tmp_path: Path) -> None:
+    """Disposable builds must not copy generated or repository-local artifacts."""
+    repository_root = tmp_path / "repository"
+    source_root = tmp_path / "source"
+    (repository_root / "src" / "ix_sally").mkdir(parents=True)
+    (repository_root / "src" / "ix_sally" / "__init__.py").write_text(
+        "__version__ = '0.1.0'\n",
+        encoding="utf-8",
+    )
+    (repository_root / "pyproject.toml").write_text(
+        "[build-system]\n",
+        encoding="utf-8",
+    )
+    generated_entries = (
+        repository_root / "build",
+        repository_root / "dist",
+        repository_root / ".pytest_cache",
+        repository_root / "src" / "ix_sally.egg-info",
+        repository_root / "src" / "ix_sally" / "__pycache__",
+    )
+    for entry in generated_entries:
+        entry.mkdir(parents=True)
+        (entry / "generated.txt").write_text("generated\n", encoding="utf-8")
+
+    package_smoke._copy_source_tree(
+        repository_root=repository_root,
+        source_root=source_root,
+    )
+
+    assert (source_root / "pyproject.toml").is_file()
+    assert (source_root / "src" / "ix_sally" / "__init__.py").is_file()
+    assert not (source_root / "build").exists()
+    assert not (source_root / "dist").exists()
+    assert not (source_root / ".pytest_cache").exists()
+    assert not (source_root / "src" / "ix_sally.egg-info").exists()
+    assert not (source_root / "src" / "ix_sally" / "__pycache__").exists()
+
+
 def test_build_wheel_requires_exactly_one_artifact(
     tmp_path: Path,
     monkeypatch: object,
@@ -59,6 +97,6 @@ def test_build_wheel_requires_exactly_one_artifact(
         match="expected exactly one IX-Sally wheel",
     ):
         package_smoke._build_wheel(
-            repository_root=tmp_path,
-            wheel_directory=tmp_path,
+            source_root=tmp_path,
+            wheel_directory=tmp_path / "dist",
         )
