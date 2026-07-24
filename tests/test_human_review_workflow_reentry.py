@@ -37,7 +37,9 @@ def _state(max_cycles: int = 3) -> NinefoldRunState:
     return NinefoldRunState.create(runtime_kit=NinefoldRuntimeKit.create(contract=contract))
 
 
-def _review_action(description: str = "Run certified workflow reentry verification.") -> BoundedActionRecord:
+def _review_action(
+    description: str = "Run certified workflow reentry verification.",
+) -> BoundedActionRecord:
     action = BoundedActionRecord.create(
         cycle=1,
         proposed_by=AgentRole.SALLY,
@@ -91,15 +93,21 @@ def test_workflow_kit_records_reentry_operation() -> None:
     operation = HumanReviewWorkflowKit.create().record_reentry(reentry_result=reentry)
 
     assert operation.receipt.workflow_stage is HumanReviewWorkflowStage.REENTRY_RECORDED
-    assert operation.operation_kind() is HumanReviewControlPlaneOperationKind.REENTRY_RECORDED
+    assert operation.operation_kind() is (
+        HumanReviewControlPlaneOperationKind.REENTRY_RECORDED
+    )
     assert operation.require_reentry() == reentry
     assert operation.run_state == reentry.state
     assert operation.control_plane.reentry_count() == 1
-    assert operation.report.status is HumanReviewControlPlaneReportStatus.REENTRY_RECORDED
+    assert operation.report.status is (
+        HumanReviewControlPlaneReportStatus.REENTRY_RECORDED
+    )
     assert operation.report.has_reentry() is True
     assert operation.report.reentry_recorded() is True
     assert operation.report.requires_operator_attention() is False
-    assert operation.run_state.dispatched_execution_count() == 1
+    assert operation.run_state.queued_execution_count() == 1
+    assert operation.run_state.dispatched_execution_count() == 0
+    assert reentry.final_stage() is RunStage.FORGE_DISPATCH
 
 
 def test_workflow_kit_reports_waiting_reentry_status() -> None:
@@ -136,9 +144,13 @@ def test_workflow_reentry_payload_links_report_and_operation() -> None:
     assert payload["operation_kind"] == (
         HumanReviewControlPlaneOperationKind.REENTRY_RECORDED.value
     )
-    assert payload["report_status"] == HumanReviewControlPlaneReportStatus.REENTRY_RECORDED.value
+    assert payload["report_status"] == (
+        HumanReviewControlPlaneReportStatus.REENTRY_RECORDED.value
+    )
     assert payload["reentry_count"] == 1
-    assert report_payload["latest_reentry_digest"] == operation.control_plane.latest_reentry_digest()
+    assert report_payload["latest_reentry_digest"] == (
+        operation.control_plane.latest_reentry_digest()
+    )
     assert report_payload["reentry_recorded"] is True
 
 
