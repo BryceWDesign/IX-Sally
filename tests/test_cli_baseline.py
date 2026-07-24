@@ -5,7 +5,11 @@ import subprocess
 import sys
 
 from ix_sally.cli import main
-from ix_sally.session_baseline import session_one_baseline_digest, session_one_baseline_payload
+from ix_sally.session_baseline import (
+    session_one_baseline_digest,
+    session_one_baseline_payload,
+)
+from tests.subprocess_support import repository_subprocess_environment
 
 
 def test_cli_runtime_baseline_prints_stable_json(capsys: object) -> None:
@@ -39,6 +43,7 @@ def test_module_runtime_baseline_matches_direct_payload() -> None:
         check=True,
         capture_output=True,
         text=True,
+        env=repository_subprocess_environment(),
     )
 
     assert json.loads(completed.stdout) == session_one_baseline_payload()
@@ -51,6 +56,7 @@ def test_module_baseline_digest_is_sha256() -> None:
         check=True,
         capture_output=True,
         text=True,
+        env=repository_subprocess_environment(),
     )
 
     prefix, value = completed.stdout.strip().split(":", maxsplit=1)
