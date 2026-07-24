@@ -7,6 +7,7 @@ import subprocess
 import sys
 
 import ix_sally
+from tests.subprocess_support import repository_subprocess_environment
 
 
 def _runtime_module_names() -> tuple[str, ...]:
@@ -50,6 +51,7 @@ def test_runtime_modules_import_in_multiple_orders() -> None:
             check=False,
             capture_output=True,
             text=True,
+            env=repository_subprocess_environment(),
         )
         if completed.returncode != 0:
             failures.append(
