@@ -24,9 +24,9 @@ from ix_sally.human_review_control_plane_report import (
 from ix_sally.human_review_reentry import HumanReviewReentryStatus
 from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditStatus
 from ix_sally.human_review_workflow import (
+    HumanReviewWorkflowKit,
     HumanReviewWorkflowOperation,
     HumanReviewWorkflowStage,
-    HumanReviewWorkflowKit,
 )
 from ix_sally.stage_readiness import RunStage
 from ix_sally.state import NinefoldRunState
@@ -254,11 +254,10 @@ class CompleteHumanReviewReentryCloseoutCoordinationResult:
                 "complete reentry closeout report must match complete reentry result"
             )
         if closeout_report.control_plane_digest != (
-            complete_reentry_result.control_plane.digest()
+            closeout_workflow_operation.operation_result.before_control_plane.digest()
         ):
             raise FoundationError(
-                "complete reentry closeout report must match complete reentry "
-                "control plane"
+                "complete reentry closeout report must match closeout control plane"
             )
         if closeout_workflow_operation.receipt.workflow_stage is not (
             HumanReviewWorkflowStage.COMPLETE_REENTRY_CLOSEOUT_RECORDED
@@ -299,12 +298,12 @@ class CompleteHumanReviewReentryCloseoutCoordinationResult:
             before_control_plane_digest=(
                 complete_reentry_result.receipt.before_control_plane_digest
             ),
-            closeout_control_plane_digest=complete_reentry_result.control_plane.digest(),
+            closeout_control_plane_digest=closeout_report.control_plane_digest,
             after_control_plane_digest=closeout_workflow_operation.control_plane.digest(),
             final_stage=complete_reentry_result.final_stage(),
             reentry_status=complete_reentry_result.reentry_status(),
             audit_status=complete_reentry_result.audit_status(),
-            report_status=complete_reentry_result.report_status(),
+            report_status=closeout_report.report_status,
             closeout_status=closeout_report.closeout_status,
             max_steps=complete_reentry_result.receipt.max_steps,
             executed_steps=complete_reentry_result.receipt.executed_steps,
