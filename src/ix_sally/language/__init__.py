@@ -8,6 +8,7 @@ from ix_sally.language.errors import (
     IXValidationError,
     LanguageDiagnostic,
 )
+from ix_sally.language.lexer import IXLexer, tokenize_ix
 from ix_sally.language.source import SourcePosition, SourceSpan
 from ix_sally.language.tokens import (
     KEYWORDS_BY_LEXEME,
@@ -22,6 +23,7 @@ __all__ = [
     "DiagnosticSeverity",
     "IXExecutionError",
     "IXLanguageError",
+    "IXLexer",
     "IXSyntaxError",
     "IXValidationError",
     "Keyword",
@@ -31,4 +33,5 @@ __all__ = [
     "SourceSpan",
     "TokenKind",
     "TokenLiteral",
+    "tokenize_ix",
 ]
