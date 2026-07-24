@@ -18,6 +18,7 @@ def test_quality_gate_commands_match_ci_tools() -> None:
         "lint": ("-m", "ruff", "check", "."),
         "type-check": ("-m", "mypy", "src", "tests"),
         "dependencies": ("-m", "dependency_check"),
+        "architecture": ("-m", "architecture_check"),
         "test": ("-m", "pytest"),
         "package": ("-m", "package_smoke"),
     }
@@ -44,6 +45,7 @@ def test_main_runs_all_gates_in_declared_order(monkeypatch: object) -> None:
         "lint",
         "type-check",
         "dependencies",
+        "architecture",
         "test",
         "package",
     ]
@@ -64,10 +66,12 @@ def test_main_runs_only_requested_gates(monkeypatch: object) -> None:
 
     monkeypatch.setattr(check_green, "_run_gate", fake_run_gate)
 
-    result = check_green.main(["--gate", "package", "--gate", "format"])
+    result = check_green.main(
+        ["--gate", "architecture", "--gate", "format"]
+    )
 
     assert result == 0
-    assert observed == ["package", "format"]
+    assert observed == ["architecture", "format"]
 
 
 def test_main_returns_failure_after_running_selected_gates(
@@ -94,6 +98,7 @@ def test_main_returns_failure_after_running_selected_gates(
         "lint",
         "type-check",
         "dependencies",
+        "architecture",
         "test",
         "package",
     ]
@@ -112,6 +117,7 @@ def test_ci_workflow_delegates_each_gate_to_shared_runner() -> None:
         "lint",
         "type-check",
         "dependencies",
+        "architecture",
         "test",
         "package",
     ):
