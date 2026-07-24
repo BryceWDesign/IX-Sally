@@ -40,19 +40,29 @@ from ix_sally.language.statements import (
     Statement,
     TraceStatement,
 )
-from ix_sally.language.validation import (
-    IXSemanticValidator,
-    IXValidationContext,
-    IXValidationReport,
-    require_valid_ix_program,
-    validate_ix_program,
-)
 from ix_sally.language.tokens import (
     KEYWORDS_BY_LEXEME,
     Keyword,
     LanguageToken,
     TokenKind,
     TokenLiteral,
+)
+from ix_sally.language.type_system import (
+    IXTypeBinding,
+    IXTypeChecker,
+    IXTypeContext,
+    IXTypeReport,
+    IXValueType,
+    check_ix_program_types,
+    infer_ix_expression_type,
+    require_typed_ix_program,
+)
+from ix_sally.language.validation import (
+    IXSemanticValidator,
+    IXValidationContext,
+    IXValidationReport,
+    require_valid_ix_program,
+    validate_ix_program,
 )
 
 __all__ = [
@@ -70,6 +80,11 @@ __all__ = [
     "IXSemanticValidator",
     "IXStatementParser",
     "IXSyntaxError",
+    "IXTypeBinding",
+    "IXTypeChecker",
+    "IXTypeContext",
+    "IXTypeReport",
+    "IXValueType",
     "IXValidationContext",
     "IXValidationError",
     "IXValidationReport",
@@ -93,8 +108,11 @@ __all__ = [
     "TraceStatement",
     "UnaryExpression",
     "UnaryOperator",
+    "check_ix_program_types",
+    "infer_ix_expression_type",
     "parse_ix_expression",
     "parse_ix_program",
+    "require_typed_ix_program",
     "require_valid_ix_program",
     "tokenize_ix",
     "validate_ix_program",
