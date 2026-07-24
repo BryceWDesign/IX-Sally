@@ -9,6 +9,7 @@ import pytest
 
 import ix_sally
 from ix_sally.state import NinefoldRunState
+from tests.subprocess_support import repository_subprocess_environment
 
 
 def test_package_import_does_not_eagerly_load_runtime_modules() -> None:
@@ -33,6 +34,7 @@ if loaded:
         check=False,
         capture_output=True,
         text=True,
+        env=repository_subprocess_environment(),
     )
 
     assert completed.returncode == 0, completed.stderr
