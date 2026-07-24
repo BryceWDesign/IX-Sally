@@ -19,6 +19,10 @@ from ix_sally.language.errors import (
     IXValidationError,
     LanguageDiagnostic,
 )
+from ix_sally.language.expression_parser import (
+    IXExpressionParser,
+    parse_ix_expression,
+)
 from ix_sally.language.lexer import IXLexer, tokenize_ix
 from ix_sally.language.source import SourcePosition, SourceSpan
 from ix_sally.language.tokens import (
@@ -37,6 +41,7 @@ __all__ = [
     "Expression",
     "GroupExpression",
     "IXExecutionError",
+    "IXExpressionParser",
     "IXLanguageError",
     "IXLexer",
     "IXSyntaxError",
@@ -53,5 +58,6 @@ __all__ = [
     "TokenLiteral",
     "UnaryExpression",
     "UnaryOperator",
+    "parse_ix_expression",
     "tokenize_ix",
 ]
