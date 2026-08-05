@@ -1,7 +1,8 @@
+
+
 from __future__ import annotations
 
 import pytest
-
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
@@ -68,7 +69,10 @@ def _control_state_after_handoff() -> HumanReviewControlPlaneState:
     return HumanReviewControlPlaneState.create().with_handoff_ledger(handoff_ledger)
 
 
-def _control_state_after_approved_decision() -> tuple[HumanReviewControlPlaneState, NinefoldRunState]:
+def _control_state_after_approved_decision() -> tuple[
+    HumanReviewControlPlaneState,
+    NinefoldRunState,
+]:
     state = _state().with_action(_review_action())
     bundle = HumanReviewBundleAssembler.create().assemble(state=state)
     handoff_ledger = HumanReviewBundleLedger.create(()).append_bundle(bundle)

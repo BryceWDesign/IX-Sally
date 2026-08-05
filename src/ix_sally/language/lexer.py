@@ -147,7 +147,7 @@ class IXLexer:
                 message="Unexpected '!'; IX supports '!=' but not unary bang.",
                 hint="Use the 'not' keyword for logical negation.",
             )
-                  if character == ">":
+        if character == ">":
             self._emit(
                 TokenKind.GREATER_EQUAL
                 if self._match("=")

@@ -218,7 +218,7 @@ class HumanReviewControlPlaneReport:
                 "human-review control-plane report reentry audit subtotals exceed "
                 "reentry_audit_count"
             )
-                    if blocking_reentry_audit_count > reentry_audit_count:
+        if blocking_reentry_audit_count > reentry_audit_count:
             raise FoundationError(
                 "human-review control-plane report blocking_reentry_audit_count "
                 "exceeds reentry_audit_count"

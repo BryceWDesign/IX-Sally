@@ -1,7 +1,8 @@
+
+
 from __future__ import annotations
 
 import pytest
-
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
@@ -32,7 +33,9 @@ def _state() -> NinefoldRunState:
     return NinefoldRunState.create(runtime_kit=NinefoldRuntimeKit.create(contract=contract))
 
 
-def _review_action(description: str = "Run certified post-review verification.") -> BoundedActionRecord:
+def _review_action(
+    description: str = "Run certified post-review verification.",
+) -> BoundedActionRecord:
     action = BoundedActionRecord.create(
         cycle=1,
         proposed_by=AgentRole.SALLY,

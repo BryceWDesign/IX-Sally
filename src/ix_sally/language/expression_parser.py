@@ -179,7 +179,7 @@ class IXExpressionParser:
             span=opening.span.merge(closing.span),
             expression=expression,
         )
-          def _binary_operator(self, token: LanguageToken) -> BinaryOperator | None:
+    def _binary_operator(self, token: LanguageToken) -> BinaryOperator | None:
         """Return the binary operator represented by ``token``."""
         if token.kind is TokenKind.KEYWORD and token.keyword is not None:
             return _BINARY_OPERATORS.get(token.keyword)

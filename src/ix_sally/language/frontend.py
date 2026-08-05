@@ -112,7 +112,7 @@ class IXFrontendAnalysis:
             raise FoundationError(
                 "IX front-end type report does not match the program"
             )
-              @property
+    @property
     def filename(self) -> str:
         """Return the analyzed source filename."""
         return self.program.span.filename
@@ -202,7 +202,9 @@ class IXFrontendAnalysis:
     def digest(self) -> DigestRecord:
         """Return a deterministic digest for this front-end analysis."""
         return DigestRecord.from_payload(self.to_payload())
-      @dataclass(frozen=True, slots=True)
+
+
+@dataclass(frozen=True, slots=True)
 class IXFrontendAnalyzer:
     """Run the complete non-executing IX source front end."""
 

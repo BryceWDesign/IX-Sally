@@ -155,13 +155,22 @@ class ForgeEvidenceAdapter:
     def _summary_for_result(self, result: ForgeResultRecord) -> str:
         """Return a receipt-grade evidence summary for a Forge result."""
         if result.observed_output is not None:
-            return f"Forge result {result.status.value}: {result.summary} Output: {result.observed_output}"
+            return (
+                f"Forge result {result.status.value}: {result.summary} "
+                f"Output: {result.observed_output}"
+            )
 
         if result.failure_reason is not None:
-            return f"Forge result {result.status.value}: {result.summary} Reason: {result.failure_reason}"
+            return (
+                f"Forge result {result.status.value}: {result.summary} "
+                f"Reason: {result.failure_reason}"
+            )
 
         if result.boundary_note is not None:
-            return f"Forge result {result.status.value}: {result.summary} Boundary: {result.boundary_note}"
+            return (
+                f"Forge result {result.status.value}: {result.summary} "
+                f"Boundary: {result.boundary_note}"
+            )
 
         return f"Forge result {result.status.value}: {result.summary}"
 

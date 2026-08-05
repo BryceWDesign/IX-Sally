@@ -194,9 +194,21 @@ if TYPE_CHECKING:
         TransferTrial,
         TransferTrialPacket,
     )
+    from ix_sally.cognition.compiler import compile_ix_source
+    from ix_sally.cognition.evaluation import (
+        CognitiveEvaluationReport,
+        run_core_evaluation,
+    )
+    from ix_sally.cognition.system import SallyCognitiveSystem
+    from ix_sally.cognition.vm import IXVirtualMachine
 
 __all__ = [
     "__version__",
+    "run_core_evaluation",
+    "compile_ix_source",
+    "SallyCognitiveSystem",
+    "IXVirtualMachine",
+    "CognitiveEvaluationReport",
     "ActionStatus",
     "AgentArtifact",
     "AgentArtifactKind",
@@ -313,6 +325,26 @@ __all__ = [
     "session_one_runtime_kit",
 ]
 _LAZY_EXPORTS: Final[dict[str, tuple[str, str]]] = {
+    "CognitiveEvaluationReport": (
+        "ix_sally.cognition.evaluation",
+        "CognitiveEvaluationReport",
+    ),
+    "IXVirtualMachine": (
+        "ix_sally.cognition.vm",
+        "IXVirtualMachine",
+    ),
+    "SallyCognitiveSystem": (
+        "ix_sally.cognition.system",
+        "SallyCognitiveSystem",
+    ),
+    "compile_ix_source": (
+        "ix_sally.cognition.compiler",
+        "compile_ix_source",
+    ),
+    "run_core_evaluation": (
+        "ix_sally.cognition.evaluation",
+        "run_core_evaluation",
+    ),
     "ActionStatus": (
         "ix_sally.actions",
         "ActionStatus",

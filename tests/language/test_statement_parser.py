@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from ix_sally.foundation import FoundationError
 from ix_sally.language.ast import (
     BinaryExpression,
@@ -172,7 +171,9 @@ def test_statement_parser_rejects_missing_expression() -> None:
     diagnostic = captured.value.diagnostic
     assert diagnostic.code.value == "syntax-expected-expression"
     assert diagnostic.span.label() == "broken.ix:1:6"
-  def test_statement_parser_rejects_recall_trailing_tokens() -> None:
+
+
+def test_statement_parser_rejects_recall_trailing_tokens() -> None:
     """Recall accepts exactly one memory name and no expression tail."""
     with pytest.raises(IXSyntaxError) as captured:
         parse_ix_program(

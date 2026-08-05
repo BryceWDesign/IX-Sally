@@ -1,7 +1,8 @@
+
+
 from __future__ import annotations
 
 import pytest
-
 from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.foundation import FoundationError
 

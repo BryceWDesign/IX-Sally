@@ -201,7 +201,10 @@ class HumanReviewReentryCoordinationResult:
             raise FoundationError(
                 "human-review reentry coordination resume operation mismatch"
             )
-        if workflow_operation.receipt.workflow_stage is not HumanReviewWorkflowStage.REENTRY_RECORDED:
+        if (
+            workflow_operation.receipt.workflow_stage
+            is not HumanReviewWorkflowStage.REENTRY_RECORDED
+        ):
             raise FoundationError(
                 "human-review reentry coordination requires reentry-recorded workflow"
             )

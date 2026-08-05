@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
@@ -218,7 +218,10 @@ class StateAuditor:
                 StateAuditFinding.create(
                     severity=StateAuditSeverity.BLOCKING,
                     summary="Bounded actions block autonomous continuation.",
-                    detail=f"{state.blocked_action_count()} bounded action(s) are denied or blocked.",
+                    detail=(
+                        f"{state.blocked_action_count()} bounded action(s) "
+                        "are denied or blocked."
+                    ),
                     reference="actions.blocked",
                 )
             )

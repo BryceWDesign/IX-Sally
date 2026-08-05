@@ -5,7 +5,6 @@ from __future__ import annotations
 from dataclasses import replace
 
 import pytest
-
 from ix_sally.digest import DigestRecord
 from ix_sally.foundation import FoundationError
 from ix_sally.language.errors import IXSyntaxError, IXValidationError
@@ -128,7 +127,9 @@ def test_frontend_analysis_payload_and_digest_are_deterministic() -> None:
     assert first.to_payload()["token_count"] == len(first.tokens)
     assert first.to_payload()["error_count"] == 0
     assert first.to_payload()["is_accepted"] is True
-  def test_frontend_source_digest_changes_with_source_content() -> None:
+
+
+def test_frontend_source_digest_changes_with_source_content() -> None:
     """The front-end receipt must bind analysis to exact source content."""
     first = analyze_ix_source("print 1", filename="source.ix")
     second = analyze_ix_source("print 2", filename="source.ix")

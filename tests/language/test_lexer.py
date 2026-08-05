@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from ix_sally.foundation import FoundationError
 from ix_sally.language.errors import IXSyntaxError
 from ix_sally.language.lexer import IXLexer, tokenize_ix

@@ -1,7 +1,8 @@
+
+
 from __future__ import annotations
 
 import pytest
-
 from ix_sally.chamber import ObservationChamberConfig, StopCondition, StopReason
 from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.doctrine import default_doctrine_catalog

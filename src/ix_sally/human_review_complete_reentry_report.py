@@ -7,11 +7,11 @@ from typing import TYPE_CHECKING
 
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
-from ix_sally.human_review_complete_reentry_ledger import (
-    CompleteHumanReviewReentryLedgerEntry,
-)
 from ix_sally.human_review_complete_reentry_closeout_status import (
     CompleteHumanReviewReentryCloseoutStatus,
+)
+from ix_sally.human_review_complete_reentry_ledger import (
+    CompleteHumanReviewReentryLedgerEntry,
 )
 from ix_sally.human_review_control_plane_report_status import (
     HumanReviewControlPlaneReportStatus,
@@ -191,7 +191,7 @@ class CompleteHumanReviewReentryCloseoutReport:
                 raise FoundationError(
                     "complete human-review reentry closeout ledger entry state mismatch"
                 )
-                        return cls(
+        return cls(
             report_id=report_id
             or CanonicalKey.from_text(
                 f"complete-human-review-reentry-closeout-"
@@ -331,7 +331,8 @@ class CompleteHumanReviewReentryCloseoutReport:
     def digest(self) -> DigestRecord:
         """Return a deterministic digest for this complete reentry closeout report."""
         return DigestRecord.from_payload(self.to_payload())
-        
+
+
 def _select_closeout_status(
     result: CompleteHumanReviewReentryResult,
     findings: tuple[CompleteHumanReviewReentryCloseoutFinding, ...],

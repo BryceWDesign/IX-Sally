@@ -5,9 +5,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-import pytest
-
 import package_smoke
+import pytest
 
 
 def test_isolated_environment_removes_python_path_overrides(

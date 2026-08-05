@@ -1,7 +1,8 @@
+
+
 from __future__ import annotations
 
 import pytest
-
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
 from ix_sally.contracts import AutonomyContract, AutonomyMode

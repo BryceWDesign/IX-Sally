@@ -208,7 +208,7 @@ class IXStatementParser:
         return IXExpressionParser(
             tokens=(*expression_tokens, expression_eof)
         ).parse()
-          def _require_statement_end(self, *, context: str) -> None:
+    def _require_statement_end(self, *, context: str) -> None:
         """Require newline or EOF after a non-expression statement."""
         token = self._peek()
         if token.kind in {TokenKind.NEWLINE, TokenKind.EOF}:

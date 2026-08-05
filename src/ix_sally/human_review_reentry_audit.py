@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
@@ -180,7 +180,7 @@ class HumanReviewReentryAuditReport:
             status=status,
             findings=findings,
         )
-            def blocking_findings(self) -> tuple[HumanReviewReentryAuditFinding, ...]:
+    def blocking_findings(self) -> tuple[HumanReviewReentryAuditFinding, ...]:
         """Return blocking findings."""
         return tuple(finding for finding in self.findings if finding.is_blocking())
 
@@ -355,7 +355,7 @@ def _findings_from_coordination(
                 detail="Human-review reentry was not recorded in control-plane state.",
             )
         )
-            if coordination.recorded_reentry() and coordination.control_plane.reentry_count() > 0:
+    if coordination.recorded_reentry() and coordination.control_plane.reentry_count() > 0:
         findings.append(
             _finding(
                 severity=HumanReviewReentryAuditSeverity.INFO,

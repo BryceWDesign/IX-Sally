@@ -4,7 +4,6 @@ import subprocess
 import sys
 
 import pytest
-
 from tests.subprocess_support import repository_subprocess_environment
 
 

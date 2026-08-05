@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.agents import AgentRole
 from ix_sally.contracts import AutonomyContract
@@ -228,7 +228,9 @@ class AuthorityDecisionLedger:
 
         for decision in normalized:
             if decision.decision_id.value in seen:
-                raise FoundationError(f"duplicate authority decision id: {decision.decision_id.value}")
+                raise FoundationError(
+                    f"duplicate authority decision id: {decision.decision_id.value}"
+                )
             seen.add(decision.decision_id.value)
 
         return cls(decisions=normalized)
@@ -314,7 +316,10 @@ def decide_authority_request(
             cycle=request.cycle,
             request_digest=request.digest(),
             status=AuthorityDecisionStatus.HUMAN_REVIEW_REQUIRED,
-            rationale="Requested action is inside role jurisdiction but requires human boundary review.",
+            rationale=(
+                "Requested action is inside role jurisdiction but requires "
+                "human boundary review."
+            ),
             jurisdiction_decision=jurisdiction,
             human_review_note="human boundary review is required before action execution",
         )

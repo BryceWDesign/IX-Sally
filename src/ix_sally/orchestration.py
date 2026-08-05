@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.authority_processing import AuthorityProcessor
 from ix_sally.chamber_closing import ChamberCloseResult, ChamberCloser

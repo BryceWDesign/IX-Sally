@@ -163,7 +163,9 @@ class GroupExpression(Expression):
             "span": self.span.to_payload(),
             "expression": self.expression.to_payload(),
         }
-      @dataclass(frozen=True, slots=True)
+
+
+@dataclass(frozen=True, slots=True)
 class UnaryExpression(Expression):
     """An IX unary operation over one operand."""
 

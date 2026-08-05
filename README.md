@@ -1,248 +1,316 @@
 # IX-Sally
 
-IX-Sally is a source-available, evaluation-only governed AI operating architecture for controlled proposal intake, evidence handling, staged execution, human review, certified resume, audited reentry, and closeout reporting.
+IX-Sally is a source-available, evaluation-only governed experimental cognitive
+runtime. It combines a deterministic human-authority control plane with typed
+IX language execution, bounded memory, world modeling, planning, learning,
+metacognition, persistence, and evidence-linked proposal generation.
 
-The core rule is simple:
+The controlling rule is:
 
-**AI proposes. Humans decide. Evidence governs what may proceed.**
+> **AI proposes. Humans decide. Evidence governs what may proceed.**
 
-IX-Sally is not an autonomous agent framework, not a deployment bot, not a compliance certification engine, and not an AGI claim. It is a receipt-driven control-plane architecture for proving that proposals, execution readiness, human decisions, reentry, and closeout status were handled under explicit authority boundaries.
+IX-Sally is not a demonstrated AGI, autonomous deployment platform,
+certification authority, or substitute for independent engineering and human
+judgment.
 
-## Purpose
+## What is delivered
 
-Modern AI systems can produce confident outputs that look actionable before they are grounded, reviewed, authorized, or safe to execute. IX-Sally is built around the opposite assumption:
+The repository contains two integrated architectural layers.
+
+### Governed control plane
+
+The inherited IX-Sally control plane provides:
+
+- deterministic canonical records and SHA-256 digest links;
+- doctrine, claims, jurisdiction, contracts, and bounded run state;
+- proposal intake and proposal gateways;
+- evidence records, support findings, and evidence processing;
+- stage readiness, stage gates, orchestration, and advance receipts;
+- execution planning, queues, dispatch, and Forge result processing;
+- human-review handoffs, dockets, packets, bundles, and decisions;
+- clearance, resume certification, reentry, audit, and complete reentry;
+- closeout reports, ledgers, coordination records, and export packets;
+- explicit separation between capability, evidence, permission, and authority.
+
+### Experimental cognitive runtime
+
+The cognitive runtime adds:
+
+- complete IX lexical, syntactic, semantic, and type analysis;
+- exact typed cognitive scalar values;
+- deterministic bytecode compilation;
+- a bounded step-limited virtual machine;
+- immutable execution status, failure, output, memory, and trace receipts;
+- atomic VM memory commitment after a clean halt;
+- grounded closed-catalog primitives without dynamic Python callbacks;
+- a bounded typed attention workspace;
+- working, episodic, semantic, and procedural memory;
+- explicit pending, verified, stale, contradicted, and quarantined status;
+- replayable digest-linked cognitive episodes;
+- observed, inferred, predicted, hypothetical, and contradicted world facts;
+- evidence-bound causal inference, prediction, and counterfactual simulation;
+- dependency-aware goals and bounded deterministic planning;
+- exact preconditions, effects, cost, risk, and authority metadata;
+- calibrated uncertainty, Brier score, and calibration-error reporting;
+- training, validation, and held-out curriculum splits;
+- evidence-bound learning, retention, and transfer records;
+- an evidence-limited self model and regression-aware adaptation proposals;
+- a functional ninefold cognitive cycle using IX-Sally's canonical roles;
+- complete canonical snapshots, exact restoration, backup, and recovery;
+- an explicit bridge from cognitive plans into the existing proposal path;
+- human-authority and risk gates before consequential action may proceed.
+
+## Core boundaries
+
+IX-Sally preserves these distinctions throughout the implementation:
 
 - Output is not evidence.
-- Proposal is not permission.
+- Memory is not truth.
+- Prediction is not observation.
+- Simulation is not execution.
 - Capability is not authority.
-- Human review is not optional ceremony.
-- Resume after human review must be certified.
-- Reentry after resume must be audited.
-- Closeout must be ledgered and exportable.
+- A proposal is not permission.
+- A test result is not certification.
+- Repetition does not convert a claim into truth.
+- IX-Sally may not approve its own consequential action.
+- IX-Sally may not certify itself as AGI.
 
-The system is designed to make every meaningful transition inspectable through deterministic records, digests, receipts, ledgers, reports, and control-plane snapshots.
+## Architecture flow
 
-## What IX-Sally does
+```text
+IX source
+  -> lexer / parser / semantic validation / type checking
+  -> deterministic bytecode compiler
+  -> bounded virtual machine
+  -> typed output, memory, failure, and trace receipt
 
-IX-Sally models a governed workflow for AI-assisted operations:
+observations and admitted evidence
+  -> cognitive workspace and active memory
+  -> epistemically typed world model
+  -> causal inference, prediction, and counterfactuals
+  -> goal graph and bounded planner
+  -> executive uncertainty, risk, and authority gates
+  -> cognitive proposal bridge
+  -> existing IX-Sally proposal and human-review control plane
 
-1. Establish a bounded contract and run state.
-2. Accept proposals only through explicit intake and gateway structures.
-3. Evaluate evidence and support before action is treated as ready.
-4. Gate staged orchestration through readiness checks.
-5. Dispatch only bounded execution candidates.
-6. Process Forge results through structured result gateways.
-7. Route human-boundary actions into human review.
-8. Record human review handoffs, packets, dockets, bundles, and decisions.
-9. Certify cleared resume after human authority is recorded.
-10. Reenter orchestration after resume with explicit receipts.
-11. Audit reentry before treating it as accepted.
-12. Record complete reentry and closeout.
-13. Export closeout evidence packets for downstream review.
+observed outcomes
+  -> learning ledger and capability measures
+  -> curriculum, retention, and held-out transfer records
+  -> regression-aware adaptation proposal
+  -> separate human decision and validation boundary
+```
 
-The emphasis is not on making an AI act faster. The emphasis is on making it harder for unearned authority, unsupported claims, or skipped review to pass unnoticed.
+Detailed design documentation is available in:
 
-## Current capability
+- `docs/ARCHITECTURE.md`
+- `docs/USAGE.md`
+- `docs/AGI_CLAIM_BOUNDARY.md`
+- `docs/ROADMAP_COMPLETION_LEDGER.md`
+- `VALIDATION_REPORT.md`
 
-IX-Sally now includes a complete governed control-plane path from proposal intake through final human-review reentry closeout export.
+## Repository layout
 
-Major capabilities include:
+```text
+IX-Sally/
+├── .github/workflows/       GitHub Actions quality gates
+├── docs/                    Architecture, usage, boundaries, and ledger
+├── examples/                Executable IX and Python demonstrations
+├── src/ix_sally/
+│   ├── cognition/           Integrated cognitive runtime
+│   ├── language/            IX language frontend and type system
+│   └── ...                  Governed control-plane modules
+├── tests/                   Complete source test inventory
+├── check_green.py           Unified quality-gate runner
+├── repository_check.py      Repository-integrity gate
+├── dependency_check.py      Dependency-cycle gate
+├── architecture_check.py    Runtime-boundary gate
+├── package_smoke.py         Installed-wheel verification
+├── pyproject.toml           Package and tool configuration
+├── VALIDATION_REPORT.md     Exact local validation evidence and limits
+└── LICENSE                  Controlling evaluation-only terms
+```
 
-- Deterministic digest records and canonical payloads.
-- Doctrine and boundary primitives.
-- Runtime contracts and bounded run state.
-- Proposal intake, proposal gateway, and Sally proposal routing.
-- Evidence records, evidence support records, and evidence support processing.
-- Stage readiness, stage gates, stage advance receipts, and staged orchestration.
-- One-step orchestration and loop-runner support.
-- Execution queues, execution planning, execution dispatch, and Forge result processing.
-- Forge evidence, Forge result records, Forge result gateway, and Forge result processing.
-- Human-review gateway, docket, packets, operator bundle, and bundle ledger.
-- Human-review handoff coordination.
-- Human-review decision ledger and decision coordination.
-- Human-review resolution audit and clearance reporting.
-- Human-review resume certificate, resume ledger, and resume coordination.
-- Human-review control-plane state, coordinator, status, snapshot, and report.
-- Human-review workflow kit for handoff, decision, clearance, resume, reentry, audit, complete reentry, and closeout.
-- Certified human-review reentry runner.
-- Reentry result ledger.
-- Reentry audit report and audit ledger.
-- Audited reentry coordination and ledger.
-- Complete reentry coordination and ledger.
-- Complete reentry closeout report and closeout ledger.
-- Complete reentry closeout coordination and coordination ledger.
-- Complete reentry closeout export packet.
+## Requirements
 
-## Human-review control plane
+- Python 3.11, 3.12, or 3.13
+- No declared third-party runtime dependencies
 
-The human-review control plane is the center of the repository.
+Development tools are available through the `dev` extra:
 
-It records and reports:
+```text
+python -m pip install -e ".[dev]"
+```
 
-- Handoffs.
-- Human decisions.
-- Resume certificates.
-- Reentry results.
-- Reentry audits.
-- Audited reentries.
-- Complete reentries.
-- Complete reentry closeouts.
-- Complete reentry closeout coordination results.
+## Run the complete quality gate
 
-The control plane is intentionally ledger-driven. Each update creates a new immutable state instead of mutating prior records. This gives the runtime a stable basis for asking:
+```text
+python check_green.py
+```
 
-- What was handed off?
-- Who decided?
-- Was resume cleared?
-- Did reentry actually advance state?
-- Did the reentry audit pass?
-- Was the complete reentry recorded?
-- Was closeout accepted, waiting, or blocked?
-- Can the result be exported without operator attention?
+Individual gates can be selected:
 
-## Complete reentry closeout path
+```text
+python check_green.py --gate format
+python check_green.py --gate lint
+python check_green.py --gate type-check
+python check_green.py --gate repository
+python check_green.py --gate dependencies
+python check_green.py --gate architecture
+python check_green.py --gate test
+python check_green.py --gate package
+```
 
-The final closeout path is the most complete human-review lifecycle currently represented in IX-Sally.
+## Run the observed cognitive evaluation
 
-A cleared resume can be passed through:
+```text
+python -m ix_sally --cognitive-evaluation
+```
 
-1. Complete reentry coordination.
-2. Reentry execution.
-3. Reentry audit.
-4. Audited reentry recording.
-5. Complete reentry recording.
-6. Closeout report creation.
-7. Closeout workflow recording.
-8. Closeout coordination ledgering.
-9. Export packet creation.
+The command emits canonical JSON for fifteen deterministic local benchmarks:
 
-The export packet links the major evidence layers:
+1. typed IX arithmetic;
+2. governed VM memory;
+3. grounded primitive execution;
+4. active-memory retrieval;
+5. causal prediction;
+6. bounded planning;
+7. measured transfer;
+8. functional ninefold coordination;
+9. human-authority blocking;
+10. calibrated uncertainty;
+11. executive-to-governance bridging;
+12. separated held-out curriculum evidence;
+13. replayable episode chaining;
+14. regression-aware adaptation;
+15. exact complete-state restoration.
 
-- Coordination result.
-- Coordination receipt.
-- Closeout report.
-- Closeout workflow operation.
-- Final state.
-- Final control plane.
-- Closeout ledger.
-- Closeout coordination ledger.
+A passing report still contains:
 
-This makes the final state portable for review without implying automatic approval, certification, or production readiness.
+```text
+classification = experimental-cognitive-architecture
+agi_certified = false
+```
 
-## Repository shape
+## Execute IX source
 
-IX-Sally is a standalone modular-monolith Python repository. It is intentionally not a collection of repo-hopping integrations. The modules are small, explicit, testable units connected through typed records and deterministic payloads.
+Run the included example:
 
-Core module families include:
+```text
+python -m ix_sally --execute-ix examples/answer.ix
+```
 
-- Foundation, digest, state, runtime, and recording.
-- Doctrine, claims, boundaries, jurisdiction, and contracts.
-- Proposals, proposal intake, and proposal gateways.
-- Evidence, evidence support, and evidence processing.
-- Stage readiness, stage gates, orchestration, and orchestration receipts.
-- Execution planning, queueing, dispatch, and Forge result processing.
-- Human review handoff, packets, dockets, bundles, decisions, clearance, resume, reentry, audit, closeout, and export.
+Example IX program:
 
-## Design principles
+```text
+let answer = 6 * 7
+remember answer = answer
+print recall answer
+assert answer == 42
+```
 
-IX-Sally follows these principles:
+The command returns a deterministic JSON receipt with typed local values,
+outputs, memories, instruction trace, status, and failure information.
 
-### 1. No self-approval
+## Python integration
 
-The system may create records, evaluate readiness, and prepare evidence. It may not convert its own output into authority.
+```python
+from ix_sally.cognition import SallyCognitiveSystem
 
-### 2. Evidence before motion
+system = SallyCognitiveSystem.create()
+result = system.execute_ix(
+    "let answer = 6 * 7\nprint answer\nassert answer == 42\n",
+    filename="example.ix",
+)
 
-Readiness and support are represented as records. Unsupported claims must not silently become executable steps.
+print(result.status.value)
+print(result.to_payload())
+```
 
-### 3. Human authority remains explicit
+## Persist and restore complete state
 
-Human-review boundaries are not hidden inside generic success paths. Handoffs, decisions, clearance, resume, and reentry are separate records.
+```python
+from pathlib import Path
 
-### 4. Resume is certified
+from ix_sally.cognition import SallyCognitiveSystem, SnapshotRepository
 
-After human review, the system does not simply continue. It records a resume certificate and resumes from a traceable state.
+system = SallyCognitiveSystem.create()
+system.execute_ix("remember answer = 42\n", filename="memory.ix")
 
-### 5. Reentry is audited
+repository = SnapshotRepository(Path("ix-sally-state.json"))
+repository.save(system.snapshot())
+loaded = repository.load()
+restored = SallyCognitiveSystem.from_snapshot(loaded.snapshot)
 
-A resumed workflow is not treated as clean merely because it advanced. Reentry is separately audited and reported.
+assert restored.state_payload() == system.state_payload()
+```
 
-### 6. Closeout is exportable
+Snapshot restoration validates canonical payloads and state digests before
+reconstructing the integrated runtime. Backup recovery fails closed when no
+valid copy remains.
 
-The final closeout state can be converted into a digest-linked export packet for inspection, review, or downstream evidence handling.
+## Local validation evidence
 
-### 7. Determinism over theater
+The final source state was locally observed with:
 
-The repository favors small immutable records, stable JSON-compatible payloads, digest links, and tests over broad claims.
+- CPython 3.13.5 compilation across `src`, `tests`, and `examples`;
+- exactly 969 collected tests across 135 test files;
+- all 969 tests passing in four balanced shards;
+- repository integrity passing with 0 violations;
+- 123 runtime modules and 655 imports with 0 dependency cycles;
+- 0 architecture-boundary violations;
+- installed-wheel smoke testing passing;
+- all 15 built-in cognitive benchmarks passing;
+- 0 Python lines over the configured 100-character limit;
+- 0 trailing-whitespace findings;
+- 0 source TODO/FIXME/placeholder/`pass`/`NotImplementedError` findings.
 
-## What IX-Sally is not
+Ruff, Mypy, CPython 3.11, and CPython 3.12 were not available in the local
+execution environment and are not falsely reported as passed. GitHub Actions is
+configured to run formatting, lint, strict typing, structural checks, tests,
+and wheel verification on Python 3.11, 3.12, and 3.13.
 
-IX-Sally is not:
+See `VALIDATION_REPORT.md` for the exact evidence and limitations.
 
-- An AGI system.
-- An autonomous operations platform.
-- A production deployment tool.
-- A certification authority.
-- A substitute for human judgment.
-- A legal, safety, security, or compliance guarantee.
-- A system that grants AI independent authority.
+## AGI claim boundary
 
-It is an evaluation architecture for governed AI workflow control.
+IX-Sally implements mechanisms commonly explored in cognitive architectures,
+but architecture completion and local tests do not establish artificial
+general intelligence.
 
-## Example use cases
+This repository does not prove:
 
-IX-Sally may be useful for research and evaluation work involving:
+- human-level or open-world general intelligence;
+- broad unfamiliar-task competence;
+- autonomous scientific discovery;
+- safe recursive self-improvement;
+- robust embodiment;
+- production safety;
+- certification or regulatory compliance.
 
-- AI proposal governance.
-- Human-in-the-loop execution control.
-- AI evidence handling.
-- Audit-oriented orchestration.
-- Review-gated tool execution.
-- Safety-case style workflow records.
-- Receipt-driven agent evaluation.
-- Control-plane design for AI-assisted engineering.
-- Demonstrations of bounded AI authority.
+No external foundation-model weights, training corpus, sensor stream, robotics
+stack, or proprietary benchmark data is bundled. Those are explicit external
+system boundaries rather than hidden missing files.
+
+The accurate description is:
+
+> IX-Sally is a governed experimental cognitive runtime and research
+> architecture. It is not a demonstrated AGI.
 
 ## Development status
 
-This repository is a research and evaluation build. It is structured around deterministic behavior, typed records, and tests. Interfaces may evolve as the control-plane model is refined.
+IX-Sally remains an alpha research and evaluation build. It is intended for
+architecture review, deterministic experimentation, governed-agent research,
+human-authority workflow evaluation, and reproducible cognitive-runtime tests.
 
-Do not treat this repository as production-ready. Do not use it to authorize real-world execution without independent engineering, legal, security, safety, and human governance review.
+Do not use it to authorize real-world consequential execution without separate
+engineering, security, legal, safety, operational, and human governance review.
 
-## Running tests
+## License
 
-Typical local development flow:
+IX-Sally is source-available for evaluation and review under the terms in
+`LICENSE`.
 
-```
-python -m pytest
-python -m ruff check .
-python -m ruff format --check .
-python -m mypy src tests
-```
-Depending on environment configuration, set PYTHONPATH=src before running tests.
-
-PowerShell example:
-```
-$env:PYTHONPATH="src"
-python -m pytest
-python -m ruff check .
-python -m ruff format --check .
-python -m mypy src tests
-```
-License posture
-
-IX-Sally is source-available for evaluation and review.
-
-Public viewing and evaluation are allowed. Production use, commercial use, hosted use, derivative use, funded use, government or regulated operational use, redistribution, or ownership transfer require written permission and a paid commercial license from Bryce Lovell.
-
-See the repository license file for the controlling terms.
-
-Claim boundary
-
-IX-Sally demonstrates a governed control-plane architecture for AI-assisted proposal, evidence, review, resume, reentry, audit, closeout, and export workflows.
-
-It does not claim autonomous trustworthiness. It does not claim certification. It does not claim AGI.
-
-The correct interpretation is:
-
-IX-Sally is a receipt-driven governed AI workflow architecture where AI output remains subordinate to evidence, explicit authority, human review, and auditable control-plane state.
+Production use, commercial use, hosted use, derivative use, funded use,
+government or regulated operational use, redistribution, or ownership transfer
+requires prior written permission and a paid commercial license from Bryce
+Lovell.

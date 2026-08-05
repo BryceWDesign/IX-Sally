@@ -221,7 +221,9 @@ class IXSemanticValidator:
             )
         )
         return tuple(diagnostics)
-      def validate_ix_program(
+
+
+def validate_ix_program(
     program: Program,
     *,
     context: IXValidationContext | None = None,
