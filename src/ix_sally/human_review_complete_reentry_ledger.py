@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError
@@ -11,11 +12,11 @@ from ix_sally.stage_readiness import RunStage
 
 if TYPE_CHECKING:
     from ix_sally.human_review_complete_reentry import CompleteHumanReviewReentryResult
-    from ix_sally.human_review_control_plane_report import (
+    from ix_sally.human_review_control_plane_report_status import (
         HumanReviewControlPlaneReportStatus,
     )
-    from ix_sally.human_review_reentry import HumanReviewReentryStatus
-    from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditStatus
+    from ix_sally.human_review_reentry_audit_status import HumanReviewReentryAuditStatus
+    from ix_sally.human_review_reentry_status import HumanReviewReentryStatus
 
 
 @dataclass(frozen=True, slots=True)
@@ -68,13 +69,9 @@ class CompleteHumanReviewReentryLedgerEntry:
     ) -> CompleteHumanReviewReentryLedgerEntry:
         """Create a normalized complete human-review reentry ledger entry."""
         if sequence <= 0:
-            raise FoundationError(
-                "complete human-review reentry ledger sequence must be positive"
-            )
+            raise FoundationError("complete human-review reentry ledger sequence must be positive")
         if max_steps <= 0:
-            raise FoundationError(
-                "complete human-review reentry ledger max_steps must be positive"
-            )
+            raise FoundationError("complete human-review reentry ledger max_steps must be positive")
         if executed_steps < 0:
             raise FoundationError(
                 "complete human-review reentry ledger executed_steps must not be negative"
@@ -138,9 +135,7 @@ class CompleteHumanReviewReentryLedgerEntry:
             resume_operation_digest=result.receipt.resume_operation_digest,
             audited_reentry_result_digest=result.receipt.audited_reentry_result_digest,
             audited_reentry_receipt_digest=result.receipt.audited_reentry_receipt_digest,
-            final_workflow_operation_digest=(
-                result.receipt.final_workflow_operation_digest
-            ),
+            final_workflow_operation_digest=(result.receipt.final_workflow_operation_digest),
             before_state_digest=result.receipt.before_state_digest,
             after_state_digest=result.receipt.after_state_digest,
             before_control_plane_digest=result.receipt.before_control_plane_digest,
@@ -273,9 +268,7 @@ class CompleteHumanReviewReentryLedgerEntry:
             "executed_steps": self.executed_steps,
             "changed_state": self.changed_state(),
             "recorded_reentry_and_audit": self.recorded_reentry_and_audit(),
-            "recorded_complete_audited_reentry": (
-                self.recorded_complete_audited_reentry()
-            ),
+            "recorded_complete_audited_reentry": (self.recorded_complete_audited_reentry()),
             "accepted": self.accepted(),
             "failed": self.failed(),
             "waiting_for_external_input": self.waiting_for_external_input(),
@@ -308,8 +301,7 @@ class CompleteHumanReviewReentryLedger:
         for entry in normalized:
             if entry.sequence in seen_sequences:
                 raise FoundationError(
-                    f"duplicate complete human-review reentry ledger sequence: "
-                    f"{entry.sequence}"
+                    f"duplicate complete human-review reentry ledger sequence: {entry.sequence}"
                 )
             if entry.entry_id.value in seen_entry_ids:
                 raise FoundationError(
@@ -413,9 +405,7 @@ class CompleteHumanReviewReentryLedger:
             "waiting_entry_count": len(self.waiting_entries()),
             "operator_attention_entry_count": len(self.operator_attention_entries()),
             "changed_state_entry_count": len(self.changed_state_entries()),
-            "forge_dispatch_entry_count": len(
-                self.entries_for_stage(RunStage.FORGE_DISPATCH)
-            ),
+            "forge_dispatch_entry_count": len(self.entries_for_stage(RunStage.FORGE_DISPATCH)),
             "forge_result_processing_entry_count": len(
                 self.entries_for_stage(RunStage.FORGE_RESULT_PROCESSING)
             ),

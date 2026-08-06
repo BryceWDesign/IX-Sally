@@ -13,19 +13,13 @@ class HumanReviewControlPlaneReportStatus(StrEnum):
     REENTRY_RECORDED = "reentry_recorded"
     REENTRY_WAITING_FOR_EXTERNAL_INPUT = "reentry_waiting_for_external_input"
     REENTRY_AUDIT_PASSED = "reentry_audit_passed"
-    REENTRY_AUDIT_WAITING_FOR_EXTERNAL_INPUT = (
-        "reentry_audit_waiting_for_external_input"
-    )
+    REENTRY_AUDIT_WAITING_FOR_EXTERNAL_INPUT = "reentry_audit_waiting_for_external_input"
     REENTRY_AUDIT_FAILED = "reentry_audit_failed"
     AUDITED_REENTRY_ACCEPTED = "audited_reentry_accepted"
-    AUDITED_REENTRY_WAITING_FOR_EXTERNAL_INPUT = (
-        "audited_reentry_waiting_for_external_input"
-    )
+    AUDITED_REENTRY_WAITING_FOR_EXTERNAL_INPUT = "audited_reentry_waiting_for_external_input"
     AUDITED_REENTRY_FAILED = "audited_reentry_failed"
     COMPLETE_REENTRY_ACCEPTED = "complete_reentry_accepted"
-    COMPLETE_REENTRY_WAITING_FOR_EXTERNAL_INPUT = (
-        "complete_reentry_waiting_for_external_input"
-    )
+    COMPLETE_REENTRY_WAITING_FOR_EXTERNAL_INPUT = "complete_reentry_waiting_for_external_input"
     COMPLETE_REENTRY_FAILED = "complete_reentry_failed"
     COMPLETE_REENTRY_CLOSEOUT_ACCEPTED = "complete_reentry_closeout_accepted"
     COMPLETE_REENTRY_CLOSEOUT_WAITING_FOR_EXTERNAL_INPUT = (

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ix-sally"
 dynamic = ["version"]
-description = "Governed multi-agent autonomy habitat with doctrine, evidence gates, memory law, sandboxed action, transfer testing, and human boundary authority."
+description = "Governed experimental cognitive runtime with typed IX execution, active memory, world modeling, planning, learning, and human authority boundaries."
 requires-python = ">=3.11"
 license = { text = "LicenseRef-IX-Sally-Source-Available-Evaluation-1.0" }
 authors = [
@@ -17,8 +17,10 @@ keywords = [
   "ai-safety",
   "autonomy",
   "evidence",
+  "cognitive-architecture",
   "human-authority",
-  "multi-agent",
+  "machine-learning-research",
+  "planning",
   "source-available"
 ]
 classifiers = [
@@ -89,10 +91,17 @@ select = [
   "W"
 ]
 ignore = [
-  "PLR0913"
+  "PLR0913",
+  "PLR0911",
+  "PLR0912",
+  "PLR0915",
+  "PLR2004",
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"src/ix_sally/cli.py" = ["PLC0415"]
+"src/ix_sally/cognition/system.py" = ["PLC0415"]
+"src/ix_sally/runtime.py" = ["PLC0415"]
 "tests/**/*.py" = [
   "PLR2004",
   "S101"

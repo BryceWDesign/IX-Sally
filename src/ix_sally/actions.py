@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.agents import AgentRole
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus, AuthorityRequest
@@ -91,9 +91,11 @@ class BoundedActionRecord:
         if requires_tool and normalized_tool is None:
             raise FoundationError("bounded tool actions require a tool key")
 
-        if status in {ActionStatus.DENIED, ActionStatus.BLOCKED}:
-            if normalized_boundary_note is None:
-                raise FoundationError("denied or blocked bounded actions require a boundary note")
+        if (
+            status in {ActionStatus.DENIED, ActionStatus.BLOCKED}
+            and normalized_boundary_note is None
+        ):
+            raise FoundationError("denied or blocked bounded actions require a boundary note")
 
         if status is ActionStatus.AUTHORIZED and authority_decision_digest is None:
             raise FoundationError("authorized bounded actions require an authority decision digest")

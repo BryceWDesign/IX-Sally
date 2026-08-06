@@ -90,8 +90,12 @@ def test_human_review_bundle_assembler_accepts_custom_authority_note() -> None:
 
 
 def test_human_review_bundle_assembler_combines_gateway_and_manual_cards() -> None:
-    state = _state().with_action(_review_action()).with_evidence_support_finding(
-        _unsupported_finding(),
+    state = (
+        _state()
+        .with_action(_review_action())
+        .with_evidence_support_finding(
+            _unsupported_finding(),
+        )
     )
 
     bundle = HumanReviewBundleAssembler.create().assemble(state=state)

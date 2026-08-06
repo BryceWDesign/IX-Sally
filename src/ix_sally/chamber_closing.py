@@ -9,7 +9,7 @@ from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import require_text
 from ix_sally.recording import StateRecorder
 from ix_sally.state import NinefoldRunState
-from ix_sally.state_audit import StateAuditReport, StateAuditor
+from ix_sally.state_audit import StateAuditor, StateAuditReport
 
 
 class ChamberCloseStatus(StrEnum):

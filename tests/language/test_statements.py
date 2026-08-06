@@ -201,10 +201,13 @@ def test_program_preserves_statement_order_and_payload() -> None:
         second_expression,
     )
     assert program.to_payload()["statement_count"] == 2
-    assert program.digest() == Program(
-        span=_span(0, 17),
-        statements=(first, second),
-    ).digest()
+    assert (
+        program.digest()
+        == Program(
+            span=_span(0, 17),
+            statements=(first, second),
+        ).digest()
+    )
 
 
 def test_program_rejects_reordered_or_overlapping_statements() -> None:

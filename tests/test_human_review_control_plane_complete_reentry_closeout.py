@@ -67,15 +67,11 @@ def test_control_plane_state_defaults_to_empty_closeout_ledger() -> None:
 
 def test_control_plane_state_tracks_closeout_ledger() -> None:
     ledger = _closeout_ledger()
-    state = HumanReviewControlPlaneState.create().with_complete_reentry_closeout_ledger(
-        ledger
-    )
+    state = HumanReviewControlPlaneState.create().with_complete_reentry_closeout_ledger(ledger)
 
     assert state.complete_reentry_closeout_count() == 1
     assert state.has_recorded_complete_reentry_closeouts() is True
-    assert state.latest_complete_reentry_closeout_digest() == (
-        ledger.latest().digest().value
-    )
+    assert state.latest_complete_reentry_closeout_digest() == (ledger.latest().digest().value)
     assert state.to_payload()["complete_reentry_closeout_count"] == 1
     assert state.to_payload()["latest_complete_reentry_closeout_digest"] == (
         ledger.latest().digest().value
@@ -145,9 +141,7 @@ def test_control_plane_snapshot_rejects_closeout_count_mismatch() -> None:
         operator_attention_audited_reentry_count=(
             good_status.operator_attention_audited_reentry_count
         ),
-        changed_state_audited_reentry_count=(
-            good_status.changed_state_audited_reentry_count
-        ),
+        changed_state_audited_reentry_count=(good_status.changed_state_audited_reentry_count),
         complete_reentry_count=good_status.complete_reentry_count,
         accepted_complete_reentry_count=good_status.accepted_complete_reentry_count,
         failed_complete_reentry_count=good_status.failed_complete_reentry_count,
@@ -155,9 +149,7 @@ def test_control_plane_snapshot_rejects_closeout_count_mismatch() -> None:
         operator_attention_complete_reentry_count=(
             good_status.operator_attention_complete_reentry_count
         ),
-        changed_state_complete_reentry_count=(
-            good_status.changed_state_complete_reentry_count
-        ),
+        changed_state_complete_reentry_count=(good_status.changed_state_complete_reentry_count),
         complete_reentry_closeout_count=0,
         accepted_complete_reentry_closeout_count=(
             good_status.accepted_complete_reentry_closeout_count

@@ -149,12 +149,8 @@ class HumanReviewControlPlaneReport:
             "accepted_audited_reentry_count": accepted_audited_reentry_count,
             "failed_audited_reentry_count": failed_audited_reentry_count,
             "waiting_audited_reentry_count": waiting_audited_reentry_count,
-            "operator_attention_audited_reentry_count": (
-                operator_attention_audited_reentry_count
-            ),
-            "changed_state_audited_reentry_count": (
-                changed_state_audited_reentry_count
-            ),
+            "operator_attention_audited_reentry_count": (operator_attention_audited_reentry_count),
+            "changed_state_audited_reentry_count": (changed_state_audited_reentry_count),
             "complete_reentry_count": complete_reentry_count,
             "accepted_complete_reentry_count": accepted_complete_reentry_count,
             "failed_complete_reentry_count": failed_complete_reentry_count,
@@ -162,27 +158,18 @@ class HumanReviewControlPlaneReport:
             "operator_attention_complete_reentry_count": (
                 operator_attention_complete_reentry_count
             ),
-            "changed_state_complete_reentry_count": (
-                changed_state_complete_reentry_count
-            ),
+            "changed_state_complete_reentry_count": (changed_state_complete_reentry_count),
             "complete_reentry_closeout_count": complete_reentry_closeout_count,
-            "accepted_complete_reentry_closeout_count": (
-                accepted_complete_reentry_closeout_count
-            ),
-            "waiting_complete_reentry_closeout_count": (
-                waiting_complete_reentry_closeout_count
-            ),
-            "blocked_complete_reentry_closeout_count": (
-                blocked_complete_reentry_closeout_count
-            ),
+            "accepted_complete_reentry_closeout_count": (accepted_complete_reentry_closeout_count),
+            "waiting_complete_reentry_closeout_count": (waiting_complete_reentry_closeout_count),
+            "blocked_complete_reentry_closeout_count": (blocked_complete_reentry_closeout_count),
             "blocking_finding_complete_reentry_closeout_count": (
                 blocking_finding_complete_reentry_closeout_count
             ),
         }.items():
             if value < 0:
                 raise FoundationError(
-                    f"human-review control-plane report {field_name} "
-                    "must not be negative"
+                    f"human-review control-plane report {field_name} must not be negative"
                 )
 
         if (
@@ -190,44 +177,34 @@ class HumanReviewControlPlaneReport:
             > decision_count
         ):
             raise FoundationError(
-                "human-review control-plane report decision subtotals exceed "
-                "decision_count"
+                "human-review control-plane report decision subtotals exceed decision_count"
             )
         if cleared_resume_count > resume_count:
             raise FoundationError(
-                "human-review control-plane report cleared_resume_count exceeds "
-                "resume_count"
+                "human-review control-plane report cleared_resume_count exceeds resume_count"
             )
         if completed_reentry_count > reentry_count:
             raise FoundationError(
-                "human-review control-plane report completed_reentry_count exceeds "
-                "reentry_count"
+                "human-review control-plane report completed_reentry_count exceeds reentry_count"
             )
         if waiting_reentry_count > reentry_count:
             raise FoundationError(
-                "human-review control-plane report waiting_reentry_count exceeds "
-                "reentry_count"
+                "human-review control-plane report waiting_reentry_count exceeds reentry_count"
             )
         if (
-            passed_reentry_audit_count
-            + failed_reentry_audit_count
-            + waiting_reentry_audit_count
+            passed_reentry_audit_count + failed_reentry_audit_count + waiting_reentry_audit_count
             > reentry_audit_count
         ):
             raise FoundationError(
                 "human-review control-plane report reentry audit subtotals exceed "
                 "reentry_audit_count"
             )
-                    if blocking_reentry_audit_count > reentry_audit_count:
+        if blocking_reentry_audit_count > reentry_audit_count:
             raise FoundationError(
                 "human-review control-plane report blocking_reentry_audit_count "
                 "exceeds reentry_audit_count"
             )
-        if (
-            accepted_audited_reentry_count
-            + failed_audited_reentry_count
-            > audited_reentry_count
-        ):
+        if accepted_audited_reentry_count + failed_audited_reentry_count > audited_reentry_count:
             raise FoundationError(
                 "human-review control-plane report audited reentry subtotals exceed "
                 "audited_reentry_count"
@@ -247,10 +224,7 @@ class HumanReviewControlPlaneReport:
                 "human-review control-plane report "
                 "changed_state_audited_reentry_count exceeds audited_reentry_count"
             )
-        if (
-            accepted_complete_reentry_count + failed_complete_reentry_count
-            > complete_reentry_count
-        ):
+        if accepted_complete_reentry_count + failed_complete_reentry_count > complete_reentry_count:
             raise FoundationError(
                 "human-review control-plane report complete reentry subtotals "
                 "exceed complete_reentry_count"
@@ -281,10 +255,7 @@ class HumanReviewControlPlaneReport:
                 "human-review control-plane report complete closeout subtotals "
                 "exceed complete_reentry_closeout_count"
             )
-        if (
-            blocking_finding_complete_reentry_closeout_count
-            > complete_reentry_closeout_count
-        ):
+        if blocking_finding_complete_reentry_closeout_count > complete_reentry_closeout_count:
             raise FoundationError(
                 "human-review control-plane report complete closeout blocking "
                 "finding count exceeds complete_reentry_closeout_count"
@@ -334,38 +305,24 @@ class HumanReviewControlPlaneReport:
             accepted_audited_reentry_count=accepted_audited_reentry_count,
             failed_audited_reentry_count=failed_audited_reentry_count,
             waiting_audited_reentry_count=waiting_audited_reentry_count,
-            operator_attention_audited_reentry_count=(
-                operator_attention_audited_reentry_count
-            ),
-            changed_state_audited_reentry_count=(
-                changed_state_audited_reentry_count
-            ),
+            operator_attention_audited_reentry_count=(operator_attention_audited_reentry_count),
+            changed_state_audited_reentry_count=(changed_state_audited_reentry_count),
             latest_audited_reentry_digest=latest_audited_reentry_digest,
             complete_reentry_count=complete_reentry_count,
             accepted_complete_reentry_count=accepted_complete_reentry_count,
             failed_complete_reentry_count=failed_complete_reentry_count,
             waiting_complete_reentry_count=waiting_complete_reentry_count,
-            operator_attention_complete_reentry_count=(
-                operator_attention_complete_reentry_count
-            ),
+            operator_attention_complete_reentry_count=(operator_attention_complete_reentry_count),
             changed_state_complete_reentry_count=changed_state_complete_reentry_count,
             latest_complete_reentry_digest=latest_complete_reentry_digest,
             complete_reentry_closeout_count=complete_reentry_closeout_count,
-            accepted_complete_reentry_closeout_count=(
-                accepted_complete_reentry_closeout_count
-            ),
-            waiting_complete_reentry_closeout_count=(
-                waiting_complete_reentry_closeout_count
-            ),
-            blocked_complete_reentry_closeout_count=(
-                blocked_complete_reentry_closeout_count
-            ),
+            accepted_complete_reentry_closeout_count=(accepted_complete_reentry_closeout_count),
+            waiting_complete_reentry_closeout_count=(waiting_complete_reentry_closeout_count),
+            blocked_complete_reentry_closeout_count=(blocked_complete_reentry_closeout_count),
             blocking_finding_complete_reentry_closeout_count=(
                 blocking_finding_complete_reentry_closeout_count
             ),
-            latest_complete_reentry_closeout_digest=(
-                latest_complete_reentry_closeout_digest
-            ),
+            latest_complete_reentry_closeout_digest=(latest_complete_reentry_closeout_digest),
         )
 
     @classmethod
@@ -402,19 +359,11 @@ class HumanReviewControlPlaneReport:
             passed_reentry_audit_count=control_status.passed_reentry_audit_count,
             failed_reentry_audit_count=control_status.failed_reentry_audit_count,
             waiting_reentry_audit_count=control_status.waiting_reentry_audit_count,
-            blocking_reentry_audit_count=(
-                control_status.blocking_reentry_audit_count
-            ),
+            blocking_reentry_audit_count=(control_status.blocking_reentry_audit_count),
             audited_reentry_count=control_status.audited_reentry_count,
-            accepted_audited_reentry_count=(
-                control_status.accepted_audited_reentry_count
-            ),
-            failed_audited_reentry_count=(
-                control_status.failed_audited_reentry_count
-            ),
-            waiting_audited_reentry_count=(
-                control_status.waiting_audited_reentry_count
-            ),
+            accepted_audited_reentry_count=(control_status.accepted_audited_reentry_count),
+            failed_audited_reentry_count=(control_status.failed_audited_reentry_count),
+            waiting_audited_reentry_count=(control_status.waiting_audited_reentry_count),
             operator_attention_audited_reentry_count=(
                 control_status.operator_attention_audited_reentry_count
             ),
@@ -422,23 +371,17 @@ class HumanReviewControlPlaneReport:
                 control_status.changed_state_audited_reentry_count
             ),
             complete_reentry_count=control_status.complete_reentry_count,
-            accepted_complete_reentry_count=(
-                control_status.accepted_complete_reentry_count
-            ),
+            accepted_complete_reentry_count=(control_status.accepted_complete_reentry_count),
             failed_complete_reentry_count=control_status.failed_complete_reentry_count,
-            waiting_complete_reentry_count=(
-                control_status.waiting_complete_reentry_count
-            ),
+            waiting_complete_reentry_count=(control_status.waiting_complete_reentry_count),
             operator_attention_complete_reentry_count=(
                 control_status.operator_attention_complete_reentry_count
             ),
             changed_state_complete_reentry_count=(
                 control_status.changed_state_complete_reentry_count
             ),
-            complete_reentry_closeout_count=(
-                control_status.complete_reentry_closeout_count
-            ),
-                    accepted_complete_reentry_closeout_count=(
+            complete_reentry_closeout_count=(control_status.complete_reentry_closeout_count),
+            accepted_complete_reentry_closeout_count=(
                 control_status.accepted_complete_reentry_closeout_count
             ),
             waiting_complete_reentry_closeout_count=(
@@ -658,18 +601,14 @@ class HumanReviewControlPlaneReport:
             "operator_attention_audited_reentry_count": (
                 self.operator_attention_audited_reentry_count
             ),
-                    "changed_state_audited_reentry_count": (
-                self.changed_state_audited_reentry_count
-            ),
+            "changed_state_audited_reentry_count": (self.changed_state_audited_reentry_count),
             "accepted_complete_reentry_count": self.accepted_complete_reentry_count,
             "failed_complete_reentry_count": self.failed_complete_reentry_count,
             "waiting_complete_reentry_count": self.waiting_complete_reentry_count,
             "operator_attention_complete_reentry_count": (
                 self.operator_attention_complete_reentry_count
             ),
-            "changed_state_complete_reentry_count": (
-                self.changed_state_complete_reentry_count
-            ),
+            "changed_state_complete_reentry_count": (self.changed_state_complete_reentry_count),
             "accepted_complete_reentry_closeout_count": (
                 self.accepted_complete_reentry_closeout_count
             ),
@@ -705,15 +644,9 @@ class HumanReviewControlPlaneReport:
             "complete_reentry_recorded": self.complete_reentry_recorded(),
             "complete_reentry_accepted": self.complete_reentry_accepted(),
             "complete_reentry_failed": self.complete_reentry_failed(),
-            "complete_reentry_closeout_recorded": (
-                self.complete_reentry_closeout_recorded()
-            ),
-            "complete_reentry_closeout_accepted": (
-                self.complete_reentry_closeout_accepted()
-            ),
-            "complete_reentry_closeout_blocked": (
-                self.complete_reentry_closeout_blocked()
-            ),
+            "complete_reentry_closeout_recorded": (self.complete_reentry_closeout_recorded()),
+            "complete_reentry_closeout_accepted": (self.complete_reentry_closeout_accepted()),
+            "complete_reentry_closeout_blocked": (self.complete_reentry_closeout_blocked()),
             "has_handoff": self.has_handoff(),
             "has_decision": self.has_decision(),
             "has_resume": self.has_resume(),
@@ -738,9 +671,7 @@ class HumanReviewControlPlaneReporter:
         """Return a receipt-grade report for the current run and control-plane state."""
         return HumanReviewControlPlaneReport.from_snapshots(
             run_snapshot=RunStageSnapshot.from_state(run_state),
-            control_plane_snapshot=HumanReviewControlPlaneSnapshot.from_state(
-                control_plane
-            ),
+            control_plane_snapshot=HumanReviewControlPlaneSnapshot.from_state(control_plane),
         )
 
 
@@ -802,10 +733,7 @@ def _select_report_status(
             "Complete human-review reentry was accepted and recorded.",
         )
 
-    if (
-        status.audited_reentry_requires_operator_attention()
-        or status.has_failed_audited_reentry()
-    ):
+    if status.audited_reentry_requires_operator_attention() or status.has_failed_audited_reentry():
         return (
             HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_FAILED,
             "A fully audited human-review reentry requires operator attention.",

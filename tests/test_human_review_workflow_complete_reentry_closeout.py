@@ -97,9 +97,7 @@ def _complete_result(max_steps: int = 1):
 
 def test_workflow_kit_records_complete_reentry_closeout_operation() -> None:
     complete_reentry = _complete_result(max_steps=1)
-    closeout_report = CompleteHumanReviewReentryCloseoutReport.from_result(
-        complete_reentry
-    )
+    closeout_report = CompleteHumanReviewReentryCloseoutReport.from_result(complete_reentry)
 
     operation = HumanReviewWorkflowKit.create().record_complete_reentry_closeout(
         run_state=complete_reentry.state,
@@ -125,9 +123,7 @@ def test_workflow_kit_records_complete_reentry_closeout_operation() -> None:
 
 def test_workflow_kit_records_waiting_complete_reentry_closeout_status() -> None:
     complete_reentry = _complete_result(max_steps=3)
-    closeout_report = CompleteHumanReviewReentryCloseoutReport.from_result(
-        complete_reentry
-    )
+    closeout_report = CompleteHumanReviewReentryCloseoutReport.from_result(complete_reentry)
 
     operation = HumanReviewWorkflowKit.create().record_complete_reentry_closeout(
         run_state=complete_reentry.state,
@@ -147,9 +143,7 @@ def test_workflow_kit_records_waiting_complete_reentry_closeout_status() -> None
 
 def test_workflow_complete_reentry_closeout_payload_links_report() -> None:
     complete_reentry = _complete_result(max_steps=1)
-    closeout_report = CompleteHumanReviewReentryCloseoutReport.from_result(
-        complete_reentry
-    )
+    closeout_report = CompleteHumanReviewReentryCloseoutReport.from_result(complete_reentry)
 
     operation = HumanReviewWorkflowKit.create().record_complete_reentry_closeout(
         run_state=complete_reentry.state,
@@ -177,9 +171,7 @@ def test_workflow_complete_reentry_closeout_payload_links_report() -> None:
 
 def test_workflow_complete_reentry_closeout_rejects_mismatched_state() -> None:
     complete_reentry = _complete_result(max_steps=1)
-    closeout_report = CompleteHumanReviewReentryCloseoutReport.from_result(
-        complete_reentry
-    )
+    closeout_report = CompleteHumanReviewReentryCloseoutReport.from_result(complete_reentry)
 
     with pytest.raises(FoundationError, match="run state must match report"):
         HumanReviewWorkflowKit.create().record_complete_reentry_closeout(
@@ -191,9 +183,7 @@ def test_workflow_complete_reentry_closeout_rejects_mismatched_state() -> None:
 
 def test_workflow_complete_reentry_closeout_rejects_mismatched_plane() -> None:
     complete_reentry = _complete_result(max_steps=1)
-    closeout_report = CompleteHumanReviewReentryCloseoutReport.from_result(
-        complete_reentry
-    )
+    closeout_report = CompleteHumanReviewReentryCloseoutReport.from_result(complete_reentry)
 
     with pytest.raises(FoundationError, match="closeout must match current"):
         HumanReviewWorkflowKit.create().record_complete_reentry_closeout(

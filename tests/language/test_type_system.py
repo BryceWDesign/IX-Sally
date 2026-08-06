@@ -41,9 +41,7 @@ def test_type_checker_infers_local_and_memory_types() -> None:
 def test_type_checker_applies_numeric_promotion() -> None:
     """Mixed numeric arithmetic must promote deterministically to float."""
     program = parse_ix_program(
-        "let integer_sum = 1 + 2\n"
-        "let mixed_sum = 1 + 2.5\n"
-        "let product = mixed_sum * 2\n",
+        "let integer_sum = 1 + 2\nlet mixed_sum = 1 + 2.5\nlet product = mixed_sum * 2\n",
         filename="numeric.ix",
     )
 
@@ -58,9 +56,7 @@ def test_type_checker_accepts_boolean_assertion_and_logic() -> None:
     """Comparisons and Boolean operators must produce assertion-safe values."""
     report = check_ix_program_types(
         parse_ix_program(
-            "let score = 80\n"
-            "let ready = score >= 75 and true\n"
-            "assert ready\n",
+            "let score = 80\nlet ready = score >= 75 and true\nassert ready\n",
             filename="assertion.ix",
         )
     )
@@ -82,18 +78,14 @@ def test_type_checker_rejects_non_boolean_assertion() -> None:
     diagnostic = report.errors()[0]
     assert diagnostic.code.value == "typing-assertion-not-boolean"
     assert diagnostic.span.label() == "assertion.ix:2:8-13"
-    assert diagnostic.message == (
-        "Assert expression must be Boolean, not integer."
-    )
+    assert diagnostic.message == ("Assert expression must be Boolean, not integer.")
 
 
 def test_type_checker_rejects_invalid_operator_operands() -> None:
     """Operators must reject statically incompatible operand categories."""
     report = check_ix_program_types(
         parse_ix_program(
-            'let bad_add = "count" + 1\n'
-            "let bad_logic = true and 2\n"
-            'let bad_negation = -"value"\n',
+            'let bad_add = "count" + 1\nlet bad_logic = true and 2\nlet bad_negation = -"value"\n',
             filename="operators.ix",
         )
     )
@@ -126,12 +118,8 @@ def test_type_checker_avoids_cascading_unknown_name_errors() -> None:
 def test_type_context_supplies_host_types() -> None:
     """Host-provided local and memory types must seed static analysis."""
     context = IXTypeContext(
-        local_types=(
-            IXTypeBinding("input_value", IXValueType.FLOAT),
-          ),
-        memory_types=(
-            IXTypeBinding("prior_result", IXValueType.STRING),
-        ),
+        local_types=(IXTypeBinding("input_value", IXValueType.FLOAT),),
+        memory_types=(IXTypeBinding("prior_result", IXValueType.STRING),),
     )
     program = parse_ix_program(
         "let total = input_value + 1\nrecall prior_result\n",

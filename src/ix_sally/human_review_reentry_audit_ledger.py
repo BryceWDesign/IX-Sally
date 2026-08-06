@@ -2,19 +2,18 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError
 from ix_sally.stage_readiness import RunStage
 
 if TYPE_CHECKING:
-    from ix_sally.human_review_reentry import HumanReviewReentryStatus
-    from ix_sally.human_review_reentry_audit import (
-        HumanReviewReentryAuditReport,
-        HumanReviewReentryAuditStatus,
-    )
+    from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditReport
+    from ix_sally.human_review_reentry_audit_status import HumanReviewReentryAuditStatus
+    from ix_sally.human_review_reentry_status import HumanReviewReentryStatus
 
 
 @dataclass(frozen=True, slots=True)
@@ -61,9 +60,7 @@ class HumanReviewReentryAuditLedgerEntry:
     ) -> HumanReviewReentryAuditLedgerEntry:
         """Create a normalized human-review reentry audit ledger entry."""
         if sequence <= 0:
-            raise FoundationError(
-                "human-review reentry audit ledger sequence must be positive"
-            )
+            raise FoundationError("human-review reentry audit ledger sequence must be positive")
 
         for field_name, value in {
             "finding_count": finding_count,
@@ -73,17 +70,12 @@ class HumanReviewReentryAuditLedgerEntry:
         }.items():
             if value < 0:
                 raise FoundationError(
-                    f"human-review reentry audit ledger {field_name} "
-                    "must not be negative"
+                    f"human-review reentry audit ledger {field_name} must not be negative"
                 )
 
-        if (
-            blocking_finding_count + warning_finding_count + info_finding_count
-            != finding_count
-        ):
+        if blocking_finding_count + warning_finding_count + info_finding_count != finding_count:
             raise FoundationError(
-                "human-review reentry audit ledger finding subtotals must equal "
-                "finding_count"
+                "human-review reentry audit ledger finding subtotals must equal finding_count"
             )
 
         audit_report_digest.require_algorithm("sha256")
@@ -249,13 +241,11 @@ class HumanReviewReentryAuditLedger:
         for entry in normalized:
             if entry.sequence in seen_sequences:
                 raise FoundationError(
-                    f"duplicate human-review reentry audit ledger sequence: "
-                    f"{entry.sequence}"
+                    f"duplicate human-review reentry audit ledger sequence: {entry.sequence}"
                 )
             if entry.entry_id.value in seen_entry_ids:
                 raise FoundationError(
-                    f"duplicate human-review reentry audit ledger entry id: "
-                    f"{entry.entry_id.value}"
+                    f"duplicate human-review reentry audit ledger entry id: {entry.entry_id.value}"
                 )
             if entry.audit_report_digest.value in seen_report_digests:
                 raise FoundationError(
@@ -263,9 +253,7 @@ class HumanReviewReentryAuditLedger:
                     f"{entry.audit_report_digest.value}"
                 )
             if entry.sequence <= previous_sequence:
-                raise FoundationError(
-                    "human-review reentry audit ledger sequences must increase"
-                )
+                raise FoundationError("human-review reentry audit ledger sequences must increase")
 
             seen_sequences.add(entry.sequence)
             seen_entry_ids.add(entry.entry_id.value)
@@ -366,15 +354,11 @@ class HumanReviewReentryAuditLedger:
             "waiting_entry_count": len(self.waiting_entries()),
             "blocking_entry_count": len(self.blocking_entries()),
             "warning_entry_count": len(self.warning_entries()),
-            "forge_dispatch_entry_count": len(
-                self.entries_for_stage(RunStage.FORGE_DISPATCH)
-            ),
+            "forge_dispatch_entry_count": len(self.entries_for_stage(RunStage.FORGE_DISPATCH)),
             "forge_result_processing_entry_count": len(
                 self.entries_for_stage(RunStage.FORGE_RESULT_PROCESSING)
             ),
-            "advanced_reentry_entry_count": len(
-                self.entries_by_audit_status_value("passed")
-            ),
+            "advanced_reentry_entry_count": len(self.entries_by_audit_status_value("passed")),
             "waiting_reentry_entry_count": len(
                 self.entries_by_audit_status_value("waiting_for_external_input")
             ),

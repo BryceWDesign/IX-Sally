@@ -84,12 +84,9 @@ def _resume_operation():
 
 
 def test_closeout_coordinator_records_accepted_complete_reentry_closeout() -> None:
-    result = (
-        CompleteHumanReviewReentryCloseoutCoordinator.create()
-        .resume_closeout_and_record(
-            resume_operation=_resume_operation(),
-            max_steps=1,
-        )
+    result = CompleteHumanReviewReentryCloseoutCoordinator.create().resume_closeout_and_record(
+        resume_operation=_resume_operation(),
+        max_steps=1,
     )
 
     assert result.accepted() is True
@@ -111,24 +108,17 @@ def test_closeout_coordinator_records_accepted_complete_reentry_closeout() -> No
 
 
 def test_closeout_coordinator_records_waiting_complete_reentry_closeout() -> None:
-    result = (
-        CompleteHumanReviewReentryCloseoutCoordinator.create()
-        .resume_closeout_and_record(
-            resume_operation=_resume_operation(),
-            max_steps=3,
-        )
+    result = CompleteHumanReviewReentryCloseoutCoordinator.create().resume_closeout_and_record(
+        resume_operation=_resume_operation(),
+        max_steps=3,
     )
 
     assert result.accepted() is False
     assert result.waiting_for_external_input() is True
     assert result.blocked() is False
     assert result.final_stage() is RunStage.FORGE_RESULT_PROCESSING
-    assert result.receipt.reentry_status is (
-        HumanReviewReentryStatus.WAITING_FOR_EXTERNAL_INPUT
-    )
-    assert result.receipt.audit_status is (
-        HumanReviewReentryAuditStatus.WAITING_FOR_EXTERNAL_INPUT
-    )
+    assert result.receipt.reentry_status is (HumanReviewReentryStatus.WAITING_FOR_EXTERNAL_INPUT)
+    assert result.receipt.audit_status is (HumanReviewReentryAuditStatus.WAITING_FOR_EXTERNAL_INPUT)
     assert result.closeout_report.closeout_status is (
         CompleteHumanReviewReentryCloseoutStatus.WAITING_FOR_EXTERNAL_INPUT
     )
@@ -138,19 +128,14 @@ def test_closeout_coordinator_records_waiting_complete_reentry_closeout() -> Non
 
 
 def test_closeout_coordination_receipt_links_layers() -> None:
-    result = (
-        CompleteHumanReviewReentryCloseoutCoordinator.create()
-        .resume_closeout_and_record(
-            resume_operation=_resume_operation(),
-            max_steps=1,
-        )
+    result = CompleteHumanReviewReentryCloseoutCoordinator.create().resume_closeout_and_record(
+        resume_operation=_resume_operation(),
+        max_steps=1,
     )
 
     receipt = result.receipt
 
-    assert receipt.complete_reentry_result_digest == (
-        result.complete_reentry_result.digest()
-    )
+    assert receipt.complete_reentry_result_digest == (result.complete_reentry_result.digest())
     assert receipt.complete_reentry_receipt_digest == (
         result.complete_reentry_result.receipt.digest()
     )
@@ -161,18 +146,13 @@ def test_closeout_coordination_receipt_links_layers() -> None:
     assert receipt.recorded_complete_reentry() is True
     assert receipt.recorded_closeout() is True
     assert receipt.changed_state() is True
-    assert receipt.report_status is (
-        HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_ACCEPTED
-    )
+    assert receipt.report_status is (HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_ACCEPTED)
 
 
 def test_closeout_coordination_payload_and_digest_are_stable() -> None:
-    result = (
-        CompleteHumanReviewReentryCloseoutCoordinator.create()
-        .resume_closeout_and_record(
-            resume_operation=_resume_operation(),
-            max_steps=1,
-        )
+    result = CompleteHumanReviewReentryCloseoutCoordinator.create().resume_closeout_and_record(
+        resume_operation=_resume_operation(),
+        max_steps=1,
     )
 
     payload = result.to_payload()

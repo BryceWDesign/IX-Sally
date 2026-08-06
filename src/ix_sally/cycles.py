@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.agents import AgentRole
 from ix_sally.artifacts import AgentArtifact
@@ -218,9 +218,7 @@ def _payload_reports_termination(payload: JsonObject) -> bool:
 
 def _payload_reports_human_review(payload: JsonObject) -> bool:
     """Return whether artifact payload data reports human-review need."""
-    return _is_true(payload.get("requires_human_review")) or _is_true(
-        payload.get("has_blocker")
-    )
+    return _is_true(payload.get("requires_human_review")) or _is_true(payload.get("has_blocker"))
 
 
 def _is_true(value: JsonValue | None) -> bool:

@@ -91,17 +91,17 @@ def test_human_review_handoff_coordinator_preserves_custom_authority_note() -> N
     assert result.bundle.packet.authority_note == (
         "Operator must approve the exact bounded action."
     )
-    assert result.ledger_entry.authority_note == (
-        "Operator must approve the exact bounded action."
-    )
-    assert result.receipt.authority_note == (
-        "Operator must approve the exact bounded action."
-    )
+    assert result.ledger_entry.authority_note == ("Operator must approve the exact bounded action.")
+    assert result.receipt.authority_note == ("Operator must approve the exact bounded action.")
 
 
 def test_human_review_handoff_coordinator_counts_mixed_targets() -> None:
-    state = _state().with_action(_review_action()).with_evidence_support_finding(
-        _unsupported_finding(),
+    state = (
+        _state()
+        .with_action(_review_action())
+        .with_evidence_support_finding(
+            _unsupported_finding(),
+        )
     )
 
     result = HumanReviewHandoffCoordinator.create().handoff(

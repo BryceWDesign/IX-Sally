@@ -106,9 +106,7 @@ def test_complete_reentry_closeout_ledger_entry_records_report() -> None:
 
     assert entry.sequence == 1
     assert entry.closeout_report_digest == report.digest()
-    assert entry.complete_reentry_result_digest == (
-        report.complete_reentry_result_digest
-    )
+    assert entry.complete_reentry_result_digest == (report.complete_reentry_result_digest)
     assert entry.closeout_status is CompleteHumanReviewReentryCloseoutStatus.ACCEPTED
     assert entry.final_stage is RunStage.FORGE_DISPATCH
     assert entry.finding_count == 6

@@ -76,9 +76,7 @@ QUALITY_GATES: Final[tuple[QualityGate, ...]] = (
     ),
 )
 
-_GATE_BY_NAME: Final[dict[str, QualityGate]] = {
-    gate.name: gate for gate in QUALITY_GATES
-}
+_GATE_BY_NAME: Final[dict[str, QualityGate]] = {gate.name: gate for gate in QUALITY_GATES}
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -135,9 +133,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             failures.append(gate.name)
 
     if failures:
-        sys.stderr.write(
-            f"Failed quality gates: {', '.join(failures)}\n"
-        )
+        sys.stderr.write(f"Failed quality gates: {', '.join(failures)}\n")
         return 1
 
     sys.stdout.write("All selected quality gates passed.\n")

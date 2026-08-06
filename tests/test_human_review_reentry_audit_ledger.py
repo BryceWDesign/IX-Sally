@@ -11,8 +11,8 @@ from ix_sally.foundation import FoundationError
 from ix_sally.human_review_gateway import HumanReviewDecisionStatus
 from ix_sally.human_review_reentry import HumanReviewReentryStatus
 from ix_sally.human_review_reentry_audit import (
-    HumanReviewReentryAuditStatus,
     HumanReviewReentryAuditor,
+    HumanReviewReentryAuditStatus,
 )
 from ix_sally.human_review_reentry_audit_ledger import (
     HumanReviewReentryAuditLedger,
@@ -125,9 +125,7 @@ def test_reentry_audit_ledger_appends_report_at_next_sequence() -> None:
     assert updated.passed_entries() == (latest,)
     assert updated.failed_entries() == ()
     assert updated.entries_for_stage(RunStage.FORGE_DISPATCH) == (latest,)
-    assert updated.entries_for_reentry_status(HumanReviewReentryStatus.ADVANCED) == (
-        latest,
-    )
+    assert updated.entries_for_reentry_status(HumanReviewReentryStatus.ADVANCED) == (latest,)
 
 
 def test_reentry_audit_ledger_tracks_waiting_audit_report() -> None:

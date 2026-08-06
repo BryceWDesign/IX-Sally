@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.agents import AgentRole
 from ix_sally.artifacts import AgentArtifact, AgentArtifactKind
@@ -84,9 +84,11 @@ class ForgeExecutionReceipt:
         if status is ExecutionStatus.FAILED and exit_code in {None, 0}:
             raise FoundationError("failed execution receipts require a non-zero exit_code")
 
-        if status in {ExecutionStatus.BLOCKED, ExecutionStatus.TIMED_OUT}:
-            if normalized_boundary_note is None:
-                raise FoundationError("blocked or timed-out executions require a boundary note")
+        if (
+            status in {ExecutionStatus.BLOCKED, ExecutionStatus.TIMED_OUT}
+            and normalized_boundary_note is None
+        ):
+            raise FoundationError("blocked or timed-out executions require a boundary note")
 
         return cls(
             receipt_id=receipt_id

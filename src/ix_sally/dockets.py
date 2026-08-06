@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.agents import AgentRole
 from ix_sally.artifacts import AgentArtifact, AgentArtifactKind
@@ -170,9 +170,7 @@ class ClerkDocketPacket:
     def referenced_digests(self) -> tuple[DigestRecord, ...]:
         """Return all digests referenced by docket entries."""
         return tuple(
-            entry.reference_digest
-            for entry in self.entries
-            if entry.reference_digest is not None
+            entry.reference_digest for entry in self.entries if entry.reference_digest is not None
         )
 
     def to_artifact(self) -> AgentArtifact:

@@ -349,8 +349,7 @@ class HumanReviewWorkflowKit:
         run_state: NinefoldRunState,
         control_plane: HumanReviewControlPlaneState | None = None,
         authority_note: str = (
-            "Human authority is required before IX-Sally may treat these "
-            "targets as resolved."
+            "Human authority is required before IX-Sally may treat these targets as resolved."
         ),
     ) -> HumanReviewWorkflowOperation:
         """Record a human-review handoff and return the updated workflow operation."""
@@ -501,9 +500,7 @@ class HumanReviewWorkflowKit:
     ) -> HumanReviewWorkflowOperation:
         """Record a human-review reentry audit and return updated workflow state."""
         if run_state.digest() != audit_report.state_digest:
-            raise FoundationError(
-                "workflow reentry audit run state must match audit report"
-            )
+            raise FoundationError("workflow reentry audit run state must match audit report")
 
         operation = self.coordinator.record_reentry_audit(
             audit_report=audit_report,
@@ -584,9 +581,7 @@ class HumanReviewWorkflowKit:
     ) -> HumanReviewWorkflowOperation:
         """Record a complete human-review reentry closeout report."""
         if run_state.digest() != closeout_report.state_digest:
-            raise FoundationError(
-                "workflow complete reentry closeout run state must match report"
-            )
+            raise FoundationError("workflow complete reentry closeout run state must match report")
 
         operation = self.coordinator.record_complete_reentry_closeout(
             closeout_report=closeout_report,

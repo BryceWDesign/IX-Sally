@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
@@ -66,9 +66,7 @@ class HumanReviewBundleLedgerEntry:
             )
 
         surfaced_count = (
-            gateway_resolvable_count
-            + manual_investigation_count
-            + blocker_acknowledgment_count
+            gateway_resolvable_count + manual_investigation_count + blocker_acknowledgment_count
         )
         if surfaced_count != target_count:
             raise FoundationError(
@@ -216,17 +214,14 @@ class HumanReviewBundleLedger:
                 )
             if entry.entry_id.value in seen_entry_ids:
                 raise FoundationError(
-                    f"duplicate human-review bundle ledger entry id: "
-                    f"{entry.entry_id.value}"
+                    f"duplicate human-review bundle ledger entry id: {entry.entry_id.value}"
                 )
             if entry.bundle_digest.value in seen_bundle_digests:
                 raise FoundationError(
                     f"duplicate human-review bundle digest: {entry.bundle_digest.value}"
                 )
             if entry.sequence <= previous_sequence:
-                raise FoundationError(
-                    "human-review bundle ledger sequences must increase"
-                )
+                raise FoundationError("human-review bundle ledger sequences must increase")
 
             seen_sequences.add(entry.sequence)
             seen_entry_ids.add(entry.entry_id.value)
@@ -270,9 +265,7 @@ class HumanReviewBundleLedger:
 
     def blocker_acknowledgment_entries(self) -> tuple[HumanReviewBundleLedgerEntry, ...]:
         """Return entries that include blocker-only cards."""
-        return tuple(
-            entry for entry in self.entries if entry.has_blocker_acknowledgment_cards()
-        )
+        return tuple(entry for entry in self.entries if entry.has_blocker_acknowledgment_cards())
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible human-review bundle ledger."""
@@ -289,9 +282,7 @@ class HumanReviewBundleLedger:
             "latest_entry_digest": latest.digest().value if latest is not None else None,
             "gateway_resolvable_entry_count": len(self.gateway_resolvable_entries()),
             "manual_investigation_entry_count": len(self.manual_investigation_entries()),
-            "blocker_acknowledgment_entry_count": len(
-                self.blocker_acknowledgment_entries()
-            ),
+            "blocker_acknowledgment_entry_count": len(self.blocker_acknowledgment_entries()),
         }
 
     def digest(self) -> DigestRecord:

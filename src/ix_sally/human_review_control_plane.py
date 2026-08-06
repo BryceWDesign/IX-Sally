@@ -53,9 +53,7 @@ class HumanReviewControlPlaneState:
         reentry_audit_ledger: HumanReviewReentryAuditLedger | None = None,
         audited_reentry_ledger: AuditedHumanReviewReentryLedger | None = None,
         complete_reentry_ledger: CompleteHumanReviewReentryLedger | None = None,
-        complete_reentry_closeout_ledger: (
-            CompleteHumanReviewReentryCloseoutLedger | None
-        ) = None,
+        complete_reentry_closeout_ledger: (CompleteHumanReviewReentryCloseoutLedger | None) = None,
     ) -> HumanReviewControlPlaneState:
         """Create a human-review control-plane state with empty ledgers by default."""
         return cls(
@@ -63,9 +61,7 @@ class HumanReviewControlPlaneState:
             decision_ledger=decision_ledger or HumanReviewDecisionLedger.create(()),
             resume_ledger=resume_ledger or HumanReviewResumeLedger.create(()),
             reentry_ledger=reentry_ledger or HumanReviewReentryLedger.create(()),
-            reentry_audit_ledger=(
-                reentry_audit_ledger or HumanReviewReentryAuditLedger.create(())
-            ),
+            reentry_audit_ledger=(reentry_audit_ledger or HumanReviewReentryAuditLedger.create(())),
             audited_reentry_ledger=(
                 audited_reentry_ledger or AuditedHumanReviewReentryLedger.create(())
             ),
@@ -330,20 +326,14 @@ class HumanReviewControlPlaneState:
             "reentry_audit_count": self.reentry_audit_count(),
             "audited_reentry_count": self.audited_reentry_count(),
             "complete_reentry_count": self.complete_reentry_count(),
-            "complete_reentry_closeout_count": (
-                self.complete_reentry_closeout_count()
-            ),
+            "complete_reentry_closeout_count": (self.complete_reentry_closeout_count()),
             "has_active_handoffs": self.has_active_handoffs(),
             "has_recorded_decisions": self.has_recorded_decisions(),
             "has_recorded_resumes": self.has_recorded_resumes(),
             "has_recorded_reentries": self.has_recorded_reentries(),
             "has_recorded_reentry_audits": self.has_recorded_reentry_audits(),
-            "has_recorded_audited_reentries": (
-                self.has_recorded_audited_reentries()
-            ),
-            "has_recorded_complete_reentries": (
-                self.has_recorded_complete_reentries()
-            ),
+            "has_recorded_audited_reentries": (self.has_recorded_audited_reentries()),
+            "has_recorded_complete_reentries": (self.has_recorded_complete_reentries()),
             "has_recorded_complete_reentry_closeouts": (
                 self.has_recorded_complete_reentry_closeouts()
             ),
@@ -425,32 +415,16 @@ class HumanReviewControlPlaneStatus:
             ),
             completed_reentry_count=len(state.reentry_ledger.changed_entries()),
             waiting_reentry_count=len(
-                state.reentry_ledger.entries_by_status_value(
-                    "waiting_for_external_input"
-                )
+                state.reentry_ledger.entries_by_status_value("waiting_for_external_input")
             ),
-            passed_reentry_audit_count=len(
-                state.reentry_audit_ledger.passed_entries()
-            ),
-            failed_reentry_audit_count=len(
-                state.reentry_audit_ledger.failed_entries()
-            ),
-            waiting_reentry_audit_count=len(
-                state.reentry_audit_ledger.waiting_entries()
-            ),
-            blocking_reentry_audit_count=len(
-                state.reentry_audit_ledger.blocking_entries()
-            ),
+            passed_reentry_audit_count=len(state.reentry_audit_ledger.passed_entries()),
+            failed_reentry_audit_count=len(state.reentry_audit_ledger.failed_entries()),
+            waiting_reentry_audit_count=len(state.reentry_audit_ledger.waiting_entries()),
+            blocking_reentry_audit_count=len(state.reentry_audit_ledger.blocking_entries()),
             audited_reentry_count=state.audited_reentry_count(),
-            accepted_audited_reentry_count=len(
-                state.audited_reentry_ledger.accepted_entries()
-            ),
-            failed_audited_reentry_count=len(
-                state.audited_reentry_ledger.failed_entries()
-            ),
-            waiting_audited_reentry_count=len(
-                state.audited_reentry_ledger.waiting_entries()
-            ),
+            accepted_audited_reentry_count=len(state.audited_reentry_ledger.accepted_entries()),
+            failed_audited_reentry_count=len(state.audited_reentry_ledger.failed_entries()),
+            waiting_audited_reentry_count=len(state.audited_reentry_ledger.waiting_entries()),
             operator_attention_audited_reentry_count=len(
                 state.audited_reentry_ledger.operator_attention_entries()
             ),
@@ -458,24 +432,16 @@ class HumanReviewControlPlaneStatus:
                 state.audited_reentry_ledger.changed_state_entries()
             ),
             complete_reentry_count=state.complete_reentry_count(),
-            accepted_complete_reentry_count=len(
-                state.complete_reentry_ledger.accepted_entries()
-            ),
-            failed_complete_reentry_count=len(
-                state.complete_reentry_ledger.failed_entries()
-            ),
-            waiting_complete_reentry_count=len(
-                state.complete_reentry_ledger.waiting_entries()
-            ),
+            accepted_complete_reentry_count=len(state.complete_reentry_ledger.accepted_entries()),
+            failed_complete_reentry_count=len(state.complete_reentry_ledger.failed_entries()),
+            waiting_complete_reentry_count=len(state.complete_reentry_ledger.waiting_entries()),
             operator_attention_complete_reentry_count=len(
                 state.complete_reentry_ledger.operator_attention_entries()
             ),
             changed_state_complete_reentry_count=len(
                 state.complete_reentry_ledger.changed_state_entries()
             ),
-            complete_reentry_closeout_count=(
-                state.complete_reentry_closeout_count()
-            ),
+            complete_reentry_closeout_count=(state.complete_reentry_closeout_count()),
             accepted_complete_reentry_closeout_count=len(
                 state.complete_reentry_closeout_ledger.accepted_entries()
             ),
@@ -626,18 +592,14 @@ class HumanReviewControlPlaneStatus:
             "operator_attention_audited_reentry_count": (
                 self.operator_attention_audited_reentry_count
             ),
-            "changed_state_audited_reentry_count": (
-                self.changed_state_audited_reentry_count
-            ),
+            "changed_state_audited_reentry_count": (self.changed_state_audited_reentry_count),
             "accepted_complete_reentry_count": self.accepted_complete_reentry_count,
             "failed_complete_reentry_count": self.failed_complete_reentry_count,
             "waiting_complete_reentry_count": self.waiting_complete_reentry_count,
             "operator_attention_complete_reentry_count": (
                 self.operator_attention_complete_reentry_count
             ),
-            "changed_state_complete_reentry_count": (
-                self.changed_state_complete_reentry_count
-            ),
+            "changed_state_complete_reentry_count": (self.changed_state_complete_reentry_count),
             "accepted_complete_reentry_closeout_count": (
                 self.accepted_complete_reentry_closeout_count
             ),
@@ -660,24 +622,18 @@ class HumanReviewControlPlaneStatus:
             "has_passed_reentry_audit": self.has_passed_reentry_audit(),
             "has_failed_reentry_audit": self.has_failed_reentry_audit(),
             "has_blocking_reentry_audit": self.has_blocking_reentry_audit(),
-            "is_waiting_after_reentry_audit": (
-                self.is_waiting_after_reentry_audit()
-            ),
+            "is_waiting_after_reentry_audit": (self.is_waiting_after_reentry_audit()),
             "has_audited_reentry": self.has_audited_reentry(),
             "has_accepted_audited_reentry": self.has_accepted_audited_reentry(),
             "has_failed_audited_reentry": self.has_failed_audited_reentry(),
-            "is_waiting_after_audited_reentry": (
-                self.is_waiting_after_audited_reentry()
-            ),
+            "is_waiting_after_audited_reentry": (self.is_waiting_after_audited_reentry()),
             "audited_reentry_requires_operator_attention": (
                 self.audited_reentry_requires_operator_attention()
             ),
             "has_complete_reentry": self.has_complete_reentry(),
             "has_accepted_complete_reentry": self.has_accepted_complete_reentry(),
             "has_failed_complete_reentry": self.has_failed_complete_reentry(),
-            "is_waiting_after_complete_reentry": (
-                self.is_waiting_after_complete_reentry()
-            ),
+            "is_waiting_after_complete_reentry": (self.is_waiting_after_complete_reentry()),
             "complete_reentry_requires_operator_attention": (
                 self.complete_reentry_requires_operator_attention()
             ),
@@ -688,9 +644,7 @@ class HumanReviewControlPlaneStatus:
             "is_waiting_after_complete_reentry_closeout": (
                 self.is_waiting_after_complete_reentry_closeout()
             ),
-            "has_blocked_complete_reentry_closeout": (
-                self.has_blocked_complete_reentry_closeout()
-            ),
+            "has_blocked_complete_reentry_closeout": (self.has_blocked_complete_reentry_closeout()),
             "complete_reentry_closeout_has_blocking_findings": (
                 self.complete_reentry_closeout_has_blocking_findings()
             ),
@@ -732,17 +686,11 @@ class HumanReviewControlPlaneSnapshot:
         if self.status.reentry_count != self.state.reentry_count():
             raise FoundationError("human-review control-plane reentry count mismatch")
         if self.status.reentry_audit_count != self.state.reentry_audit_count():
-            raise FoundationError(
-                "human-review control-plane reentry audit count mismatch"
-            )
+            raise FoundationError("human-review control-plane reentry audit count mismatch")
         if self.status.audited_reentry_count != self.state.audited_reentry_count():
-            raise FoundationError(
-                "human-review control-plane audited reentry count mismatch"
-            )
+            raise FoundationError("human-review control-plane audited reentry count mismatch")
         if self.status.complete_reentry_count != self.state.complete_reentry_count():
-            raise FoundationError(
-                "human-review control-plane complete reentry count mismatch"
-            )
+            raise FoundationError("human-review control-plane complete reentry count mismatch")
         if (
             self.status.complete_reentry_closeout_count
             != self.state.complete_reentry_closeout_count()
@@ -761,15 +709,9 @@ class HumanReviewControlPlaneSnapshot:
             "decision_ledger_digest": self.state.decision_ledger.digest().value,
             "resume_ledger_digest": self.state.resume_ledger.digest().value,
             "reentry_ledger_digest": self.state.reentry_ledger.digest().value,
-            "reentry_audit_ledger_digest": (
-                self.state.reentry_audit_ledger.digest().value
-            ),
-            "audited_reentry_ledger_digest": (
-                self.state.audited_reentry_ledger.digest().value
-            ),
-            "complete_reentry_ledger_digest": (
-                self.state.complete_reentry_ledger.digest().value
-            ),
+            "reentry_audit_ledger_digest": (self.state.reentry_audit_ledger.digest().value),
+            "audited_reentry_ledger_digest": (self.state.audited_reentry_ledger.digest().value),
+            "complete_reentry_ledger_digest": (self.state.complete_reentry_ledger.digest().value),
             "complete_reentry_closeout_ledger_digest": (
                 self.state.complete_reentry_closeout_ledger.digest().value
             ),

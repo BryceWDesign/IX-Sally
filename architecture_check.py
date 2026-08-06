@@ -27,10 +27,7 @@ class ArchitectureViolation:
 
     def render(self) -> str:
         """Return a stable human-readable violation message."""
-        return (
-            f"{self.rule}: {self.source} imports {self.target} "
-            f"at line {self.line}"
-        )
+        return f"{self.rule}: {self.source} imports {self.target} at line {self.line}"
 
 
 def _is_status_module(module: str) -> bool:
@@ -66,9 +63,8 @@ def architecture_violations(
                 )
             )
 
-        if (
-            dependency.target.startswith(_HUMAN_REVIEW_PREFIX)
-            and not dependency.source.startswith(_HUMAN_REVIEW_PREFIX)
+        if dependency.target.startswith(_HUMAN_REVIEW_PREFIX) and not dependency.source.startswith(
+            _HUMAN_REVIEW_PREFIX
         ):
             violations.append(
                 ArchitectureViolation(

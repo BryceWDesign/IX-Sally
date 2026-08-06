@@ -68,8 +68,7 @@ class StateRecorder:
             event_type=RuntimeEventType.EVIDENCE_RECORDED,
             actor=evidence.produced_by,
             summary=(
-                f"Recorded evidence from {evidence.produced_by.value}: "
-                f"{evidence.status.value}."
+                f"Recorded evidence from {evidence.produced_by.value}: {evidence.status.value}."
             ),
             payload=event_payload_with_reference(
                 reference_type="evidence-record",
@@ -127,8 +126,7 @@ class StateRecorder:
             event_type=RuntimeEventType.JURISDICTION_DECIDED,
             actor=action.proposed_by,
             summary=(
-                f"Recorded bounded action from {action.proposed_by.value}: "
-                f"{action.status.value}."
+                f"Recorded bounded action from {action.proposed_by.value}: {action.status.value}."
             ),
             payload=event_payload_with_reference(
                 reference_type="bounded-action",
@@ -157,8 +155,7 @@ class StateRecorder:
             event_type=RuntimeEventType.JURISDICTION_DECIDED,
             actor=action.proposed_by,
             summary=(
-                f"Updated bounded action from {action.proposed_by.value}: "
-                f"{action.status.value}."
+                f"Updated bounded action from {action.proposed_by.value}: {action.status.value}."
             ),
             payload=event_payload_with_reference(
                 reference_type="bounded-action",
@@ -222,8 +219,7 @@ class StateRecorder:
             event_type=RuntimeEventType.AGENT_ARTIFACT_RECORDED,
             actor=item.dispatch_role,
             summary=(
-                f"Updated execution queue item for {item.dispatch_role.value}: "
-                f"{item.status.value}."
+                f"Updated execution queue item for {item.dispatch_role.value}: {item.status.value}."
             ),
             payload=event_payload_with_reference(
                 reference_type="execution-queue-item",
@@ -245,8 +241,7 @@ class StateRecorder:
             event_type=RuntimeEventType.AGENT_ARTIFACT_RECORDED,
             actor=result.executed_by,
             summary=(
-                f"Recorded Forge result from {result.executed_by.value}: "
-                f"{result.status.value}."
+                f"Recorded Forge result from {result.executed_by.value}: {result.status.value}."
             ),
             payload=event_payload_with_reference(
                 reference_type="forge-result",

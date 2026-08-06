@@ -77,9 +77,7 @@ class HumanReviewClearanceReport:
             "blocker_acknowledgment_count": blocker_acknowledgment_count,
         }.items():
             if value < 0:
-                raise FoundationError(
-                    f"human-review clearance {field_name} must not be negative"
-                )
+                raise FoundationError(f"human-review clearance {field_name} must not be negative")
 
         surfaced_count = (
             pending_decision_count
@@ -88,14 +86,10 @@ class HumanReviewClearanceReport:
             + blocker_acknowledgment_count
         )
         if surfaced_count != card_count:
-            raise FoundationError(
-                "human-review clearance surfaced counts must equal card_count"
-            )
+            raise FoundationError("human-review clearance surfaced counts must equal card_count")
 
         decision_status_count = (
-            approved_decision_count
-            + rejected_decision_count
-            + deferred_decision_count
+            approved_decision_count + rejected_decision_count + deferred_decision_count
         )
         if decision_status_count != resolved_count:
             raise FoundationError(
@@ -249,19 +243,13 @@ class HumanReviewClearanceAssessment:
         if resolution_audit.bundle_digest != bundle.digest():
             raise FoundationError("human-review clearance audit does not match bundle")
         if resolution_audit.decision_ledger_digest != decision_ledger.digest():
-            raise FoundationError(
-                "human-review clearance audit does not match decision ledger"
-            )
+            raise FoundationError("human-review clearance audit does not match decision ledger")
         if clearance_report.bundle_digest != bundle.digest():
             raise FoundationError("human-review clearance report does not match bundle")
         if clearance_report.decision_ledger_digest != decision_ledger.digest():
-            raise FoundationError(
-                "human-review clearance report does not match decision ledger"
-            )
+            raise FoundationError("human-review clearance report does not match decision ledger")
         if clearance_report.resolution_audit_digest != resolution_audit.digest():
-            raise FoundationError(
-                "human-review clearance report does not match resolution audit"
-            )
+            raise FoundationError("human-review clearance report does not match resolution audit")
 
         return cls(
             bundle=bundle,

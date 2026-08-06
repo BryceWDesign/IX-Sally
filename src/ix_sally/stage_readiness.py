@@ -65,9 +65,7 @@ class RunStageCounts:
             finding.claim_digest.value for finding in state.evidence_support.findings
         }
         unreviewed_claims = sum(
-            1
-            for claim in state.claims.claims
-            if claim.digest().value not in reviewed_claim_digests
+            1 for claim in state.claims.claims if claim.digest().value not in reviewed_claim_digests
         )
 
         blocking_actions = state.blocked_action_count()

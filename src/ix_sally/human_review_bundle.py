@@ -59,9 +59,7 @@ class HumanReviewBundleReceipt:
             )
 
         surfaced_count = (
-            gateway_resolvable_count
-            + manual_investigation_count
-            + blocker_acknowledgment_count
+            gateway_resolvable_count + manual_investigation_count + blocker_acknowledgment_count
         )
         if surfaced_count != target_count:
             raise FoundationError(
@@ -252,16 +250,14 @@ class HumanReviewBundleAssembler:
         *,
         state: NinefoldRunState,
         authority_note: str = (
-            "Human authority is required before IX-Sally may treat these "
-            "targets as resolved."
+            "Human authority is required before IX-Sally may treat these targets as resolved."
         ),
     ) -> HumanReviewOperatorBundle:
         """Assemble a docket, packet, and receipt for the active human-review stage."""
         snapshot = RunStageSnapshot.from_state(state)
         if snapshot.stage is not RunStage.HUMAN_REVIEW:
             raise FoundationError(
-                f"human-review bundle expected human_review but observed "
-                f"{snapshot.stage.value}"
+                f"human-review bundle expected human_review but observed {snapshot.stage.value}"
             )
 
         docket = self.docket_builder.build(state=state)

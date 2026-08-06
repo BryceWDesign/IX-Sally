@@ -172,7 +172,9 @@ def test_statement_parser_rejects_missing_expression() -> None:
     diagnostic = captured.value.diagnostic
     assert diagnostic.code.value == "syntax-expected-expression"
     assert diagnostic.span.label() == "broken.ix:1:6"
-  def test_statement_parser_rejects_recall_trailing_tokens() -> None:
+
+
+def test_statement_parser_rejects_recall_trailing_tokens() -> None:
     """Recall accepts exactly one memory name and no expression tail."""
     with pytest.raises(IXSyntaxError) as captured:
         parse_ix_program(
@@ -197,9 +199,7 @@ def test_statement_parser_rejects_unsupported_block_keyword() -> None:
     diagnostic = captured.value.diagnostic
     assert diagnostic.code.value == "syntax-unsupported-statement"
     assert diagnostic.span.label() == "blocked.ix:1:1-3"
-    assert diagnostic.message == (
-        "Unsupported executable IX statement keyword 'if'."
-    )
+    assert diagnostic.message == ("Unsupported executable IX statement keyword 'if'.")
 
 
 def test_statement_parser_rejects_non_keyword_statement_start() -> None:

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
@@ -178,8 +178,7 @@ class HumanReviewResumeLedger:
                 )
             if entry.entry_id.value in seen_entry_ids:
                 raise FoundationError(
-                    f"duplicate human-review resume ledger entry id: "
-                    f"{entry.entry_id.value}"
+                    f"duplicate human-review resume ledger entry id: {entry.entry_id.value}"
                 )
             if entry.certificate_digest.value in seen_certificate_digests:
                 raise FoundationError(
@@ -187,9 +186,7 @@ class HumanReviewResumeLedger:
                     f"{entry.certificate_digest.value}"
                 )
             if entry.sequence <= previous_sequence:
-                raise FoundationError(
-                    "human-review resume ledger sequences must increase"
-                )
+                raise FoundationError("human-review resume ledger sequences must increase")
 
             seen_sequences.add(entry.sequence)
             seen_entry_ids.add(entry.entry_id.value)
@@ -257,12 +254,8 @@ class HumanReviewResumeLedger:
             "execution_planning_resume_count": len(
                 self.entries_for_stage(RunStage.EXECUTION_PLANNING)
             ),
-            "proposal_intake_resume_count": len(
-                self.entries_for_stage(RunStage.PROPOSAL_INTAKE)
-            ),
-            "chamber_close_resume_count": len(
-                self.entries_for_stage(RunStage.CHAMBER_CLOSE_READY)
-            ),
+            "proposal_intake_resume_count": len(self.entries_for_stage(RunStage.PROPOSAL_INTAKE)),
+            "chamber_close_resume_count": len(self.entries_for_stage(RunStage.CHAMBER_CLOSE_READY)),
         }
 
     def digest(self) -> DigestRecord:

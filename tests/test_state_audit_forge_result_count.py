@@ -57,8 +57,5 @@ def test_state_auditor_does_not_warn_when_dispatched_item_has_matching_result() 
 
     report = StateAuditor().audit(state)
 
-    assert not any(
-        finding.reference == "execution_queue.dispatched"
-        for finding in report.findings
-    )
+    assert not any(finding.reference == "execution_queue.dispatched" for finding in report.findings)
     assert report.ready_for_close() is True

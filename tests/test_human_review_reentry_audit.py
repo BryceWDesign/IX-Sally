@@ -12,10 +12,10 @@ from ix_sally.human_review_gateway import HumanReviewDecisionStatus
 from ix_sally.human_review_reentry import HumanReviewReentryStatus
 from ix_sally.human_review_reentry_audit import (
     HumanReviewReentryAuditFinding,
+    HumanReviewReentryAuditor,
     HumanReviewReentryAuditReport,
     HumanReviewReentryAuditSeverity,
     HumanReviewReentryAuditStatus,
-    HumanReviewReentryAuditor,
 )
 from ix_sally.human_review_reentry_coordination import HumanReviewReentryCoordinator
 from ix_sally.human_review_workflow import HumanReviewWorkflowKit

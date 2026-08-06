@@ -32,7 +32,9 @@ def _state() -> NinefoldRunState:
     return NinefoldRunState.create(runtime_kit=NinefoldRuntimeKit.create(contract=contract))
 
 
-def _review_action(description: str = "Run certified post-review verification.") -> BoundedActionRecord:
+def _review_action(
+    description: str = "Run certified post-review verification.",
+) -> BoundedActionRecord:
     action = BoundedActionRecord.create(
         cycle=1,
         proposed_by=AgentRole.SALLY,

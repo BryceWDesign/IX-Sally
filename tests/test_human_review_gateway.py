@@ -196,8 +196,6 @@ def test_human_review_submission_result_payload_and_digest_are_stable() -> None:
 
     assert payload["before_stage"] == RunStage.HUMAN_REVIEW.value
     assert payload["next_stage"] == RunStage.EXECUTION_PLANNING.value
-    assert payload["decision_status"] == (
-        HumanReviewDecisionStatus.APPROVED_FOR_EXECUTION.value
-    )
+    assert payload["decision_status"] == (HumanReviewDecisionStatus.APPROVED_FOR_EXECUTION.value)
     assert first.digest() == second.digest()
     assert first.receipt.digest() == second.receipt.digest()

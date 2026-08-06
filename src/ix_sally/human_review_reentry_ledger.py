@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError
@@ -11,10 +12,8 @@ from ix_sally.orchestration_loop import StageLoopStopReason
 from ix_sally.stage_readiness import RunStage
 
 if TYPE_CHECKING:
-    from ix_sally.human_review_reentry import (
-        HumanReviewReentryResult,
-        HumanReviewReentryStatus,
-    )
+    from ix_sally.human_review_reentry import HumanReviewReentryResult
+    from ix_sally.human_review_reentry_status import HumanReviewReentryStatus
 
 
 @dataclass(frozen=True, slots=True)
@@ -57,9 +56,7 @@ class HumanReviewReentryLedgerEntry:
         if sequence <= 0:
             raise FoundationError("human-review reentry ledger sequence must be positive")
         if executed_steps < 0:
-            raise FoundationError(
-                "human-review reentry ledger executed_steps must not be negative"
-            )
+            raise FoundationError("human-review reentry ledger executed_steps must not be negative")
 
         reentry_receipt_digest.require_algorithm("sha256")
         resume_operation_digest.require_algorithm("sha256")
@@ -293,15 +290,11 @@ class HumanReviewReentryLedger:
             "changed_entry_count": len(self.changed_entries()),
             "external_input_entry_count": len(self.external_input_entries()),
             "advanced_entry_count": len(self.entries_by_status_value("advanced")),
-            "waiting_entry_count": len(
-                self.entries_by_status_value("waiting_for_external_input")
-            ),
+            "waiting_entry_count": len(self.entries_by_status_value("waiting_for_external_input")),
             "forge_result_processing_entry_count": len(
                 self.entries_for_stage(RunStage.FORGE_RESULT_PROCESSING)
             ),
-            "chamber_close_entry_count": len(
-                self.entries_for_stage(RunStage.CHAMBER_CLOSE_READY)
-            ),
+            "chamber_close_entry_count": len(self.entries_for_stage(RunStage.CHAMBER_CLOSE_READY)),
         }
 
     def digest(self) -> DigestRecord:

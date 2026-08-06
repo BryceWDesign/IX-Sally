@@ -137,9 +137,7 @@ def test_reentry_coordination_payload_links_resume_reentry_and_workflow() -> Non
 
     assert payload["resume_operation_digest"] == resume.digest().value
     assert payload["reentry_result_digest"] == result.reentry_result.digest().value
-    assert payload["workflow_operation_digest"] == (
-        result.workflow_operation.digest().value
-    )
+    assert payload["workflow_operation_digest"] == (result.workflow_operation.digest().value)
     assert payload["recorded_reentry"] is True
     assert payload["reentry_count"] == 1
     assert receipt_payload["recorded_reentry"] is True

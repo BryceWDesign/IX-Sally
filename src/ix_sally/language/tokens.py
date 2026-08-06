@@ -98,14 +98,10 @@ class Keyword(StrEnum):
             return False
         if self is Keyword.NULL:
             return None
-        raise FoundationError(
-            f"IX keyword {self.value!r} does not represent a literal value"
-        )
+        raise FoundationError(f"IX keyword {self.value!r} does not represent a literal value")
 
 
-KEYWORDS_BY_LEXEME: Final[dict[str, Keyword]] = {
-    keyword.value: keyword for keyword in Keyword
-}
+KEYWORDS_BY_LEXEME: Final[dict[str, Keyword]] = {keyword.value: keyword for keyword in Keyword}
 
 
 @dataclass(frozen=True, slots=True)
@@ -214,9 +210,7 @@ class LanguageToken:
         if self.keyword is None:
             raise FoundationError("keyword token must carry a keyword")
         if self.lexeme != self.keyword.value:
-            raise FoundationError(
-                "keyword token lexeme must match its keyword value"
-            )
+            raise FoundationError("keyword token lexeme must match its keyword value")
 
     def _require_literal_consistency(self) -> None:
         """Reject literal values that do not match their token kind."""
@@ -235,16 +229,15 @@ class LanguageToken:
                 raise FoundationError("float token literal must be a float")
             return
 
-        if self.kind is TokenKind.KEYWORD and self.keyword is not None:
-            if self.keyword.is_literal():
-                expected = self.keyword.literal_value()
-                if self.literal is not expected:
-                    raise FoundationError(
-                        "literal keyword token carries an incorrect literal value"
-                    )
-                return
+        if (
+            self.kind is TokenKind.KEYWORD
+            and self.keyword is not None
+            and self.keyword.is_literal()
+        ):
+            expected = self.keyword.literal_value()
+            if self.literal is not expected:
+                raise FoundationError("literal keyword token carries an incorrect literal value")
+            return
 
         if self.literal is not None:
-            raise FoundationError(
-                f"{self.kind.value} token must not carry a literal value"
-            )
+            raise FoundationError(f"{self.kind.value} token must not carry a literal value")

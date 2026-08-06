@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
@@ -65,8 +65,7 @@ class HumanReviewPacketCard:
 
         target_digest.require_algorithm("sha256")
         normalized_options = tuple(
-            require_text(option, field_name="decision_option")
-            for option in decision_options
+            require_text(option, field_name="decision_option") for option in decision_options
         )
         if len(set(normalized_options)) != len(normalized_options):
             raise FoundationError("human-review packet card decision options must be unique")
@@ -195,9 +194,7 @@ class HumanReviewPacket:
         seen_cards: set[str] = set()
         for card in normalized_cards:
             if card.card_id.value in seen_cards:
-                raise FoundationError(
-                    f"duplicate human-review packet card: {card.card_id.value}"
-                )
+                raise FoundationError(f"duplicate human-review packet card: {card.card_id.value}")
             seen_cards.add(card.card_id.value)
 
         normalized_note = require_text(authority_note, field_name="authority_note")
@@ -222,8 +219,7 @@ class HumanReviewPacket:
         docket: HumanReviewDocket,
         *,
         authority_note: str = (
-            "Human authority is required before IX-Sally may treat these "
-            "targets as resolved."
+            "Human authority is required before IX-Sally may treat these targets as resolved."
         ),
     ) -> HumanReviewPacket:
         """Create an operator packet from a human-review docket."""

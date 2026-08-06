@@ -43,8 +43,7 @@ class StageGateDecision:
         else:
             status = StageGateStatus.BLOCKED
             rationale = (
-                f"Stage gate expected {expected_stage.value} but observed "
-                f"{snapshot.stage.value}."
+                f"Stage gate expected {expected_stage.value} but observed {snapshot.stage.value}."
             )
 
         return cls(

@@ -135,7 +135,11 @@ class RuntimeTranscript:
         return DigestRecord.from_payload(self.to_payload())
 
 
-def event_payload_with_reference(*, reference_type: str, reference_digest: DigestRecord) -> JsonObject:
+def event_payload_with_reference(
+    *,
+    reference_type: str,
+    reference_digest: DigestRecord,
+) -> JsonObject:
     """Return a payload that links an event to another signed runtime record."""
     key = CanonicalKey.from_text(reference_type, field_name="reference_type")
     reference_digest.require_algorithm("sha256")

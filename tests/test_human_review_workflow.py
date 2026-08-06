@@ -8,7 +8,6 @@ from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
 from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.digest import DigestRecord
 from ix_sally.foundation import FoundationError
-from ix_sally.human_review_control_plane import HumanReviewControlPlaneState
 from ix_sally.human_review_control_plane_coordinator import (
     HumanReviewControlPlaneOperationKind,
 )

@@ -141,8 +141,12 @@ def test_human_review_bundle_ledger_rejects_mismatched_counts() -> None:
 
 
 def test_human_review_bundle_ledger_filters_manual_investigation_entries() -> None:
-    state = _state().with_action(_review_action()).with_evidence_support_finding(
-        _unsupported_finding(),
+    state = (
+        _state()
+        .with_action(_review_action())
+        .with_evidence_support_finding(
+            _unsupported_finding(),
+        )
     )
     bundle = HumanReviewBundleAssembler.create().assemble(state=state)
     ledger = HumanReviewBundleLedger.create(()).append_bundle(bundle)

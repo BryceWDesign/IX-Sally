@@ -102,9 +102,7 @@ class IXValidationReport:
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible validation report."""
-        diagnostics: JsonArray = [
-            diagnostic.to_payload() for diagnostic in self.diagnostics
-        ]
+        diagnostics: JsonArray = [diagnostic.to_payload() for diagnostic in self.diagnostics]
         return {
             "program_digest": {
                 "algorithm": self.program_digest.algorithm,
@@ -174,9 +172,7 @@ class IXSemanticValidator:
                     LanguageDiagnostic.create(
                         code="validation.duplicate-binding",
                         severity=DiagnosticSeverity.ERROR,
-                        message=(
-                            f"Local name {statement.name!r} is already defined."
-                        ),
+                        message=(f"Local name {statement.name!r} is already defined."),
                         span=statement.span,
                         hint="Choose a new local name instead of redefining it.",
                     )
@@ -201,14 +197,9 @@ class IXSemanticValidator:
                     LanguageDiagnostic.create(
                         code="validation.unknown-memory",
                         severity=DiagnosticSeverity.ERROR,
-                        message=(
-                            f"Memory name {statement.name!r} is not available."
-                        ),
+                        message=(f"Memory name {statement.name!r} is not available."),
                         span=statement.span,
-                        hint=(
-                            "Remember the name earlier or provide it in the "
-                            "validation context."
-                        ),
+                        hint=("Remember the name earlier or provide it in the validation context."),
                     )
                 )
             return tuple(diagnostics)
@@ -221,7 +212,9 @@ class IXSemanticValidator:
             )
         )
         return tuple(diagnostics)
-      def validate_ix_program(
+
+
+def validate_ix_program(
     program: Program,
     *,
     context: IXValidationContext | None = None,
@@ -252,8 +245,7 @@ def _statement_expression(statement: Statement) -> Expression:
     ):
         return statement.expression
     raise FoundationError(
-        f"unsupported IX statement type for semantic validation: "
-        f"{type(statement).__name__}"
+        f"unsupported IX statement type for semantic validation: {type(statement).__name__}"
     )
 
 
@@ -287,8 +279,6 @@ def _normalize_names(
     normalized: set[str] = set()
     for name in names:
         if not isinstance(name, str) or not _IDENTIFIER_PATTERN.fullmatch(name):
-            raise FoundationError(
-                f"IX validation {field_name} must contain ASCII identifiers"
-            )
+            raise FoundationError(f"IX validation {field_name} must contain ASCII identifiers")
         normalized.add(name)
     return tuple(sorted(normalized))

@@ -61,9 +61,7 @@ class JurisdictionGate:
                 role=role,
                 authority=requested,
                 status=JurisdictionStatus.DENIED,
-                reason=(
-                    f"role {role.value} is prohibited from authority {requested.value}"
-                ),
+                reason=(f"role {role.value} is prohibited from authority {requested.value}"),
             )
 
         return JurisdictionDecision(

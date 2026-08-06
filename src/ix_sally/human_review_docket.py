@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.actions import ActionStatus, BoundedActionRecord
 from ix_sally.cycles import NinefoldCyclePacket
@@ -12,7 +12,7 @@ from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.evidence_support import EvidenceSupportFinding
 from ix_sally.forge_results import ForgeResultRecord, ForgeResultStatus
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
-from ix_sally.stage_gate import RunStageGate, StageGateDecision
+from ix_sally.stage_gate import RunStageGate
 from ix_sally.stage_readiness import RunStage, RunStageSnapshot
 from ix_sally.state import NinefoldRunState
 
@@ -132,9 +132,7 @@ class HumanReviewDocketTarget:
             else HumanReviewDocketSeverity.REVIEW_REQUIRED
         )
         rationale = (
-            result.boundary_note
-            or result.failure_reason
-            or "Forge result requires human review."
+            result.boundary_note or result.failure_reason or "Forge result requires human review."
         )
 
         return cls.create(
@@ -295,9 +293,7 @@ class HumanReviewDocket:
                 self.targets_by_type(HumanReviewDocketTargetType.BOUNDED_ACTION)
             ),
             "evidence_support_finding_count": len(
-                self.targets_by_type(
-                    HumanReviewDocketTargetType.EVIDENCE_SUPPORT_FINDING
-                )
+                self.targets_by_type(HumanReviewDocketTargetType.EVIDENCE_SUPPORT_FINDING)
             ),
             "forge_result_count": len(
                 self.targets_by_type(HumanReviewDocketTargetType.FORGE_RESULT)

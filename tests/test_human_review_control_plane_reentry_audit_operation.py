@@ -95,9 +95,7 @@ def test_control_plane_coordinator_records_reentry_audit_operation() -> None:
         control_plane=audit_report_to_control_plane(audit_report),
     )
 
-    assert result.operation_kind() is (
-        HumanReviewControlPlaneOperationKind.REENTRY_AUDIT_RECORDED
-    )
+    assert result.operation_kind() is (HumanReviewControlPlaneOperationKind.REENTRY_AUDIT_RECORDED)
     assert result.changed_control_plane() is True
     assert result.before_control_plane.reentry_audit_count() == 0
     assert result.after_control_plane.reentry_audit_count() == 1

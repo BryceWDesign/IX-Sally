@@ -88,12 +88,7 @@ def _source_version(
     repository_root: Path,
 ) -> str:
     """Return the canonical version declared by the source package."""
-    version_path = (
-        repository_root
-        / "src"
-        / "ix_sally"
-        / "version.py"
-    )
+    version_path = repository_root / "src" / "ix_sally" / "version.py"
     tree = ast.parse(
         version_path.read_text(encoding="utf-8"),
         filename=str(version_path),
@@ -104,23 +99,16 @@ def _source_version(
             continue
 
         if not any(
-            isinstance(target, ast.Name)
-            and target.id == "__version__"
+            isinstance(target, ast.Name) and target.id == "__version__"
             for target in statement.targets
         ):
             continue
 
         value = statement.value
-        if (
-            isinstance(value, ast.Constant)
-            and isinstance(value.value, str)
-            and value.value
-        ):
+        if isinstance(value, ast.Constant) and isinstance(value.value, str) and value.value:
             return value.value
 
-    raise RuntimeError(
-        "IX-Sally source version is missing or is not a string literal"
-    )
+    raise RuntimeError("IX-Sally source version is missing or is not a string literal")
 
 
 def _ignored_source_entries(
@@ -179,16 +167,9 @@ def _build_wheel(
         cwd=source_root,
     )
 
-    wheels = tuple(
-        sorted(
-            wheel_directory.glob("ix_sally-*.whl")
-        )
-    )
+    wheels = tuple(sorted(wheel_directory.glob("ix_sally-*.whl")))
     if len(wheels) != 1:
-        raise RuntimeError(
-            "expected exactly one IX-Sally wheel, "
-            f"found {len(wheels)}"
-        )
+        raise RuntimeError(f"expected exactly one IX-Sally wheel, found {len(wheels)}")
 
     return wheels[0]
 
@@ -205,9 +186,7 @@ def _install_wheel(
         clear=True,
     ).create(environment_root)
 
-    python_executable = _venv_python(
-        environment_root
-    )
+    python_executable = _venv_python(environment_root)
     _run(
         (
             str(python_executable),
@@ -248,9 +227,7 @@ def _verify_installed_package(
         environment=environment,
     )
     if import_check.stderr:
-        raise RuntimeError(
-            import_check.stderr
-        )
+        raise RuntimeError(import_check.stderr)
 
     module_result = _run(
         (
@@ -262,25 +239,15 @@ def _verify_installed_package(
         cwd=working_root,
         environment=environment,
     )
-    payload = json.loads(
-        module_result.stdout
-    )
+    payload = json.loads(module_result.stdout)
     if payload.get("package") != _PACKAGE_NAME:
-        raise RuntimeError(
-            "installed module reported an unexpected package name"
-        )
+        raise RuntimeError("installed module reported an unexpected package name")
     if payload.get("version") != expected_version:
-        raise RuntimeError(
-            "installed module reported an unexpected package version"
-        )
+        raise RuntimeError("installed module reported an unexpected package version")
 
     console_result = _run(
         (
-            str(
-                _venv_console_script(
-                    environment_root
-                )
-            ),
+            str(_venv_console_script(environment_root)),
             "--baseline-digest",
         ),
         cwd=working_root,
@@ -289,26 +256,16 @@ def _verify_installed_package(
     digest_line = console_result.stdout.strip()
     prefix, separator, digest_value = digest_line.partition(":")
 
-    if (
-        prefix != "sha256"
-        or separator != ":"
-        or len(digest_value) != _SHA256_HEX_LENGTH
-    ):
-        raise RuntimeError(
-            "installed console script returned an invalid baseline digest"
-        )
+    if prefix != "sha256" or separator != ":" or len(digest_value) != _SHA256_HEX_LENGTH:
+        raise RuntimeError("installed console script returned an invalid baseline digest")
 
 
 def main() -> int:
     """Build, install, and verify the current IX-Sally wheel."""
     repository_root = Path(__file__).resolve().parent
-    expected_version = _source_version(
-        repository_root=repository_root
-    )
+    expected_version = _source_version(repository_root=repository_root)
 
-    with tempfile.TemporaryDirectory(
-        prefix="ix-sally-package-smoke-"
-    ) as directory:
+    with tempfile.TemporaryDirectory(prefix="ix-sally-package-smoke-") as directory:
         temporary_root = Path(directory)
         source_root = temporary_root / "source"
 
@@ -333,9 +290,7 @@ def main() -> int:
             expected_version=expected_version,
         )
 
-    sys.stdout.write(
-        "Installed IX-Sally wheel smoke test passed.\n"
-    )
+    sys.stdout.write("Installed IX-Sally wheel smoke test passed.\n")
     return 0
 
 

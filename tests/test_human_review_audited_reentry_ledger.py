@@ -133,12 +133,8 @@ def test_audited_reentry_ledger_appends_result_at_next_sequence() -> None:
     assert updated.failed_entries() == ()
     assert updated.changed_state_entries() == (latest,)
     assert updated.entries_for_stage(RunStage.FORGE_DISPATCH) == (latest,)
-    assert updated.entries_for_audit_status(HumanReviewReentryAuditStatus.PASSED) == (
-        latest,
-    )
-    assert updated.entries_for_reentry_status(HumanReviewReentryStatus.ADVANCED) == (
-        latest,
-    )
+    assert updated.entries_for_audit_status(HumanReviewReentryAuditStatus.PASSED) == (latest,)
+    assert updated.entries_for_reentry_status(HumanReviewReentryStatus.ADVANCED) == (latest,)
 
 
 def test_audited_reentry_ledger_tracks_waiting_external_input_result() -> None:
@@ -206,9 +202,7 @@ def test_audited_reentry_ledger_entry_rejects_invalid_step_counts() -> None:
             resume_operation_digest=result.receipt.resume_operation_digest,
             reentry_coordination_digest=result.receipt.reentry_coordination_digest,
             audit_report_digest=result.receipt.audit_report_digest,
-            audit_workflow_operation_digest=(
-                result.receipt.audit_workflow_operation_digest
-            ),
+            audit_workflow_operation_digest=(result.receipt.audit_workflow_operation_digest),
             before_state_digest=result.receipt.before_state_digest,
             after_state_digest=result.receipt.after_state_digest,
             before_control_plane_digest=result.receipt.before_control_plane_digest,
@@ -230,9 +224,7 @@ def test_audited_reentry_ledger_entry_rejects_invalid_step_counts() -> None:
             resume_operation_digest=result.receipt.resume_operation_digest,
             reentry_coordination_digest=result.receipt.reentry_coordination_digest,
             audit_report_digest=result.receipt.audit_report_digest,
-            audit_workflow_operation_digest=(
-                result.receipt.audit_workflow_operation_digest
-            ),
+            audit_workflow_operation_digest=(result.receipt.audit_workflow_operation_digest),
             before_state_digest=result.receipt.before_state_digest,
             after_state_digest=result.receipt.after_state_digest,
             before_control_plane_digest=result.receipt.before_control_plane_digest,

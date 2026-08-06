@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.agents import AgentRole
 from ix_sally.artifacts import AgentArtifact, AgentArtifactKind
@@ -80,11 +80,15 @@ class MnemosyneMemoryDecision:
         if resulting_status is MemoryStatus.VERIFIED and not normalized_evidence:
             raise FoundationError("verified memory decisions require evidence digests")
 
-        if resulting_status in {
-            MemoryStatus.CONTRADICTED,
-            MemoryStatus.QUARANTINED,
-            MemoryStatus.REJECTED,
-        } and normalized_boundary_note is None:
+        if (
+            resulting_status
+            in {
+                MemoryStatus.CONTRADICTED,
+                MemoryStatus.QUARANTINED,
+                MemoryStatus.REJECTED,
+            }
+            and normalized_boundary_note is None
+        ):
             raise FoundationError("blocking memory decisions require a boundary note")
 
         return cls(

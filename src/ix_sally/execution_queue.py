@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.actions import BoundedActionLedger, BoundedActionRecord
 from ix_sally.agents import AgentRole
@@ -168,7 +168,9 @@ class ExecutionQueue:
     @classmethod
     def from_action_ledger(cls, ledger: BoundedActionLedger) -> ExecutionQueue:
         """Queue every action currently authorized for execution."""
-        return cls.create(ExecutionQueueItem.from_action(action) for action in ledger.executable_actions())
+        return cls.create(
+            ExecutionQueueItem.from_action(action) for action in ledger.executable_actions()
+        )
 
     def append(self, item: ExecutionQueueItem) -> ExecutionQueue:
         """Return a new queue with an appended item."""

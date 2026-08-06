@@ -1,0 +1,4 @@
+let answer = 6 * 7
+remember canonical_answer = answer
+recall canonical_answer
+assert answer == 42

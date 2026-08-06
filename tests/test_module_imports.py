@@ -55,8 +55,7 @@ def test_runtime_modules_import_in_multiple_orders() -> None:
         )
         if completed.returncode != 0:
             failures.append(
-                f"order {order_index}: "
-                f"{completed.stderr.strip() or completed.stdout.strip()}"
+                f"order {order_index}: {completed.stderr.strip() or completed.stdout.strip()}"
             )
 
     assert not failures, "\n".join(failures)

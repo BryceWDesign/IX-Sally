@@ -2,17 +2,17 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
-from ix_sally.human_review_reentry import HumanReviewReentryStatus
 from ix_sally.human_review_reentry_audit_status import HumanReviewReentryAuditStatus
 from ix_sally.human_review_reentry_coordination import (
     HumanReviewReentryCoordinationResult,
 )
+from ix_sally.human_review_reentry_status import HumanReviewReentryStatus
 from ix_sally.human_review_workflow import HumanReviewWorkflowStage
 from ix_sally.stage_readiness import RunStage
 
@@ -133,15 +133,12 @@ class HumanReviewReentryAuditReport:
             reentry_status=reentry_status,
         )
         if status is not expected_status:
-            raise FoundationError(
-                "human-review reentry audit status does not match findings"
-            )
+            raise FoundationError("human-review reentry audit status does not match findings")
 
         return cls(
             report_id=report_id
             or CanonicalKey.from_text(
-                f"human-review-reentry-audit-{coordination_digest.value[:16]}-"
-                f"{status.value}",
+                f"human-review-reentry-audit-{coordination_digest.value[:16]}-{status.value}",
                 field_name="report_id",
             ),
             coordination_digest=coordination_digest,
@@ -180,7 +177,8 @@ class HumanReviewReentryAuditReport:
             status=status,
             findings=findings,
         )
-            def blocking_findings(self) -> tuple[HumanReviewReentryAuditFinding, ...]:
+
+    def blocking_findings(self) -> tuple[HumanReviewReentryAuditFinding, ...]:
         """Return blocking findings."""
         return tuple(finding for finding in self.findings if finding.is_blocking())
 
@@ -355,7 +353,7 @@ def _findings_from_coordination(
                 detail="Human-review reentry was not recorded in control-plane state.",
             )
         )
-            if coordination.recorded_reentry() and coordination.control_plane.reentry_count() > 0:
+    if coordination.recorded_reentry() and coordination.control_plane.reentry_count() > 0:
         findings.append(
             _finding(
                 severity=HumanReviewReentryAuditSeverity.INFO,

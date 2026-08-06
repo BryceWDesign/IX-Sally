@@ -43,9 +43,7 @@ class Program(LanguageNode):
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible program representation."""
-        statements: JsonArray = [
-            statement.to_payload() for statement in self.statements
-        ]
+        statements: JsonArray = [statement.to_payload() for statement in self.statements]
         return {
             "node_type": "program",
             "span": self.span.to_payload(),
@@ -257,9 +255,7 @@ def _require_child_span(
     if parent.filename != child.filename:
         raise FoundationError(f"IX {field_name} span must use the parent filename")
     if child.start < parent.start or child.end > parent.end:
-        raise FoundationError(
-            f"IX {field_name} span must be contained by the parent span"
-        )
+        raise FoundationError(f"IX {field_name} span must be contained by the parent span")
 
 
 def _require_ordered_children(

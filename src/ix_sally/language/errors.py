@@ -77,12 +77,7 @@ class LanguageDiagnostic:
 
     def format(self) -> str:
         """Return a stable one-line diagnostic rendering."""
-        rendered = (
-            f"{self.span.label()}: "
-            f"{self.severity.value} "
-            f"[{self.code.value}]: "
-            f"{self.message}"
-        )
+        rendered = f"{self.span.label()}: {self.severity.value} [{self.code.value}]: {self.message}"
 
         if self.hint is not None:
             return f"{rendered} Hint: {self.hint}"
@@ -102,9 +97,7 @@ class LanguageDiagnostic:
 
     def digest(self) -> DigestRecord:
         """Return a deterministic digest for this diagnostic."""
-        return DigestRecord.from_payload(
-            self.to_payload()
-        )
+        return DigestRecord.from_payload(self.to_payload())
 
 
 class IXLanguageError(FoundationError):
@@ -115,9 +108,7 @@ class IXLanguageError(FoundationError):
         diagnostic: LanguageDiagnostic,
     ) -> None:
         self.diagnostic = diagnostic
-        super().__init__(
-            diagnostic.format()
-        )
+        super().__init__(diagnostic.format())
 
 
 class IXSyntaxError(IXLanguageError):

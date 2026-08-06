@@ -57,9 +57,7 @@ class IXFrontendContext:
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible front-end context."""
         local_types: JsonArray = [binding.to_payload() for binding in self.local_types]
-        memory_types: JsonArray = [
-            binding.to_payload() for binding in self.memory_types
-        ]
+        memory_types: JsonArray = [binding.to_payload() for binding in self.memory_types]
         return {
             "local_types": local_types,
             "memory_types": memory_types,
@@ -95,24 +93,17 @@ class IXFrontendAnalysis:
 
         filename = self.program.span.filename
         if any(token.span.filename != filename for token in self.tokens):
-            raise FoundationError(
-                "IX front-end tokens and program must use one source filename"
-            )
+            raise FoundationError("IX front-end tokens and program must use one source filename")
         if self.tokens[-1].span.end.offset != self.source_length:
-            raise FoundationError(
-                "IX front-end EOF offset must match the source length"
-            )
+            raise FoundationError("IX front-end EOF offset must match the source length")
 
         program_digest = self.program.digest()
         if self.validation_report.program_digest != program_digest:
-            raise FoundationError(
-                "IX front-end validation report does not match the program"
-            )
+            raise FoundationError("IX front-end validation report does not match the program")
         if self.type_report.program_digest != program_digest:
-            raise FoundationError(
-                "IX front-end type report does not match the program"
-            )
-              @property
+            raise FoundationError("IX front-end type report does not match the program")
+
+    @property
     def filename(self) -> str:
         """Return the analyzed source filename."""
         return self.program.span.filename
@@ -162,9 +153,7 @@ class IXFrontendAnalysis:
             }
             for token in self.tokens
         ]
-        diagnostics: JsonArray = [
-            diagnostic.to_payload() for diagnostic in self.diagnostics()
-        ]
+        diagnostics: JsonArray = [diagnostic.to_payload() for diagnostic in self.diagnostics()]
         program_digest = self.program.digest()
         validation_digest = self.validation_report.digest()
         type_digest = self.type_report.digest()
@@ -202,7 +191,9 @@ class IXFrontendAnalysis:
     def digest(self) -> DigestRecord:
         """Return a deterministic digest for this front-end analysis."""
         return DigestRecord.from_payload(self.to_payload())
-      @dataclass(frozen=True, slots=True)
+
+
+@dataclass(frozen=True, slots=True)
 class IXFrontendAnalyzer:
     """Run the complete non-executing IX source front end."""
 
@@ -217,12 +208,10 @@ class IXFrontendAnalyzer:
         """Tokenize, parse, validate, and type-check one IX source document."""
         tokens = tokenize_ix(source, filename=filename)
         program = IXStatementParser(tokens=tokens).parse()
-        validation_report = IXSemanticValidator(
-            context=self.context.validation_context()
-        ).validate(program)
-        type_report = IXTypeChecker(
-            context=self.context.type_context()
-        ).check(program)
+        validation_report = IXSemanticValidator(context=self.context.validation_context()).validate(
+            program
+        )
+        type_report = IXTypeChecker(context=self.context.type_context()).check(program)
         return IXFrontendAnalysis(
             source_digest=DigestRecord.from_payload({"source": source}),
             source_length=len(source),

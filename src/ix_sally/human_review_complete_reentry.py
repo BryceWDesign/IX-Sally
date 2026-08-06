@@ -11,11 +11,9 @@ from ix_sally.human_review_audited_reentry import (
     AuditedHumanReviewReentryResult,
 )
 from ix_sally.human_review_control_plane import HumanReviewControlPlaneState
-from ix_sally.human_review_control_plane_report import (
-    HumanReviewControlPlaneReportStatus,
-)
-from ix_sally.human_review_reentry import HumanReviewReentryStatus
-from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditStatus
+from ix_sally.human_review_control_plane_report_status import HumanReviewControlPlaneReportStatus
+from ix_sally.human_review_reentry_audit_status import HumanReviewReentryAuditStatus
+from ix_sally.human_review_reentry_status import HumanReviewReentryStatus
 from ix_sally.human_review_workflow import (
     HumanReviewWorkflowKit,
     HumanReviewWorkflowOperation,
@@ -69,17 +67,13 @@ class CompleteHumanReviewReentryReceipt:
     ) -> CompleteHumanReviewReentryReceipt:
         """Create a normalized complete human-review reentry receipt."""
         if max_steps <= 0:
-            raise FoundationError(
-                "complete human-review reentry max_steps must be positive"
-            )
+            raise FoundationError("complete human-review reentry max_steps must be positive")
         if executed_steps < 0:
             raise FoundationError(
                 "complete human-review reentry executed_steps must not be negative"
             )
         if executed_steps > max_steps:
-            raise FoundationError(
-                "complete human-review reentry executed_steps exceeds max_steps"
-            )
+            raise FoundationError("complete human-review reentry executed_steps exceeds max_steps")
 
         resume_operation_digest.require_algorithm("sha256")
         audited_reentry_result_digest.require_algorithm("sha256")
@@ -198,9 +192,7 @@ class CompleteHumanReviewReentryReceipt:
             "executed_steps": self.executed_steps,
             "changed_state": self.changed_state(),
             "recorded_reentry_and_audit": self.recorded_reentry_and_audit(),
-            "recorded_complete_audited_reentry": (
-                self.recorded_complete_audited_reentry()
-            ),
+            "recorded_complete_audited_reentry": (self.recorded_complete_audited_reentry()),
             "accepted": self.accepted(),
             "requires_operator_attention": self.requires_operator_attention(),
             "waiting_for_external_input": self.waiting_for_external_input(),
@@ -240,16 +232,12 @@ class CompleteHumanReviewReentryResult:
             final_workflow_operation.receipt.workflow_stage
             is not HumanReviewWorkflowStage.AUDITED_REENTRY_RECORDED
         ):
-            raise FoundationError(
-                "complete human-review reentry requires audited-reentry workflow"
-            )
+            raise FoundationError("complete human-review reentry requires audited-reentry workflow")
         if (
             final_workflow_operation.require_audited_reentry_result().digest()
             != audited_reentry_result.digest()
         ):
-            raise FoundationError(
-                "complete human-review reentry final workflow result mismatch"
-            )
+            raise FoundationError("complete human-review reentry final workflow result mismatch")
         if final_workflow_operation.run_state.digest() != audited_reentry_result.state.digest():
             raise FoundationError("complete human-review reentry state mismatch")
         if receipt.resume_operation_digest != resume_operation.digest():
@@ -257,19 +245,13 @@ class CompleteHumanReviewReentryResult:
         if receipt.audited_reentry_result_digest != audited_reentry_result.digest():
             raise FoundationError("complete human-review reentry receipt result mismatch")
         if receipt.audited_reentry_receipt_digest != audited_reentry_result.receipt.digest():
-            raise FoundationError(
-                "complete human-review reentry receipt audited receipt mismatch"
-            )
+            raise FoundationError("complete human-review reentry receipt audited receipt mismatch")
         if receipt.final_workflow_operation_digest != final_workflow_operation.digest():
-            raise FoundationError(
-                "complete human-review reentry receipt workflow mismatch"
-            )
+            raise FoundationError("complete human-review reentry receipt workflow mismatch")
         if receipt.after_state_digest != final_workflow_operation.run_state.digest():
             raise FoundationError("complete human-review reentry receipt state mismatch")
         if receipt.after_control_plane_digest != final_workflow_operation.control_plane.digest():
-            raise FoundationError(
-                "complete human-review reentry receipt control-plane mismatch"
-            )
+            raise FoundationError("complete human-review reentry receipt control-plane mismatch")
 
         return cls(
             resume_operation=resume_operation,
@@ -321,9 +303,7 @@ class CompleteHumanReviewReentryResult:
         return {
             "resume_operation_digest": self.resume_operation.digest().value,
             "audited_reentry_result_digest": self.audited_reentry_result.digest().value,
-            "final_workflow_operation_digest": (
-                self.final_workflow_operation.digest().value
-            ),
+            "final_workflow_operation_digest": (self.final_workflow_operation.digest().value),
             "receipt_digest": self.receipt.digest().value,
             "state_digest": self.state.digest().value,
             "control_plane_digest": self.control_plane.digest().value,

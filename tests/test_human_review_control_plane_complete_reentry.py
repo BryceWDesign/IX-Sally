@@ -68,9 +68,7 @@ def test_control_plane_state_tracks_complete_reentry_ledger() -> None:
     assert state.has_recorded_complete_reentries() is True
     assert state.latest_complete_reentry_digest() == ledger.latest().digest().value
     assert state.to_payload()["complete_reentry_count"] == 1
-    assert state.to_payload()["latest_complete_reentry_digest"] == (
-        ledger.latest().digest().value
-    )
+    assert state.to_payload()["latest_complete_reentry_digest"] == (ledger.latest().digest().value)
 
 
 def test_control_plane_status_tracks_complete_reentry_counts() -> None:
@@ -137,9 +135,7 @@ def test_control_plane_snapshot_rejects_complete_reentry_count_mismatch() -> Non
         operator_attention_audited_reentry_count=(
             good_status.operator_attention_audited_reentry_count
         ),
-        changed_state_audited_reentry_count=(
-            good_status.changed_state_audited_reentry_count
-        ),
+        changed_state_audited_reentry_count=(good_status.changed_state_audited_reentry_count),
         complete_reentry_count=0,
         accepted_complete_reentry_count=good_status.accepted_complete_reentry_count,
         failed_complete_reentry_count=good_status.failed_complete_reentry_count,
@@ -147,9 +143,7 @@ def test_control_plane_snapshot_rejects_complete_reentry_count_mismatch() -> Non
         operator_attention_complete_reentry_count=(
             good_status.operator_attention_complete_reentry_count
         ),
-        changed_state_complete_reentry_count=(
-            good_status.changed_state_complete_reentry_count
-        ),
+        changed_state_complete_reentry_count=(good_status.changed_state_complete_reentry_count),
     )
 
     with pytest.raises(FoundationError, match="complete reentry count mismatch"):

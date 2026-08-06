@@ -99,9 +99,7 @@ def test_workflow_kit_records_complete_reentry_operation() -> None:
         complete_reentry_result=complete_reentry,
     )
 
-    assert operation.receipt.workflow_stage is (
-        HumanReviewWorkflowStage.COMPLETE_REENTRY_RECORDED
-    )
+    assert operation.receipt.workflow_stage is (HumanReviewWorkflowStage.COMPLETE_REENTRY_RECORDED)
     assert operation.operation_kind() is (
         HumanReviewControlPlaneOperationKind.COMPLETE_REENTRY_RECORDED
     )
@@ -146,9 +144,7 @@ def test_workflow_complete_reentry_payload_links_result_and_report() -> None:
     payload = operation.to_payload()
     report_payload = operation.report.to_payload()
 
-    assert payload["workflow_stage"] == (
-        HumanReviewWorkflowStage.COMPLETE_REENTRY_RECORDED.value
-    )
+    assert payload["workflow_stage"] == (HumanReviewWorkflowStage.COMPLETE_REENTRY_RECORDED.value)
     assert payload["operation_kind"] == (
         HumanReviewControlPlaneOperationKind.COMPLETE_REENTRY_RECORDED.value
     )

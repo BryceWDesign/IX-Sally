@@ -152,7 +152,9 @@ def test_expression_parser_rejects_trailing_primary() -> None:
     assert diagnostic.code.value == "syntax-unexpected-token"
     assert diagnostic.span.label() == "broken.ix:1:7-12"
     assert diagnostic.message == "Unexpected token 'ready' after expression."
-  def test_expression_parser_validates_supplied_token_stream() -> None:
+
+
+def test_expression_parser_validates_supplied_token_stream() -> None:
     """The token-based boundary must reject malformed token sequences."""
     with pytest.raises(
         FoundationError,

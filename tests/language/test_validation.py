@@ -18,11 +18,7 @@ from ix_sally.language.validation import (
 def test_semantic_validator_accepts_defined_names_and_memory() -> None:
     """Ordered local bindings and remembered values must validate cleanly."""
     program = parse_ix_program(
-        "let a = 10\n"
-        "let b = a + 5\n"
-        "remember total = b\n"
-        "recall total\n"
-        "assert b == 15\n",
+        "let a = 10\nlet b = a + 5\nremember total = b\nrecall total\nassert b == 15\n",
         filename="valid.ix",
     )
 
@@ -189,9 +185,7 @@ def test_require_valid_ix_program_raises_first_semantic_error() -> None:
 
 def test_empty_program_is_semantically_valid() -> None:
     """An empty parsed document must have a stable valid validation report."""
-    report = validate_ix_program(
-        parse_ix_program("", filename="empty.ix")
-    )
+    report = validate_ix_program(parse_ix_program("", filename="empty.ix"))
 
     assert report.is_valid() is True
     assert report.local_names == ()

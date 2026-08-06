@@ -139,9 +139,7 @@ def test_clearance_report_marks_approved_gateway_decision_as_cleared() -> None:
 def test_clearance_report_marks_deferred_gateway_decision_open() -> None:
     assessment = _assessment_for_decision(HumanReviewDecisionStatus.DEFERRED)
 
-    assert assessment.clearance_report.status is (
-        HumanReviewClearanceStatus.DEFERRED_DECISION_OPEN
-    )
+    assert assessment.clearance_report.status is (HumanReviewClearanceStatus.DEFERRED_DECISION_OPEN)
     assert assessment.cleared_to_resume() is False
     assert assessment.clearance_report.deferred_decision_count == 1
     assert assessment.clearance_report.has_blocking_decision() is True

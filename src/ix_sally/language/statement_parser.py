@@ -82,18 +82,12 @@ class IXStatementParser:
         """Parse one supported executable statement."""
         token = self._peek()
         if token.kind is not TokenKind.KEYWORD or token.keyword is None:
-            rendered = (
-                "end of source"
-                if token.kind is TokenKind.EOF
-                else repr(token.lexeme)
-            )
+            rendered = "end of source" if token.kind is TokenKind.EOF else repr(token.lexeme)
             self._raise_syntax(
                 token=token,
                 code="syntax.expected-statement",
                 message=f"Expected an executable IX statement, found {rendered}.",
-                hint=(
-                    "Begin with let, remember, recall, print, reply, assert, or trace."
-                ),
+                hint=("Begin with let, remember, recall, print, reply, assert, or trace."),
             )
 
         keyword = token.keyword
@@ -108,7 +102,7 @@ class IXStatementParser:
         if statement_type is not None:
             return self._parse_expression_statement(statement_type)
 
-        self._raise_syntax(
+        return self._raise_syntax(
             token=token,
             code="syntax.unsupported-statement",
             message=f"Unsupported executable IX statement keyword {token.lexeme!r}.",
@@ -169,9 +163,7 @@ class IXStatementParser:
 
     def _parse_expression_statement(
         self,
-        statement_type: type[
-            PrintStatement | ReplyStatement | AssertStatement | TraceStatement
-        ],
+        statement_type: type[PrintStatement | ReplyStatement | AssertStatement | TraceStatement],
     ) -> PrintStatement | ReplyStatement | AssertStatement | TraceStatement:
         """Parse one keyword followed by a typed expression."""
         opening = self._advance()
@@ -205,10 +197,9 @@ class IXStatementParser:
                 end=terminator.span.start,
             )
         )
-        return IXExpressionParser(
-            tokens=(*expression_tokens, expression_eof)
-        ).parse()
-          def _require_statement_end(self, *, context: str) -> None:
+        return IXExpressionParser(tokens=(*expression_tokens, expression_eof)).parse()
+
+    def _require_statement_end(self, *, context: str) -> None:
         """Require newline or EOF after a non-expression statement."""
         token = self._peek()
         if token.kind in {TokenKind.NEWLINE, TokenKind.EOF}:
@@ -232,7 +223,7 @@ class IXStatementParser:
         token = self._peek()
         if token.kind is kind:
             return self._advance()
-        self._raise_syntax(
+        return self._raise_syntax(
             token=token,
             code=code,
             message=message,

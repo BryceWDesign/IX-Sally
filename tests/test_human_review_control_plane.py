@@ -22,7 +22,6 @@ from ix_sally.human_review_gateway import HumanReviewDecisionStatus
 from ix_sally.human_review_resume import HumanReviewResumeCoordinator
 from ix_sally.human_review_resume_ledger import HumanReviewResumeLedger
 from ix_sally.runtime import NinefoldRuntimeKit
-from ix_sally.stage_readiness import RunStage
 from ix_sally.state import NinefoldRunState
 
 
@@ -68,7 +67,10 @@ def _control_state_after_handoff() -> HumanReviewControlPlaneState:
     return HumanReviewControlPlaneState.create().with_handoff_ledger(handoff_ledger)
 
 
-def _control_state_after_approved_decision() -> tuple[HumanReviewControlPlaneState, NinefoldRunState]:
+def _control_state_after_approved_decision() -> tuple[
+    HumanReviewControlPlaneState,
+    NinefoldRunState,
+]:
     state = _state().with_action(_review_action())
     bundle = HumanReviewBundleAssembler.create().assemble(state=state)
     handoff_ledger = HumanReviewBundleLedger.create(()).append_bundle(bundle)

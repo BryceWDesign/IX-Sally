@@ -24,17 +24,17 @@ if TYPE_CHECKING:
         AgentArtifactKind,
         AgentArtifactLedger,
     )
+    from ix_sally.authority_processing import (
+        AuthorityBatchProcessingResult,
+        AuthorityProcessingResult,
+        AuthorityProcessor,
+    )
     from ix_sally.authorization import (
         AuthorityDecision,
         AuthorityDecisionLedger,
         AuthorityDecisionStatus,
         AuthorityRequest,
         decide_authority_request,
-    )
-    from ix_sally.authority_processing import (
-        AuthorityBatchProcessingResult,
-        AuthorityProcessingResult,
-        AuthorityProcessor,
     )
     from ix_sally.boundaries import (
         BoundaryFinding,
@@ -47,15 +47,22 @@ if TYPE_CHECKING:
         StopReason,
     )
     from ix_sally.chamber_closing import (
+        ChamberCloser,
         ChamberCloseResult,
         ChamberCloseStatus,
-        ChamberCloser,
     )
     from ix_sally.claims import (
         ClaimLedger,
         ClaimRecord,
         ClaimStatus,
     )
+    from ix_sally.cognition.compiler import compile_ix_source
+    from ix_sally.cognition.evaluation import (
+        CognitiveEvaluationReport,
+        run_core_evaluation,
+    )
+    from ix_sally.cognition.system import SallyCognitiveSystem
+    from ix_sally.cognition.vm import IXVirtualMachine
     from ix_sally.contracts import (
         AutonomyContract,
         AutonomyMode,
@@ -100,8 +107,8 @@ if TYPE_CHECKING:
     )
     from ix_sally.execution_dispatch import (
         ExecutionDispatchBatchResult,
-        ExecutionDispatchResult,
         ExecutionDispatcher,
+        ExecutionDispatchResult,
     )
     from ix_sally.execution_planning import (
         ExecutionPlanner,
@@ -185,9 +192,9 @@ if TYPE_CHECKING:
     from ix_sally.state import NinefoldRunState
     from ix_sally.state_audit import (
         StateAuditFinding,
+        StateAuditor,
         StateAuditReport,
         StateAuditSeverity,
-        StateAuditor,
     )
     from ix_sally.transfer import (
         TransferStatus,
@@ -196,7 +203,6 @@ if TYPE_CHECKING:
     )
 
 __all__ = [
-    "__version__",
     "ActionStatus",
     "AgentArtifact",
     "AgentArtifactKind",
@@ -227,6 +233,7 @@ __all__ = [
     "ClaimStatus",
     "ClerkDocketEntry",
     "ClerkDocketPacket",
+    "CognitiveEvaluationReport",
     "CycleCoordinationStatus",
     "DigestRecord",
     "DocketEntryKind",
@@ -267,6 +274,7 @@ __all__ = [
     "ForgeResultRecord",
     "ForgeResultStatus",
     "FoundationError",
+    "IXVirtualMachine",
     "JurisdictionDecision",
     "JurisdictionGate",
     "JurisdictionStatus",
@@ -288,6 +296,7 @@ __all__ = [
     "RuntimeEvent",
     "RuntimeEventType",
     "RuntimeTranscript",
+    "SallyCognitiveSystem",
     "SallyProposalIntake",
     "SallyProposalIntakeResult",
     "SallyProposalPacket",
@@ -305,14 +314,37 @@ __all__ = [
     "VerityEvidenceJudgment",
     "VerityEvidenceSupportReview",
     "VerityJudgmentPacket",
+    "__version__",
+    "compile_ix_source",
     "decide_authority_request",
     "default_agent_role_registry",
+    "run_core_evaluation",
     "session_one_baseline_digest",
     "session_one_baseline_payload",
     "session_one_contract",
     "session_one_runtime_kit",
 ]
 _LAZY_EXPORTS: Final[dict[str, tuple[str, str]]] = {
+    "CognitiveEvaluationReport": (
+        "ix_sally.cognition.evaluation",
+        "CognitiveEvaluationReport",
+    ),
+    "IXVirtualMachine": (
+        "ix_sally.cognition.vm",
+        "IXVirtualMachine",
+    ),
+    "SallyCognitiveSystem": (
+        "ix_sally.cognition.system",
+        "SallyCognitiveSystem",
+    ),
+    "compile_ix_source": (
+        "ix_sally.cognition.compiler",
+        "compile_ix_source",
+    ),
+    "run_core_evaluation": (
+        "ix_sally.cognition.evaluation",
+        "run_core_evaluation",
+    ),
     "ActionStatus": (
         "ix_sally.actions",
         "ActionStatus",
@@ -693,7 +725,7 @@ _LAZY_EXPORTS: Final[dict[str, tuple[str, str]]] = {
         "ix_sally.boundaries",
         "SentinelBoundaryReport",
     ),
-        "StateAuditFinding": (
+    "StateAuditFinding": (
         "ix_sally.state_audit",
         "StateAuditFinding",
     ),
@@ -776,9 +808,7 @@ def __getattr__(name: str) -> object:
     """Load a public package export only when it is first requested."""
     target = _LAZY_EXPORTS.get(name)
     if target is None:
-        raise AttributeError(
-            f"module {__name__!r} has no attribute {name!r}"
-        )
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
     module_name, attribute_name = target
     value = getattr(
@@ -791,6 +821,4 @@ def __getattr__(name: str) -> object:
 
 def __dir__() -> list[str]:
     """Return package globals and lazy public exports for introspection."""
-    return sorted(
-        set(globals()) | set(__all__)
-    )
+    return sorted(set(globals()) | set(__all__))

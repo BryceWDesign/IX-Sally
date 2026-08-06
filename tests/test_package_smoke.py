@@ -5,9 +5,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-import pytest
-
 import package_smoke
+import pytest
 
 
 def test_isolated_environment_removes_python_path_overrides(
@@ -35,9 +34,7 @@ def test_virtual_environment_paths_match_platform() -> None:
             environment_root / "Scripts" / "ix-sally.exe"
         )
     else:
-        assert package_smoke._venv_python(environment_root) == (
-            environment_root / "bin" / "python"
-        )
+        assert package_smoke._venv_python(environment_root) == (environment_root / "bin" / "python")
         assert package_smoke._venv_console_script(environment_root) == (
             environment_root / "bin" / "ix-sally"
         )

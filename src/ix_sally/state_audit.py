@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
@@ -114,17 +114,13 @@ class StateAuditReport:
     def warning_findings(self) -> tuple[StateAuditFinding, ...]:
         """Return warning findings."""
         return tuple(
-            finding
-            for finding in self.findings
-            if finding.severity is StateAuditSeverity.WARNING
+            finding for finding in self.findings if finding.severity is StateAuditSeverity.WARNING
         )
 
     def info_findings(self) -> tuple[StateAuditFinding, ...]:
         """Return informational findings."""
         return tuple(
-            finding
-            for finding in self.findings
-            if finding.severity is StateAuditSeverity.INFO
+            finding for finding in self.findings if finding.severity is StateAuditSeverity.INFO
         )
 
     def ready_for_close(self) -> bool:
@@ -218,7 +214,9 @@ class StateAuditor:
                 StateAuditFinding.create(
                     severity=StateAuditSeverity.BLOCKING,
                     summary="Bounded actions block autonomous continuation.",
-                    detail=f"{state.blocked_action_count()} bounded action(s) are denied or blocked.",
+                    detail=(
+                        f"{state.blocked_action_count()} bounded action(s) are denied or blocked."
+                    ),
                     reference="actions.blocked",
                 )
             )

@@ -81,9 +81,7 @@ class SourceSpan:
             ),
         )
         if self.end < self.start:
-            raise FoundationError(
-                "source span end must not precede start"
-            )
+            raise FoundationError("source span end must not precede start")
 
     @classmethod
     def point(
@@ -126,11 +124,7 @@ class SourceSpan:
 
     def label(self) -> str:
         """Return a compact human-readable source label."""
-        start = (
-            f"{self.filename}:"
-            f"{self.start.line}:"
-            f"{self.start.column}"
-        )
+        start = f"{self.filename}:{self.start.line}:{self.start.column}"
 
         if self.start == self.end:
             return start
@@ -138,18 +132,12 @@ class SourceSpan:
         if self.start.line == self.end.line:
             return f"{start}-{self.end.column}"
 
-        return (
-            f"{start}-"
-            f"{self.end.line}:"
-            f"{self.end.column}"
-        )
+        return f"{start}-{self.end.line}:{self.end.column}"
 
     def merge(self, other: SourceSpan) -> SourceSpan:
         """Return the smallest span containing this span and ``other``."""
         if self.filename != other.filename:
-            raise FoundationError(
-                "cannot merge source spans from different files"
-            )
+            raise FoundationError("cannot merge source spans from different files")
 
         return SourceSpan(
             filename=self.filename,
@@ -175,6 +163,4 @@ class SourceSpan:
 
     def digest(self) -> DigestRecord:
         """Return a deterministic digest for this source span."""
-        return DigestRecord.from_payload(
-            self.to_payload()
-        )
+        return DigestRecord.from_payload(self.to_payload())

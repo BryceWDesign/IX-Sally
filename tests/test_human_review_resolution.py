@@ -129,8 +129,12 @@ def test_resolution_audit_marks_evidence_card_manual_investigation() -> None:
 
 
 def test_resolution_audit_combines_resolved_and_manual_cards() -> None:
-    state = _state().with_action(_review_action()).with_evidence_support_finding(
-        _unsupported_finding(),
+    state = (
+        _state()
+        .with_action(_review_action())
+        .with_evidence_support_finding(
+            _unsupported_finding(),
+        )
     )
     action = state.actions.human_review_actions()[0]
     bundle = HumanReviewBundleAssembler.create().assemble(state=state)

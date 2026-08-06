@@ -62,15 +62,11 @@ def test_control_plane_state_tracks_reentry_audit_ledger() -> None:
     assert state.has_recorded_reentry_audits() is True
     assert state.latest_reentry_audit_digest() == ledger.latest().digest().value
     assert state.to_payload()["reentry_audit_count"] == 1
-    assert state.to_payload()["latest_reentry_audit_digest"] == (
-        ledger.latest().digest().value
-    )
+    assert state.to_payload()["latest_reentry_audit_digest"] == (ledger.latest().digest().value)
 
 
 def test_control_plane_status_tracks_reentry_audit_counts() -> None:
-    state = HumanReviewControlPlaneState.create().with_reentry_audit_ledger(
-        _reentry_audit_ledger()
-    )
+    state = HumanReviewControlPlaneState.create().with_reentry_audit_ledger(_reentry_audit_ledger())
 
     status = HumanReviewControlPlaneStatus.from_state(state)
 
@@ -87,23 +83,17 @@ def test_control_plane_status_tracks_reentry_audit_counts() -> None:
 
 
 def test_control_plane_snapshot_includes_reentry_audit_ledger_digest() -> None:
-    state = HumanReviewControlPlaneState.create().with_reentry_audit_ledger(
-        _reentry_audit_ledger()
-    )
+    state = HumanReviewControlPlaneState.create().with_reentry_audit_ledger(_reentry_audit_ledger())
 
     snapshot = HumanReviewControlPlaneSnapshot.from_state(state)
     payload = snapshot.to_payload()
 
-    assert payload["reentry_audit_ledger_digest"] == (
-        state.reentry_audit_ledger.digest().value
-    )
+    assert payload["reentry_audit_ledger_digest"] == (state.reentry_audit_ledger.digest().value)
     assert payload["status"]["reentry_audit_count"] == 1
 
 
 def test_control_plane_snapshot_rejects_reentry_audit_count_mismatch() -> None:
-    state = HumanReviewControlPlaneState.create().with_reentry_audit_ledger(
-        _reentry_audit_ledger()
-    )
+    state = HumanReviewControlPlaneState.create().with_reentry_audit_ledger(_reentry_audit_ledger())
     good_status = HumanReviewControlPlaneStatus.from_state(state)
     bad_status = HumanReviewControlPlaneStatus(
         state_digest=state.digest(),

@@ -25,9 +25,7 @@ def _span(text: str = "token") -> SourceSpan:
 
 def test_keyword_vocabulary_maps_every_reserved_lexeme() -> None:
     """Every reserved word must have one deterministic lookup entry."""
-    assert KEYWORDS_BY_LEXEME == {
-        keyword.value: keyword for keyword in Keyword
-    }
+    assert {keyword.value: keyword for keyword in Keyword} == KEYWORDS_BY_LEXEME
     assert KEYWORDS_BY_LEXEME["human_approval"] is Keyword.HUMAN_APPROVAL
     assert KEYWORDS_BY_LEXEME["claim_boundary"] is Keyword.CLAIM_BOUNDARY
 

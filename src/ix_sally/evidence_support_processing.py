@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from ix_sally.claims import ClaimRecord
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
@@ -53,11 +53,7 @@ class EvidenceSupportBatchProcessingResult:
 
     def human_review_count(self) -> int:
         """Return how many reviewed claims require human review."""
-        return sum(
-            1
-            for result in self.processed
-            if result.finding.requires_human_review()
-        )
+        return sum(1 for result in self.processed if result.finding.requires_human_review())
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible support batch result."""
@@ -83,7 +79,7 @@ class EvidenceSupportProcessor:
     """Runs IX-Verity support reviews and records findings into run state."""
 
     recorder: StateRecorder
-    reviewer: VerityEvidenceSupportReview = VerityEvidenceSupportReview()
+    reviewer: VerityEvidenceSupportReview = field(default_factory=VerityEvidenceSupportReview)
 
     def process_claim(
         self,
@@ -148,6 +144,5 @@ class EvidenceSupportProcessor:
         """Return whether a support finding already references this claim digest."""
         claim_digest = claim.digest()
         return any(
-            finding.claim_digest == claim_digest
-            for finding in state.evidence_support.findings
+            finding.claim_digest == claim_digest for finding in state.evidence_support.findings
         )

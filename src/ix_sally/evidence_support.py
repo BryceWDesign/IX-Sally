@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.agents import AgentRole
 from ix_sally.claims import ClaimRecord
@@ -67,7 +67,9 @@ class EvidenceSupportFinding:
             raise FoundationError("evidence support findings must be reviewed by IX-Verity")
 
         if status is EvidenceSupportStatus.CONTRADICTED and normalized_contradiction is None:
-            raise FoundationError("contradicted evidence support findings require a contradiction note")
+            raise FoundationError(
+                "contradicted evidence support findings require a contradiction note"
+            )
 
         if status is EvidenceSupportStatus.SUPPORTED and not normalized_evidence:
             raise FoundationError("supported evidence support findings require evidence digests")
@@ -145,7 +147,9 @@ class EvidenceSupportLedger:
 
         for finding in normalized:
             if finding.finding_id.value in seen:
-                raise FoundationError(f"duplicate evidence support finding id: {finding.finding_id.value}")
+                raise FoundationError(
+                    f"duplicate evidence support finding id: {finding.finding_id.value}"
+                )
             seen.add(finding.finding_id.value)
 
         return cls(findings=normalized)
@@ -227,7 +231,10 @@ class VerityEvidenceSupportReview:
                 status=EvidenceSupportStatus.CONTRADICTED,
                 rationale="Recorded evidence contains contradiction language for claim terms.",
                 evidence_digests=tuple(evidence.digest() for evidence in contradicted),
-                contradiction_note="Evidence contains failed, blocked, denied, contradiction, or unsupported language.",
+                contradiction_note=(
+                    "Evidence contains failed, blocked, denied, contradiction, "
+                    "or unsupported language."
+                ),
             )
 
         supporting = self._supporting_evidence(
@@ -259,8 +266,7 @@ class VerityEvidenceSupportReview:
     ) -> EvidenceSupportLedger:
         """Review multiple claims in ledger order."""
         return EvidenceSupportLedger.create(
-            self.review_claim(claim=claim, evidence_records=evidence_records)
-            for claim in claims
+            self.review_claim(claim=claim, evidence_records=evidence_records) for claim in claims
         )
 
     def _claim_terms(self, statement: str) -> tuple[str, ...]:

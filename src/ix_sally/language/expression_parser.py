@@ -63,9 +63,7 @@ class IXExpressionParser:
 
         filename = self.tokens[0].span.filename
         if any(token.span.filename != filename for token in self.tokens):
-            raise FoundationError(
-                "IX expression token stream must use one source filename"
-            )
+            raise FoundationError("IX expression token stream must use one source filename")
 
     def parse(self) -> Expression:
         """Parse and return one complete typed IX expression."""
@@ -156,7 +154,7 @@ class IXExpressionParser:
         if token.kind is TokenKind.LEFT_PAREN:
             return self._parse_group()
 
-        self._raise_expected_expression(token)
+        return self._raise_expected_expression(token)
 
     def _parse_group(self) -> GroupExpression:
         """Parse one parenthesized expression including both delimiters."""
@@ -179,7 +177,8 @@ class IXExpressionParser:
             span=opening.span.merge(closing.span),
             expression=expression,
         )
-          def _binary_operator(self, token: LanguageToken) -> BinaryOperator | None:
+
+    def _binary_operator(self, token: LanguageToken) -> BinaryOperator | None:
         """Return the binary operator represented by ``token``."""
         if token.kind is TokenKind.KEYWORD and token.keyword is not None:
             return _BINARY_OPERATORS.get(token.keyword)

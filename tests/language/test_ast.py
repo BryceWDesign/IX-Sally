@@ -219,7 +219,4 @@ def test_nested_expression_walk_is_preorder() -> None:
         negation,
         name,
     )
-    assert (
-        group.to_payload()["expression"]
-        == negation.to_payload()
-    )
+    assert group.to_payload()["expression"] == negation.to_payload()

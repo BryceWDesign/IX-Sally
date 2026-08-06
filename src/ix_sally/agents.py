@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError, require_text
@@ -138,7 +138,10 @@ def default_agent_role_registry() -> AgentRoleRegistry:
             AgentRoleDefinition.create(
                 role=AgentRole.BUTCH,
                 title="Adversary and falsifier",
-                duty="Attacks assumptions, contradictions, weak plans, unsupported claims, and drift.",
+                duty=(
+                    "Attacks assumptions, contradictions, weak plans, "
+                    "unsupported claims, and drift."
+                ),
                 prohibited_authorities=(
                     "verified-memory-write",
                     "execution-approval",
@@ -148,7 +151,10 @@ def default_agent_role_registry() -> AgentRoleRegistry:
             AgentRoleDefinition.create(
                 role=AgentRole.VERITY,
                 title="Evidence judge",
-                duty="Judges whether claims are supported, unsupported, contradicted, blocked, or pending.",
+                duty=(
+                    "Judges whether claims are supported, unsupported, "
+                    "contradicted, blocked, or pending."
+                ),
                 prohibited_authorities=(
                     "tool-execution",
                     "memory-storage",
@@ -168,7 +174,9 @@ def default_agent_role_registry() -> AgentRoleRegistry:
             AgentRoleDefinition.create(
                 role=AgentRole.FORGE,
                 title="Executor and sandbox tester",
-                duty="Runs allowed tool actions, command checks, and executable tests inside scope.",
+                duty=(
+                    "Runs allowed tool actions, command checks, and executable tests inside scope."
+                ),
                 prohibited_authorities=(
                     "final-evidence-verdict",
                     "verified-memory-write",
@@ -178,7 +186,10 @@ def default_agent_role_registry() -> AgentRoleRegistry:
             AgentRoleDefinition.create(
                 role=AgentRole.MNEMOSYNE,
                 title="Memory law and learning keeper",
-                duty="Classifies memory candidates as pending, verified, stale, contradicted, or quarantined.",
+                duty=(
+                    "Classifies memory candidates as pending, verified, stale, "
+                    "contradicted, or quarantined."
+                ),
                 prohibited_authorities=(
                     "tool-execution",
                     "proposal-authorship",
@@ -188,7 +199,10 @@ def default_agent_role_registry() -> AgentRoleRegistry:
             AgentRoleDefinition.create(
                 role=AgentRole.SENTINEL,
                 title="Safety and boundary guard",
-                duty="Detects manipulation pressure, unsafe escalation, unauthorized scope, and drift.",
+                duty=(
+                    "Detects manipulation pressure, unsafe escalation, "
+                    "unauthorized scope, and drift."
+                ),
                 prohibited_authorities=(
                     "proposal-authorship",
                     "verified-memory-write",
@@ -198,7 +212,10 @@ def default_agent_role_registry() -> AgentRoleRegistry:
             AgentRoleDefinition.create(
                 role=AgentRole.TRANSFER,
                 title="Generalization tester",
-                duty="Tests whether learned patterns transfer beyond the originating task or context.",
+                duty=(
+                    "Tests whether learned patterns transfer beyond the "
+                    "originating task or context."
+                ),
                 prohibited_authorities=(
                     "tool-execution",
                     "verified-memory-write",

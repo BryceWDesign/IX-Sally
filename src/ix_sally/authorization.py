@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.agents import AgentRole
 from ix_sally.contracts import AutonomyContract
@@ -155,9 +155,11 @@ class AuthorityDecision:
         if status is AuthorityDecisionStatus.DENIED and normalized_contract_note is None:
             raise FoundationError("denied authority decisions require a contract note")
 
-        if status is AuthorityDecisionStatus.HUMAN_REVIEW_REQUIRED:
-            if normalized_human_note is None:
-                raise FoundationError("human-review authority decisions require a human note")
+        if (
+            status is AuthorityDecisionStatus.HUMAN_REVIEW_REQUIRED
+            and normalized_human_note is None
+        ):
+            raise FoundationError("human-review authority decisions require a human note")
 
         return cls(
             decision_id=decision_id
@@ -228,7 +230,9 @@ class AuthorityDecisionLedger:
 
         for decision in normalized:
             if decision.decision_id.value in seen:
-                raise FoundationError(f"duplicate authority decision id: {decision.decision_id.value}")
+                raise FoundationError(
+                    f"duplicate authority decision id: {decision.decision_id.value}"
+                )
             seen.add(decision.decision_id.value)
 
         return cls(decisions=normalized)
@@ -243,9 +247,7 @@ class AuthorityDecisionLedger:
 
     def human_review_decisions(self) -> tuple[AuthorityDecision, ...]:
         """Return decisions requiring human review."""
-        return tuple(
-            decision for decision in self.decisions if decision.requires_human_review()
-        )
+        return tuple(decision for decision in self.decisions if decision.requires_human_review())
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible decision ledger representation."""
@@ -314,7 +316,9 @@ def decide_authority_request(
             cycle=request.cycle,
             request_digest=request.digest(),
             status=AuthorityDecisionStatus.HUMAN_REVIEW_REQUIRED,
-            rationale="Requested action is inside role jurisdiction but requires human boundary review.",
+            rationale=(
+                "Requested action is inside role jurisdiction but requires human boundary review."
+            ),
             jurisdiction_decision=jurisdiction,
             human_review_note="human boundary review is required before action execution",
         )

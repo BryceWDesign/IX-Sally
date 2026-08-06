@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError
@@ -205,23 +205,18 @@ class HumanReviewDecisionLedger:
         for entry in normalized:
             if entry.sequence in seen_sequences:
                 raise FoundationError(
-                    f"duplicate human-review decision ledger sequence: "
-                    f"{entry.sequence}"
+                    f"duplicate human-review decision ledger sequence: {entry.sequence}"
                 )
             if entry.entry_id.value in seen_entry_ids:
                 raise FoundationError(
-                    f"duplicate human-review decision ledger entry id: "
-                    f"{entry.entry_id.value}"
+                    f"duplicate human-review decision ledger entry id: {entry.entry_id.value}"
                 )
             if entry.decision_digest.value in seen_decision_digests:
                 raise FoundationError(
-                    f"duplicate human-review decision digest: "
-                    f"{entry.decision_digest.value}"
+                    f"duplicate human-review decision digest: {entry.decision_digest.value}"
                 )
             if entry.sequence <= previous_sequence:
-                raise FoundationError(
-                    "human-review decision ledger sequences must increase"
-                )
+                raise FoundationError("human-review decision ledger sequences must increase")
 
             seen_sequences.add(entry.sequence)
             seen_entry_ids.add(entry.entry_id.value)

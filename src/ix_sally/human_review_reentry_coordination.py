@@ -7,14 +7,12 @@ from dataclasses import dataclass
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError
 from ix_sally.human_review_control_plane import HumanReviewControlPlaneState
-from ix_sally.human_review_control_plane_report import (
-    HumanReviewControlPlaneReportStatus,
-)
+from ix_sally.human_review_control_plane_report_status import HumanReviewControlPlaneReportStatus
 from ix_sally.human_review_reentry import (
     HumanReviewReentryResult,
     HumanReviewReentryRunner,
-    HumanReviewReentryStatus,
 )
+from ix_sally.human_review_reentry_status import HumanReviewReentryStatus
 from ix_sally.human_review_workflow import (
     HumanReviewWorkflowKit,
     HumanReviewWorkflowOperation,
@@ -62,9 +60,7 @@ class HumanReviewReentryCoordinationReceipt:
     ) -> HumanReviewReentryCoordinationReceipt:
         """Create a normalized human-review reentry coordination receipt."""
         if max_steps <= 0:
-            raise FoundationError(
-                "human-review reentry coordination max_steps must be positive"
-            )
+            raise FoundationError("human-review reentry coordination max_steps must be positive")
         if executed_steps < 0:
             raise FoundationError(
                 "human-review reentry coordination executed_steps must not be negative"
@@ -121,10 +117,7 @@ class HumanReviewReentryCoordinationReceipt:
 
     def waiting_for_external_input(self) -> bool:
         """Return whether reentry stopped waiting for outside input."""
-        return (
-            self.reentry_status
-            is HumanReviewReentryStatus.WAITING_FOR_EXTERNAL_INPUT
-        )
+        return self.reentry_status is HumanReviewReentryStatus.WAITING_FOR_EXTERNAL_INPUT
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible reentry coordination receipt."""
@@ -198,21 +191,18 @@ class HumanReviewReentryCoordinationResult:
                 "human-review reentry coordination requires resume-recorded operation"
             )
         if reentry_result.resume_operation.digest() != resume_operation.digest():
-            raise FoundationError(
-                "human-review reentry coordination resume operation mismatch"
-            )
-        if workflow_operation.receipt.workflow_stage is not HumanReviewWorkflowStage.REENTRY_RECORDED:
+            raise FoundationError("human-review reentry coordination resume operation mismatch")
+        if (
+            workflow_operation.receipt.workflow_stage
+            is not HumanReviewWorkflowStage.REENTRY_RECORDED
+        ):
             raise FoundationError(
                 "human-review reentry coordination requires reentry-recorded workflow"
             )
         if workflow_operation.require_reentry().digest() != reentry_result.digest():
-            raise FoundationError(
-                "human-review reentry coordination workflow reentry mismatch"
-            )
+            raise FoundationError("human-review reentry coordination workflow reentry mismatch")
         if workflow_operation.run_state.digest() != reentry_result.state.digest():
-            raise FoundationError(
-                "human-review reentry coordination workflow state mismatch"
-            )
+            raise FoundationError("human-review reentry coordination workflow state mismatch")
         if receipt.resume_operation_digest != resume_operation.digest():
             raise FoundationError(
                 "human-review reentry coordination receipt resume digest mismatch"
@@ -226,9 +216,7 @@ class HumanReviewReentryCoordinationResult:
                 "human-review reentry coordination receipt workflow digest mismatch"
             )
         if receipt.after_state_digest != workflow_operation.run_state.digest():
-            raise FoundationError(
-                "human-review reentry coordination receipt state digest mismatch"
-            )
+            raise FoundationError("human-review reentry coordination receipt state digest mismatch")
         if receipt.after_control_plane_digest != workflow_operation.control_plane.digest():
             raise FoundationError(
                 "human-review reentry coordination receipt control-plane digest mismatch"

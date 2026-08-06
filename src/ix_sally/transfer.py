@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Iterable
 
 from ix_sally.agents import AgentRole
 from ix_sally.artifacts import AgentArtifact, AgentArtifactKind
@@ -78,9 +78,8 @@ class TransferTrial:
         if status is TransferStatus.PASSED and evidence_digest is None:
             raise FoundationError("passed transfer trials require an evidence digest")
 
-        if status in {TransferStatus.PARTIAL, TransferStatus.FAILED}:
-            if normalized_failure is None:
-                raise FoundationError("partial or failed transfer trials require a failure note")
+        if status in {TransferStatus.PARTIAL, TransferStatus.FAILED} and normalized_failure is None:
+            raise FoundationError("partial or failed transfer trials require a failure note")
 
         if status is TransferStatus.BLOCKED and normalized_boundary is None:
             raise FoundationError("blocked transfer trials require a boundary note")

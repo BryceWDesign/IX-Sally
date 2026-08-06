@@ -176,11 +176,15 @@ def test_stage_snapshot_routes_human_review_before_other_work() -> None:
         human_review_note="Human boundary must approve this action.",
     )
     reviewed_action = action.with_authority_decision(decision)
-    state = _state().with_action(reviewed_action).with_claim(
-        ClaimRecord.create(
-            cycle=1,
-            author=AgentRole.SALLY,
-            statement="Forge tests passed.",
+    state = (
+        _state()
+        .with_action(reviewed_action)
+        .with_claim(
+            ClaimRecord.create(
+                cycle=1,
+                author=AgentRole.SALLY,
+                statement="Forge tests passed.",
+            )
         )
     )
     snapshot = RunStageSnapshot.from_state(state)
