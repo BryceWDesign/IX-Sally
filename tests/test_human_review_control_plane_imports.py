@@ -4,12 +4,13 @@ import subprocess
 import sys
 
 import pytest
+
 from tests.subprocess_support import repository_subprocess_environment
 
 
 @pytest.mark.parametrize(
     "modules",
-    (
+    [
         (
             "ix_sally.human_review_control_plane",
             "ix_sally.human_review_control_plane_report",
@@ -18,7 +19,7 @@ from tests.subprocess_support import repository_subprocess_environment
             "ix_sally.human_review_control_plane_report",
             "ix_sally.human_review_control_plane",
         ),
-    ),
+    ],
 )
 def test_control_plane_modules_import_in_either_order(
     modules: tuple[str, str],

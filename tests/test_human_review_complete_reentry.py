@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
@@ -98,9 +97,7 @@ def test_complete_reentry_coordinator_records_final_audited_result() -> None:
     )
     assert result.reentry_status() is HumanReviewReentryStatus.ADVANCED
     assert result.audit_status() is HumanReviewReentryAuditStatus.PASSED
-    assert result.report_status() is (
-        HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_ACCEPTED
-    )
+    assert result.report_status() is (HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_ACCEPTED)
     assert result.final_stage() is RunStage.FORGE_DISPATCH
     assert result.changed_state() is True
     assert result.accepted() is True

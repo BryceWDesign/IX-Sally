@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.cognition.curriculum import (
     Curriculum,
     CurriculumLedger,
@@ -149,9 +150,7 @@ def test_curriculum_eligibility_follows_prerequisites() -> None:
 
     updated = ledger.record(_trial("basic-pass", "basic", 0, 0.9))
 
-    assert tuple(task.task_id.value for task in updated.eligible_tasks()) == (
-        "advanced",
-    )
+    assert tuple(task.task_id.value for task in updated.eligible_tasks()) == ("advanced",)
 
 
 def test_curriculum_reports_held_out_transfer_gap() -> None:

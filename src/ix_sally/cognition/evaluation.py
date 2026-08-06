@@ -148,9 +148,7 @@ class CognitiveEvaluationReport:
         """Return deterministic mean scores grouped by capability category."""
         scores: dict[str, float] = {}
         for category in EvaluationCategory:
-            relevant = [
-                result.score for result in self.results if result.category is category
-            ]
+            relevant = [result.score for result in self.results if result.category is category]
             if relevant:
                 scores[category.value] = round(sum(relevant) / len(relevant), 12)
         return scores
@@ -158,13 +156,16 @@ class CognitiveEvaluationReport:
     def to_payload(self) -> JsonObject:
         """Return a canonical evaluation-report payload."""
         results: JsonArray = [result.to_payload() for result in self.results]
+        category_scores: JsonObject = {}
+        for category, score in self.category_scores().items():
+            category_scores[category] = score
         return {
             "classification": self.classification,
             "agi_certified": self.agi_certified,
             "benchmark_count": len(self.results),
             "passed_count": self.passed(),
             "overall_score": self.overall_score(),
-            "category_scores": self.category_scores(),
+            "category_scores": category_scores,
             "results": results,
             "limitations": [
                 "Passing this suite does not establish artificial general intelligence.",
@@ -205,9 +206,8 @@ def run_core_evaluation() -> CognitiveEvaluationReport:
         "let total = 6 * 7\nprint total\nassert total == 42\n",
         filename="evaluation-arithmetic.ix",
     )
-    arithmetic_passed = (
-        arithmetic.status is VMStatus.HALTED
-        and arithmetic.outputs == (CognitiveValue.from_python(42),)
+    arithmetic_passed = arithmetic.status is VMStatus.HALTED and arithmetic.outputs == (
+        CognitiveValue.from_python(42),
     )
     results.append(
         _result(
@@ -354,11 +354,9 @@ def run_core_evaluation() -> CognitiveEvaluationReport:
         value=CognitiveValue.from_python("comfortable"),
     )
     plan = system.plan(goal)
-    plan_passed = (
-        plan.status is PlanStatus.FOUND
-        and tuple(action.action_id.value for action in plan.actions)
-        == ("activate-cooling",)
-    )
+    plan_passed = plan.status is PlanStatus.FOUND and tuple(
+        action.action_id.value for action in plan.actions
+    ) == ("activate-cooling",)
     results.append(
         _result(
             "bounded-planning",
@@ -377,9 +375,7 @@ def run_core_evaluation() -> CognitiveEvaluationReport:
             task_family="state-transition",
             status=OutcomeStatus.SUCCESS if score >= 0.8 else OutcomeStatus.PARTIAL,
             score=score,
-            evidence_digest=DigestRecord.from_payload(
-                {"trial": index, "observed_score": score}
-            ),
+            evidence_digest=DigestRecord.from_payload({"trial": index, "observed_score": score}),
             notes="Deterministic held-out state-transition trial.",
         )
         learning_evidence.append(outcome.digest())
@@ -412,10 +408,9 @@ def run_core_evaluation() -> CognitiveEvaluationReport:
         )
     )
     cycle = system.run_cycle(task="Make the room comfortable", goal=goal)
-    ninefold_passed = (
-        len(cycle.findings) == len(AgentRole)
-        and {finding.role for finding in cycle.findings} == set(AgentRole)
-    )
+    ninefold_passed = len(cycle.findings) == len(AgentRole) and {
+        finding.role for finding in cycle.findings
+    } == set(AgentRole)
     results.append(
         _result(
             "functional-ninefold-cycle",
@@ -516,8 +511,7 @@ def run_core_evaluation() -> CognitiveEvaluationReport:
     bridge = system.bridge_decision(decision, cycle=system.cycle_count)
     executive_passed = (
         decision.status is ExecutiveDecisionStatus.PLAN_READY
-        and bridge.proposal.proposed_actions[0].action_id.value
-        == "activate-cooling"
+        and bridge.proposal.proposed_actions[0].action_id.value == "activate-cooling"
         and bridge.receipt.executive_decision_digest == decision.digest()
     )
     results.append(
@@ -560,9 +554,7 @@ def run_core_evaluation() -> CognitiveEvaluationReport:
         pass_threshold=0.75,
     )
     system.set_curriculum(
-        CurriculumLedger(
-            Curriculum.create((training_task, validation_task, held_out_task))
-        )
+        CurriculumLedger(Curriculum.create((training_task, validation_task, held_out_task)))
     )
     system.record_curriculum_trial(
         CurriculumTrial.create(
@@ -571,9 +563,7 @@ def run_core_evaluation() -> CognitiveEvaluationReport:
             sequence=0,
             score=0.9,
             status=TrialStatus.PASSED,
-            evidence_digest=DigestRecord.from_payload(
-                {"task": "planning-training", "score": 0.9}
-            ),
+            evidence_digest=DigestRecord.from_payload({"task": "planning-training", "score": 0.9}),
             notes="Observed deterministic training trial.",
         )
     )
@@ -597,9 +587,7 @@ def run_core_evaluation() -> CognitiveEvaluationReport:
             sequence=2,
             score=0.8,
             status=TrialStatus.PASSED,
-            evidence_digest=DigestRecord.from_payload(
-                {"task": "planning-held-out", "score": 0.8}
-            ),
+            evidence_digest=DigestRecord.from_payload({"task": "planning-held-out", "score": 0.8}),
             notes="Observed deterministic held-out trial.",
         )
     )
@@ -639,9 +627,7 @@ def run_core_evaluation() -> CognitiveEvaluationReport:
         steps=(episode_step,),
     )
     system.append_episode(episode)
-    episode_passed = (
-        system.episodes.head_digest() == episode.digest() and episode.completed()
-    )
+    episode_passed = system.episodes.head_digest() == episode.digest() and episode.completed()
     results.append(
         _result(
             "replayable-episode-chain",

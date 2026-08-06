@@ -34,9 +34,7 @@ def test_virtual_environment_paths_match_platform() -> None:
             environment_root / "Scripts" / "ix-sally.exe"
         )
     else:
-        assert package_smoke._venv_python(environment_root) == (
-            environment_root / "bin" / "python"
-        )
+        assert package_smoke._venv_python(environment_root) == (environment_root / "bin" / "python")
         assert package_smoke._venv_console_script(environment_root) == (
             environment_root / "bin" / "ix-sally"
         )

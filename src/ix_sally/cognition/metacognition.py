@@ -85,7 +85,8 @@ class SelfModel:
     def update(self, measure: CapabilityMeasure) -> SelfModel:
         """Replace or append one measured capability."""
         retained = tuple(
-            existing for existing in self.measures
+            existing
+            for existing in self.measures
             if existing.capability_id != measure.capability_id
         )
         return SelfModel(
@@ -186,9 +187,7 @@ class ImprovementProposal:
             regression_risk=self.regression_risk,
             evidence_digests=self.evidence_digests,
             status=(
-                ImprovementStatus.HUMAN_APPROVED
-                if approved
-                else ImprovementStatus.HUMAN_REJECTED
+                ImprovementStatus.HUMAN_APPROVED if approved else ImprovementStatus.HUMAN_REJECTED
             ),
             human_decision_digest=decision_digest,
         )

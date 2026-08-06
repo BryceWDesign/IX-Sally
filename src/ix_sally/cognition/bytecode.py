@@ -67,14 +67,10 @@ class Instruction:
             return
         if self.opcode in _NAME_OPERATIONS:
             if self.name is None or self.value is not None:
-                raise FoundationError(
-                    f"{self.opcode.value} requires a name and no literal value"
-                )
+                raise FoundationError(f"{self.opcode.value} requires a name and no literal value")
             return
         if self.value is not None or self.name is not None:
-            raise FoundationError(
-                f"{self.opcode.value} does not accept instruction operands"
-            )
+            raise FoundationError(f"{self.opcode.value} does not accept instruction operands")
 
     def to_payload(self) -> JsonObject:
         """Return a canonical instruction payload."""
@@ -110,7 +106,8 @@ class BytecodeProgram:
         if not normalized:
             raise FoundationError("bytecode program must contain instructions")
         halt_positions = tuple(
-            index for index, instruction in enumerate(normalized)
+            index
+            for index, instruction in enumerate(normalized)
             if instruction.opcode is OpCode.HALT
         )
         if halt_positions != (len(normalized) - 1,):
@@ -127,9 +124,7 @@ class BytecodeProgram:
 
     def to_payload(self) -> JsonObject:
         """Return a canonical bytecode representation."""
-        instructions: JsonArray = [
-            instruction.to_payload() for instruction in self.instructions
-        ]
+        instructions: JsonArray = [instruction.to_payload() for instruction in self.instructions]
         return {
             "program_id": self.program_id.value,
             "source_digest": {

@@ -91,10 +91,17 @@ select = [
   "W"
 ]
 ignore = [
-  "PLR0913"
+  "PLR0913",
+  "PLR0911",
+  "PLR0912",
+  "PLR0915",
+  "PLR2004",
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"src/ix_sally/cli.py" = ["PLC0415"]
+"src/ix_sally/cognition/system.py" = ["PLC0415"]
+"src/ix_sally/runtime.py" = ["PLC0415"]
 "tests/**/*.py" = [
   "PLR2004",
   "S101"

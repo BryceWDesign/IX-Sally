@@ -29,7 +29,10 @@ class SallyProposalIntakeResult:
 
     def claim_count(self) -> int:
         """Return the number of claims carried by the proposal."""
-        return len(self.proposal_artifact.data.get("claims", []))
+        claims = self.proposal_artifact.data.get("claims", [])
+        if isinstance(claims, list):
+            return len(claims)
+        return 0
 
     def requires_human_review(self) -> bool:
         """Return whether any bounded action requires human boundary review."""

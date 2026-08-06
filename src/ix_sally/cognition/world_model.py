@@ -303,8 +303,9 @@ class WorldModel:
                         confidence=rule.confidence,
                         evidence_digests=(rule.digest(),),
                         derived_from=tuple(
-                            state[(condition.subject.value, condition.predicate.value)]
-                            .fact_id.value
+                            state[
+                                (condition.subject.value, condition.predicate.value)
+                            ].fact_id.value
                             for condition in rule.conditions
                         ),
                     )
@@ -323,13 +324,15 @@ class WorldModel:
     def to_payload(self) -> JsonObject:
         """Return a canonical world-model payload."""
         facts: JsonArray = [
-            fact.to_payload() for fact in sorted(
+            fact.to_payload()
+            for fact in sorted(
                 self.facts,
                 key=lambda candidate: candidate.fact_id.value,
             )
         ]
         rules: JsonArray = [
-            rule.to_payload() for rule in sorted(
+            rule.to_payload()
+            for rule in sorted(
                 self.rules,
                 key=lambda candidate: candidate.rule_id.value,
             )

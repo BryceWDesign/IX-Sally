@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
@@ -117,10 +116,7 @@ def test_closeout_coordination_ledger_entry_records_result() -> None:
 def test_closeout_coordination_ledger_appends_result() -> None:
     result = _coordination_result(max_steps=1)
 
-    updated = (
-        CompleteHumanReviewReentryCloseoutCoordinationLedger.create(())
-        .append_result(result)
-    )
+    updated = CompleteHumanReviewReentryCloseoutCoordinationLedger.create(()).append_result(result)
     latest = updated.latest()
 
     assert latest is not None
@@ -137,10 +133,7 @@ def test_closeout_coordination_ledger_appends_result() -> None:
 def test_closeout_coordination_ledger_tracks_waiting_result() -> None:
     result = _coordination_result(max_steps=3)
 
-    updated = (
-        CompleteHumanReviewReentryCloseoutCoordinationLedger.create(())
-        .append_result(result)
-    )
+    updated = CompleteHumanReviewReentryCloseoutCoordinationLedger.create(()).append_result(result)
     latest = updated.latest()
 
     assert latest is not None
@@ -168,9 +161,7 @@ def test_closeout_coordination_ledger_rejects_duplicate_result_digest() -> None:
         FoundationError,
         match="duplicate complete reentry closeout coordination result digest",
     ):
-        CompleteHumanReviewReentryCloseoutCoordinationLedger.create(
-            (first, duplicate)
-        )
+        CompleteHumanReviewReentryCloseoutCoordinationLedger.create((first, duplicate))
 
 
 def test_closeout_coordination_ledger_rejects_duplicate_sequence() -> None:
@@ -199,16 +190,10 @@ def test_closeout_coordination_ledger_entry_rejects_invalid_steps() -> None:
             coordination_result_digest=result.digest(),
             coordination_receipt_digest=result.receipt.digest(),
             resume_operation_digest=result.receipt.resume_operation_digest,
-            complete_reentry_result_digest=(
-                result.receipt.complete_reentry_result_digest
-            ),
-            complete_reentry_receipt_digest=(
-                result.receipt.complete_reentry_receipt_digest
-            ),
+            complete_reentry_result_digest=(result.receipt.complete_reentry_result_digest),
+            complete_reentry_receipt_digest=(result.receipt.complete_reentry_receipt_digest),
             closeout_report_digest=result.receipt.closeout_report_digest,
-            closeout_workflow_operation_digest=(
-                result.receipt.closeout_workflow_operation_digest
-            ),
+            closeout_workflow_operation_digest=(result.receipt.closeout_workflow_operation_digest),
             before_state_digest=result.receipt.before_state_digest,
             after_state_digest=result.receipt.after_state_digest,
             before_control_plane_digest=result.receipt.before_control_plane_digest,
@@ -227,14 +212,8 @@ def test_closeout_coordination_ledger_entry_rejects_invalid_steps() -> None:
 def test_closeout_coordination_ledger_payload_and_digest_are_stable() -> None:
     result = _coordination_result(max_steps=1)
 
-    first = (
-        CompleteHumanReviewReentryCloseoutCoordinationLedger.create(())
-        .append_result(result)
-    )
-    second = (
-        CompleteHumanReviewReentryCloseoutCoordinationLedger.create(())
-        .append_result(result)
-    )
+    first = CompleteHumanReviewReentryCloseoutCoordinationLedger.create(()).append_result(result)
+    second = CompleteHumanReviewReentryCloseoutCoordinationLedger.create(()).append_result(result)
     payload = first.to_payload()
     latest = first.latest()
 

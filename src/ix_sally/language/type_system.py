@@ -67,9 +67,7 @@ class IXTypeBinding:
 
     def __post_init__(self) -> None:
         """Require one valid IX identifier."""
-        if not isinstance(self.name, str) or not _IDENTIFIER_PATTERN.fullmatch(
-            self.name
-        ):
+        if not isinstance(self.name, str) or not _IDENTIFIER_PATTERN.fullmatch(self.name):
             raise FoundationError("IX type binding name must be an ASCII identifier")
 
     def to_payload(self) -> JsonObject:
@@ -153,13 +151,9 @@ class IXTypeReport:
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible type report."""
-        diagnostics: JsonArray = [
-            diagnostic.to_payload() for diagnostic in self.diagnostics
-        ]
+        diagnostics: JsonArray = [diagnostic.to_payload() for diagnostic in self.diagnostics]
         local_types: JsonArray = [binding.to_payload() for binding in self.local_types]
-        memory_types: JsonArray = [
-            binding.to_payload() for binding in self.memory_types
-        ]
+        memory_types: JsonArray = [binding.to_payload() for binding in self.memory_types]
         return {
             "program_digest": {
                 "algorithm": self.program_digest.algorithm,
@@ -168,7 +162,7 @@ class IXTypeReport:
             "diagnostics": diagnostics,
             "diagnostic_count": len(self.diagnostics),
             "error_count": len(self.errors()),
-                  "local_types": local_types,
+            "local_types": local_types,
             "memory_types": memory_types,
             "is_valid": self.is_valid(),
         }
@@ -249,10 +243,7 @@ class IXTypeChecker:
                 LanguageDiagnostic.create(
                     code="typing.assertion-not-boolean",
                     severity=DiagnosticSeverity.ERROR,
-                    message=(
-                        "Assert expression must be Boolean, "
-                        f"not {value_type.value}."
-                    ),
+                    message=(f"Assert expression must be Boolean, not {value_type.value}."),
                     span=statement.expression.span,
                     hint="Use a comparison or Boolean expression after 'assert'.",
                 )
@@ -286,9 +277,7 @@ def infer_ix_expression_type(
     diagnostics: list[LanguageDiagnostic] = []
     return _infer_expression_type(
         expression,
-        local_types=_binding_map(
-            _normalize_bindings(local_types, field_name="local_types")
-        ),
+        local_types=_binding_map(_normalize_bindings(local_types, field_name="local_types")),
         diagnostics=diagnostics,
     )
 
@@ -338,14 +327,13 @@ def _infer_expression_type(
         )
         return _binary_result_type(
             expression,
-                  left_type=left_type,
+            left_type=left_type,
             right_type=right_type,
             diagnostics=diagnostics,
         )
 
     raise FoundationError(
-        f"unsupported IX expression type for static analysis: "
-        f"{type(expression).__name__}"
+        f"unsupported IX expression type for static analysis: {type(expression).__name__}"
     )
 
 
@@ -377,10 +365,7 @@ def _unary_result_type(
     _append_operator_diagnostic(
         expression=expression,
         diagnostics=diagnostics,
-        message=(
-            "Unary operator 'not' requires a Boolean operand, "
-            f"not {operand_type.value}."
-        ),
+        message=(f"Unary operator 'not' requires a Boolean operand, not {operand_type.value}."),
     )
     return IXValueType.UNKNOWN
 
@@ -508,7 +493,7 @@ def _addition_result_type(
     if left_type is right_type is IXValueType.STRING:
         return IXValueType.STRING
     return _invalid_binary_result(
-          expression,
+        expression,
         left_type=left_type,
         right_type=right_type,
         diagnostics=diagnostics,
@@ -605,8 +590,7 @@ def _equality_compatible(
     """Return whether two types may be compared for equality."""
     return (
         left_type is right_type
-        or left_type.is_numeric()
-        and right_type.is_numeric()
+        or (left_type.is_numeric() and right_type.is_numeric())
         or IXValueType.NULL in {left_type, right_type}
     )
 
@@ -617,10 +601,8 @@ def _ordered_compatible(
 ) -> bool:
     """Return whether two types support ordered comparison."""
     return (
-        left_type.is_numeric()
-        and right_type.is_numeric()
-        or left_type is right_type is IXValueType.STRING
-    )
+        left_type.is_numeric() and right_type.is_numeric()
+    ) or left_type is right_type is IXValueType.STRING
 
 
 def _statement_expression(statement: Statement) -> Expression:
@@ -631,8 +613,7 @@ def _statement_expression(statement: Statement) -> Expression:
     ):
         return statement.expression
     raise FoundationError(
-        f"unsupported IX statement type for static analysis: "
-        f"{type(statement).__name__}"
+        f"unsupported IX statement type for static analysis: {type(statement).__name__}"
     )
 
 
@@ -645,14 +626,11 @@ def _normalize_bindings(
     by_name: dict[str, IXTypeBinding] = {}
     for binding in bindings:
         if not isinstance(binding, IXTypeBinding):
-            raise FoundationError(
-                f"IX type context {field_name} must contain IXTypeBinding values"
-            )
+            raise FoundationError(f"IX type context {field_name} must contain IXTypeBinding values")
         existing = by_name.get(binding.name)
         if existing is not None and existing.value_type is not binding.value_type:
             raise FoundationError(
-                f"IX type context {field_name} contains conflicting types for "
-                f"{binding.name!r}"
+                f"IX type context {field_name} contains conflicting types for {binding.name!r}"
             )
         by_name[binding.name] = binding
     return tuple(by_name[name] for name in sorted(by_name))
@@ -667,10 +645,7 @@ def _bindings_from_map(
     values: dict[str, IXValueType],
 ) -> tuple[IXTypeBinding, ...]:
     """Return deterministic bindings from one mutable type environment."""
-    return tuple(
-        IXTypeBinding(name=name, value_type=values[name])
-        for name in sorted(values)
-    )
+    return tuple(IXTypeBinding(name=name, value_type=values[name]) for name in sorted(values))
 
 
 def _binding_type(

@@ -83,13 +83,13 @@ class CognitiveProposalBridge:
         """Convert a plan-ready decision into the existing proposal schema."""
         if cycle < 0:
             raise FoundationError("proposal bridge cycle must not be negative")
-        if not decision.may_enter_governance() or decision.plan is None:
+        selected_goal = decision.selected_goal
+        plan = decision.plan
+        if not decision.may_enter_governance() or plan is None or selected_goal is None:
             raise FoundationError(
                 "only plan-ready executive decisions may enter proposal governance"
             )
-        proposal_actions = tuple(
-            self._proposal_action(action) for action in decision.plan.actions
-        )
+        proposal_actions = tuple(self._proposal_action(action) for action in plan.actions)
         claim_status = (
             ClaimStatus.PARTIAL
             if decision.status.value == "requires_human"
@@ -105,14 +105,14 @@ class CognitiveProposalBridge:
             author=AgentRole.SALLY,
             statement=(
                 "The bounded planner found a declarative action sequence for the "
-                f"selected goal {decision.selected_goal.goal_id.value}."
+                f"selected goal {selected_goal.goal_id.value}."
             ),
             status=claim_status,
             support_digests=support,
         )
         proposal = SallyProposalPacket.create(
             cycle=cycle,
-            goal_interpretation=decision.selected_goal.description,
+            goal_interpretation=selected_goal.description,
             rationale=decision.rationale,
             proposed_actions=proposal_actions,
             claims=(claim,),
@@ -121,7 +121,7 @@ class CognitiveProposalBridge:
         links = tuple(
             (action.action_id, proposal_action.action_id)
             for action, proposal_action in zip(
-                decision.plan.actions,
+                plan.actions,
                 proposal_actions,
                 strict=True,
             )

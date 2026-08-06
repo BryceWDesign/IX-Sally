@@ -50,15 +50,11 @@ class ForgeResultSubmissionReceipt:
         if passed_count < 0:
             raise FoundationError("Forge result submission passed_count must not be negative")
         if human_review_count < 0:
-            raise FoundationError(
-                "Forge result submission human_review_count must not be negative"
-            )
+            raise FoundationError("Forge result submission human_review_count must not be negative")
         if passed_count > result_count:
             raise FoundationError("Forge result submission passed_count exceeds result_count")
         if human_review_count > result_count:
-            raise FoundationError(
-                "Forge result submission human_review_count exceeds result_count"
-            )
+            raise FoundationError("Forge result submission human_review_count exceeds result_count")
 
         before_state_digest.require_algorithm("sha256")
         after_state_digest.require_algorithm("sha256")
@@ -256,9 +252,7 @@ class ForgeResultGateway:
             if queue_digest in recorded_queue_digests:
                 raise FoundationError("Forge result already recorded for dispatched queue item")
             if queue_digest not in pending_queue_digests:
-                raise FoundationError(
-                    "Forge result does not match a pending dispatched queue item"
-                )
+                raise FoundationError("Forge result does not match a pending dispatched queue item")
 
             action = state.actions.require_action(result.action_id.value)
             if result.action_digest != action.digest():

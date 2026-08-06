@@ -53,9 +53,7 @@ class HumanReviewResumeCoordinationReceipt:
     ) -> HumanReviewResumeCoordinationReceipt:
         """Create a normalized human-review resume coordination receipt."""
         if resumed_stage is RunStage.HUMAN_REVIEW:
-            raise FoundationError(
-                "human-review resume coordination cannot resume to human_review"
-            )
+            raise FoundationError("human-review resume coordination cannot resume to human_review")
 
         before_ledger_digest.require_algorithm("sha256")
         after_ledger_digest.require_algorithm("sha256")
@@ -247,9 +245,7 @@ class HumanReviewResumeLedgerCoordinator:
         after_ledger = ledger.append_result(resume_result)
         entry = after_ledger.latest()
         if entry is None:
-            raise FoundationError(
-                "human-review resume coordination failed to append ledger entry"
-            )
+            raise FoundationError("human-review resume coordination failed to append ledger entry")
 
         receipt = HumanReviewResumeCoordinationReceipt.from_coordination(
             before_ledger=ledger,

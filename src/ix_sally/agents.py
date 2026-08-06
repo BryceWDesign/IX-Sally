@@ -175,8 +175,7 @@ def default_agent_role_registry() -> AgentRoleRegistry:
                 role=AgentRole.FORGE,
                 title="Executor and sandbox tester",
                 duty=(
-                    "Runs allowed tool actions, command checks, and executable "
-                    "tests inside scope."
+                    "Runs allowed tool actions, command checks, and executable tests inside scope."
                 ),
                 prohibited_authorities=(
                     "final-evidence-verdict",

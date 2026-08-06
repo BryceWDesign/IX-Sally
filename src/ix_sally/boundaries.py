@@ -60,11 +60,11 @@ class BoundaryFinding:
             field_name="required_human_action",
         )
 
-        if severity in {BoundarySeverity.BLOCKING, BoundarySeverity.TERMINATION}:
-            if normalized_action is None:
-                raise FoundationError(
-                    "blocking or termination boundary findings require human action"
-                )
+        if (
+            severity in {BoundarySeverity.BLOCKING, BoundarySeverity.TERMINATION}
+            and normalized_action is None
+        ):
+            raise FoundationError("blocking or termination boundary findings require human action")
 
         return cls(
             finding_id=finding_id

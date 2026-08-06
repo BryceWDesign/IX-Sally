@@ -60,6 +60,7 @@ class StageLoopResult:
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible loop result."""
         latest = self.trace.latest()
+        latest_kind = self.latest_kind()
         return {
             "state_digest": self.state.digest().value,
             "trace_digest": self.trace.digest().value,
@@ -70,7 +71,7 @@ class StageLoopResult:
             "executed_steps": self.executed_steps(),
             "forge_results_consumed": self.forge_results_consumed,
             "latest_receipt_digest": latest.digest().value if latest is not None else None,
-            "latest_kind": self.latest_kind().value if self.latest_kind() is not None else None,
+            "latest_kind": latest_kind.value if latest_kind is not None else None,
             "stopped_for_external_input": self.stopped_for_external_input(),
             "stopped_for_step_limit": self.stopped_for_step_limit(),
             "attempted_chamber_close": self.attempted_chamber_close(),
@@ -98,9 +99,7 @@ class StageLoopRunner:
         state: NinefoldRunState,
         max_steps: int,
         forge_results: Iterable[ForgeResultRecord] = (),
-        chamber_close_summary: str = (
-            "IX-Sally chamber closed after staged work completed."
-        ),
+        chamber_close_summary: str = ("IX-Sally chamber closed after staged work completed."),
     ) -> StageLoopResult:
         """Advance legal stages until input, close-attempt, or step limit stops the loop."""
         if max_steps <= 0:

@@ -20,9 +20,7 @@ from ix_sally.digest import DigestRecord, stable_json
 def main() -> None:
     """Build a bounded plan and bridge it into IX-Sally's proposal control plane."""
     system = SallyCognitiveSystem.create()
-    observation = DigestRecord.from_payload(
-        {"sensor": "demo", "machine_state": "off"}
-    )
+    observation = DigestRecord.from_payload({"sensor": "demo", "machine_state": "off"})
     system.observe(
         WorldFact.create(
             fact_id="demo-machine-off",

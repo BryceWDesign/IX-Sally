@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.foundation import (
     CanonicalKey,
     FoundationError,

@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
@@ -109,9 +108,7 @@ def test_complete_reentry_ledger_entry_records_result() -> None:
     assert entry.final_stage is RunStage.FORGE_DISPATCH
     assert entry.reentry_status is HumanReviewReentryStatus.ADVANCED
     assert entry.audit_status is HumanReviewReentryAuditStatus.PASSED
-    assert entry.report_status is (
-        HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_ACCEPTED
-    )
+    assert entry.report_status is (HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_ACCEPTED)
     assert entry.changed_state() is True
     assert entry.recorded_reentry_and_audit() is True
     assert entry.recorded_complete_audited_reentry() is True
@@ -194,9 +191,7 @@ def test_complete_reentry_ledger_entry_rejects_invalid_step_counts() -> None:
             resume_operation_digest=result.receipt.resume_operation_digest,
             audited_reentry_result_digest=result.receipt.audited_reentry_result_digest,
             audited_reentry_receipt_digest=result.receipt.audited_reentry_receipt_digest,
-            final_workflow_operation_digest=(
-                result.receipt.final_workflow_operation_digest
-            ),
+            final_workflow_operation_digest=(result.receipt.final_workflow_operation_digest),
             before_state_digest=result.receipt.before_state_digest,
             after_state_digest=result.receipt.after_state_digest,
             before_control_plane_digest=result.receipt.before_control_plane_digest,

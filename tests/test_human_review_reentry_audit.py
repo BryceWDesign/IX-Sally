@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
@@ -13,10 +12,10 @@ from ix_sally.human_review_gateway import HumanReviewDecisionStatus
 from ix_sally.human_review_reentry import HumanReviewReentryStatus
 from ix_sally.human_review_reentry_audit import (
     HumanReviewReentryAuditFinding,
+    HumanReviewReentryAuditor,
     HumanReviewReentryAuditReport,
     HumanReviewReentryAuditSeverity,
     HumanReviewReentryAuditStatus,
-    HumanReviewReentryAuditor,
 )
 from ix_sally.human_review_reentry_coordination import HumanReviewReentryCoordinator
 from ix_sally.human_review_workflow import HumanReviewWorkflowKit

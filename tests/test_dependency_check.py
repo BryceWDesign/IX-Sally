@@ -21,9 +21,7 @@ def _create_package(path: Path) -> None:
 
 def test_repository_runtime_dependency_graph_is_acyclic() -> None:
     """The current IX-Sally runtime graph must remain cycle-free."""
-    repository_root = Path(
-        dependency_check.__file__
-    ).resolve().parent
+    repository_root = Path(dependency_check.__file__).resolve().parent
 
     graph = dependency_check.build_dependency_graph(
         source_root=repository_root / "src",
@@ -81,9 +79,7 @@ def test_dependency_graph_ignores_type_checking_imports(
         encoding="utf-8",
     )
     (package_root / "alpha.py").write_text(
-        "from typing import TYPE_CHECKING\n"
-        "if TYPE_CHECKING:\n"
-        "    from ix_sally.beta import Beta\n",
+        "from typing import TYPE_CHECKING\nif TYPE_CHECKING:\n    from ix_sally.beta import Beta\n",
         encoding="utf-8",
     )
     (package_root / "beta.py").write_text(
@@ -112,9 +108,7 @@ def test_dependency_graph_ignores_qualified_type_checking_imports(
     package_root = tmp_path / "ix_sally"
     _create_package(package_root)
     (package_root / "alpha.py").write_text(
-        "import typing\n"
-        "if typing.TYPE_CHECKING:\n"
-        "    from . import beta\n",
+        "import typing\nif typing.TYPE_CHECKING:\n    from . import beta\n",
         encoding="utf-8",
     )
     (package_root / "beta.py").write_text(
@@ -126,11 +120,14 @@ def test_dependency_graph_ignores_qualified_type_checking_imports(
         source_root=tmp_path,
     )
 
-    assert dependency_check.ModuleDependency(
-        source="ix_sally.alpha",
-        target="ix_sally.beta",
-        line=3,
-    ) not in graph.dependencies
+    assert (
+        dependency_check.ModuleDependency(
+            source="ix_sally.alpha",
+            target="ix_sally.beta",
+            line=3,
+        )
+        not in graph.dependencies
+    )
 
 
 def test_dependency_graph_resolves_relative_submodule_imports(
@@ -154,16 +151,22 @@ def test_dependency_graph_resolves_relative_submodule_imports(
         source_root=tmp_path,
     )
 
-    assert dependency_check.ModuleDependency(
-        source="ix_sally.language.alpha",
-        target="ix_sally.language.beta",
-        line=1,
-    ) in graph.dependencies
-    assert dependency_check.ModuleDependency(
-        source="ix_sally.language.beta",
-        target="ix_sally.language.alpha",
-        line=1,
-    ) in graph.dependencies
+    assert (
+        dependency_check.ModuleDependency(
+            source="ix_sally.language.alpha",
+            target="ix_sally.language.beta",
+            line=1,
+        )
+        in graph.dependencies
+    )
+    assert (
+        dependency_check.ModuleDependency(
+            source="ix_sally.language.beta",
+            target="ix_sally.language.alpha",
+            line=1,
+        )
+        in graph.dependencies
+    )
     assert graph.cycles() == (
         (
             "ix_sally.language.alpha",
@@ -181,8 +184,7 @@ def test_dependency_graph_resolves_parent_relative_imports(
     _create_package(package_root)
     _create_package(language_root)
     (package_root / "foundation.py").write_text(
-        "class FoundationError(Exception):\n"
-        "    pass\n",
+        "class FoundationError(Exception):\n    pass\n",
         encoding="utf-8",
     )
     (language_root / "runtime.py").write_text(
@@ -194,11 +196,14 @@ def test_dependency_graph_resolves_parent_relative_imports(
         source_root=tmp_path,
     )
 
-    assert dependency_check.ModuleDependency(
-        source="ix_sally.language.runtime",
-        target="ix_sally.foundation",
-        line=1,
-    ) in graph.dependencies
+    assert (
+        dependency_check.ModuleDependency(
+            source="ix_sally.language.runtime",
+            target="ix_sally.foundation",
+            line=1,
+        )
+        in graph.dependencies
+    )
 
 
 def test_dependency_graph_resolves_package_member_modules(
@@ -220,11 +225,14 @@ def test_dependency_graph_resolves_package_member_modules(
         source_root=tmp_path,
     )
 
-    assert dependency_check.ModuleDependency(
-        source="ix_sally.bridge",
-        target="ix_sally.state",
-        line=1,
-    ) in graph.dependencies
+    assert (
+        dependency_check.ModuleDependency(
+            source="ix_sally.bridge",
+            target="ix_sally.state",
+            line=1,
+        )
+        in graph.dependencies
+    )
 
 
 def test_dependency_check_main_reports_repository_summary(

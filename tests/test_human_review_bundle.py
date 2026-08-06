@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
@@ -91,8 +90,12 @@ def test_human_review_bundle_assembler_accepts_custom_authority_note() -> None:
 
 
 def test_human_review_bundle_assembler_combines_gateway_and_manual_cards() -> None:
-    state = _state().with_action(_review_action()).with_evidence_support_finding(
-        _unsupported_finding(),
+    state = (
+        _state()
+        .with_action(_review_action())
+        .with_evidence_support_finding(
+            _unsupported_finding(),
+        )
     )
 
     bundle = HumanReviewBundleAssembler.create().assemble(state=state)

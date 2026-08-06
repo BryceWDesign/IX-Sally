@@ -99,19 +99,22 @@ class IXCompiler:
             instructions.append(Instruction(OpCode.LOAD_MEMORY, name=statement.name))
             instructions.append(Instruction(OpCode.EMIT_OUTPUT))
             return
-        expression_statement: tuple[type[Statement], OpCode] = (
-            (PrintStatement, OpCode.EMIT_OUTPUT),
-            (ReplyStatement, OpCode.EMIT_REPLY),
-            (AssertStatement, OpCode.ASSERT),
-            (TraceStatement, OpCode.TRACE),
-        )
-        for statement_type, opcode in expression_statement:
-            if isinstance(statement, statement_type):
-                expression = getattr(statement, "expression")
-                assert isinstance(expression, Expression)
-                self._compile_expression(expression, instructions=instructions)
-                instructions.append(Instruction(opcode))
-                return
+        if isinstance(statement, PrintStatement):
+            self._compile_expression(statement.expression, instructions=instructions)
+            instructions.append(Instruction(OpCode.EMIT_OUTPUT))
+            return
+        if isinstance(statement, ReplyStatement):
+            self._compile_expression(statement.expression, instructions=instructions)
+            instructions.append(Instruction(OpCode.EMIT_REPLY))
+            return
+        if isinstance(statement, AssertStatement):
+            self._compile_expression(statement.expression, instructions=instructions)
+            instructions.append(Instruction(OpCode.ASSERT))
+            return
+        if isinstance(statement, TraceStatement):
+            self._compile_expression(statement.expression, instructions=instructions)
+            instructions.append(Instruction(OpCode.TRACE))
+            return
         raise FoundationError(
             f"unsupported IX statement for compilation: {type(statement).__name__}"
         )
@@ -157,6 +160,4 @@ def compile_ix_source(
     filename: str = "<memory>",
 ) -> BytecodeProgram:
     """Analyze and compile one IX source document."""
-    return IXCompiler().compile_analysis(
-        require_accepted_ix_source(source, filename=filename)
-    )
+    return IXCompiler().compile_analysis(require_accepted_ix_source(source, filename=filename))

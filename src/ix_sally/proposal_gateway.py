@@ -91,10 +91,7 @@ class SallyProposalSubmissionReceipt:
             action_count=intake_result.action_count(),
             claim_count=intake_result.claim_count(),
             requires_human_review=intake_result.requires_human_review(),
-            detail=(
-                "Accepted Sally proposal into run state after proposal-intake "
-                "stage gate."
-            ),
+            detail=("Accepted Sally proposal into run state after proposal-intake stage gate."),
         )
 
     def changed_state(self) -> bool:

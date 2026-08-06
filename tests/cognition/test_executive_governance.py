@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.claims import ClaimStatus
 from ix_sally.cognition import (
     ActionSpec,
@@ -11,10 +12,10 @@ from ix_sally.cognition import (
     FactEffect,
     FactPattern,
     FactStatus,
-    WorldFact,
-    WorldModel,
     WorkspaceItem,
     WorkspaceItemKind,
+    WorldFact,
+    WorldModel,
 )
 from ix_sally.cognition.active_memory import ActiveMemoryStore
 from ix_sally.cognition.adaptation import AdaptationController, RegressionOutcome
@@ -230,8 +231,7 @@ def test_regression_report_rejects_hidden_capability_loss() -> None:
     assert report.has_regression()
     assert not report.may_request_validation()
     assert any(
-        item.capability_id.value == "memory"
-        and item.outcome is RegressionOutcome.REGRESSED
+        item.capability_id.value == "memory" and item.outcome is RegressionOutcome.REGRESSED
         for item in report.findings
     )
 

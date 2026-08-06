@@ -124,8 +124,7 @@ class CompleteHumanReviewReentryCloseoutReport:
             )
         if executed_steps < 0:
             raise FoundationError(
-                "complete human-review reentry closeout executed_steps "
-                "must not be negative"
+                "complete human-review reentry closeout executed_steps must not be negative"
             )
         if executed_steps > max_steps:
             raise FoundationError(
@@ -140,8 +139,7 @@ class CompleteHumanReviewReentryCloseoutReport:
         }.items():
             if value < 0:
                 raise FoundationError(
-                    f"complete human-review reentry closeout {field_name} "
-                    "must not be negative"
+                    f"complete human-review reentry closeout {field_name} must not be negative"
                 )
 
         complete_reentry_result_digest.require_algorithm("sha256")
@@ -153,16 +151,11 @@ class CompleteHumanReviewReentryCloseoutReport:
         has_blocking = any(finding.blocking for finding in findings)
         if has_blocking and closeout_status is not CompleteHumanReviewReentryCloseoutStatus.BLOCKED:
             raise FoundationError(
-                "complete human-review reentry closeout with blocking findings "
-                "must be blocked"
+                "complete human-review reentry closeout with blocking findings must be blocked"
             )
-        if (
-            not has_blocking
-            and closeout_status is CompleteHumanReviewReentryCloseoutStatus.BLOCKED
-        ):
+        if not has_blocking and closeout_status is CompleteHumanReviewReentryCloseoutStatus.BLOCKED:
             raise FoundationError(
-                "complete human-review reentry closeout blocked status requires "
-                "blocking findings"
+                "complete human-review reentry closeout blocked status requires blocking findings"
             )
 
         if complete_reentry_ledger_entry is not None:
@@ -225,11 +218,9 @@ class CompleteHumanReviewReentryCloseoutReport:
         result: CompleteHumanReviewReentryResult,
     ) -> CompleteHumanReviewReentryCloseoutReport:
         """Create a closeout report from a complete human-review reentry result."""
-        complete_reentry_ledger_entry = (
-            CompleteHumanReviewReentryLedgerEntry.from_result(
-                sequence=result.control_plane.complete_reentry_ledger.next_sequence(),
-                result=result,
-            )
+        complete_reentry_ledger_entry = CompleteHumanReviewReentryLedgerEntry.from_result(
+            sequence=result.control_plane.complete_reentry_ledger.next_sequence(),
+            result=result,
         )
         recorded_control_plane = _recorded_control_plane_for_result(
             result,
@@ -363,13 +354,8 @@ def _complete_reentry_report_status(
     status = result.report_status()
     if status is HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_ACCEPTED:
         return HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_ACCEPTED
-    if (
-        status
-        is HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_WAITING_FOR_EXTERNAL_INPUT
-    ):
-        return (
-            HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_WAITING_FOR_EXTERNAL_INPUT
-        )
+    if status is HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_WAITING_FOR_EXTERNAL_INPUT:
+        return HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_WAITING_FOR_EXTERNAL_INPUT
     if status is HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_FAILED:
         return HumanReviewControlPlaneReportStatus.COMPLETE_REENTRY_FAILED
     return status

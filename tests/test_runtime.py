@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.agents import AgentRole, AgentRoleDefinition, AgentRoleRegistry
 from ix_sally.contracts import AutonomyContract, AutonomyMode
 from ix_sally.events import RuntimeEventType

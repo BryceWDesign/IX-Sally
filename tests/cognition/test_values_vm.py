@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.cognition import (
     BytecodeProgram,
     CognitiveValue,
     CognitiveValueType,
-    IXVirtualMachine,
     Instruction,
+    IXVirtualMachine,
     OpCode,
     VMStatus,
     compile_ix_source,
@@ -62,9 +63,7 @@ def test_compiler_and_vm_execute_all_statement_outputs() -> None:
 
 def test_vm_fails_closed_on_false_assertion() -> None:
     """A false assertion must return a failed receipt without raising outward."""
-    result = IXVirtualMachine().execute(
-        compile_ix_source("assert 1 == 2\n", filename="false.ix")
-    )
+    result = IXVirtualMachine().execute(compile_ix_source("assert 1 == 2\n", filename="false.ix"))
 
     assert result.status is VMStatus.FAILED
     assert result.failure is not None

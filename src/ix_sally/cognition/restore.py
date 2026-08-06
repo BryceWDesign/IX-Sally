@@ -162,18 +162,14 @@ def _restore_workspace(value: JsonValue) -> CognitiveWorkspace:
     items = tuple(
         WorkspaceItem.create(
             item_id=_text(item_payload.get("item_id"), field="workspace.item_id"),
-            kind=WorkspaceItemKind(
-                _text(item_payload.get("kind"), field="workspace.kind")
-            ),
+            kind=WorkspaceItemKind(_text(item_payload.get("kind"), field="workspace.kind")),
             content=_text(item_payload.get("content"), field="workspace.content"),
             confidence=_number(
                 item_payload.get("confidence"),
                 field="workspace.confidence",
             ),
             salience=_number(item_payload.get("salience"), field="workspace.salience"),
-            status=WorkspaceItemStatus(
-                _text(item_payload.get("status"), field="workspace.status")
-            ),
+            status=WorkspaceItemStatus(_text(item_payload.get("status"), field="workspace.status")),
             evidence_digests=_digests(
                 item_payload.get("evidence_digests"),
                 field="workspace.evidence_digests",
@@ -202,9 +198,7 @@ def _restore_memory(value: JsonValue) -> ActiveMemoryStore:
             layer=MemoryLayer(_text(item.get("layer"), field="memory.layer")),
             content=_text(item.get("content"), field="memory.content"),
             confidence=_number(item.get("confidence"), field="memory.confidence"),
-            status=ActiveMemoryStatus(
-                _text(item.get("status"), field="memory.status")
-            ),
+            status=ActiveMemoryStatus(_text(item.get("status"), field="memory.status")),
             sequence=_integer(item.get("sequence"), field="memory.sequence"),
             evidence_digests=_digests(
                 item.get("evidence_digests"),
@@ -329,9 +323,7 @@ def _restore_learning(value: JsonValue) -> LearningLedger:
                 item.get("task_family"),
                 field="learning.task_family",
             ),
-            status=OutcomeStatus(
-                _text(item.get("status"), field="learning.status")
-            ),
+            status=OutcomeStatus(_text(item.get("status"), field="learning.status")),
             score=_number(item.get("score"), field="learning.score"),
             evidence_digest=_digest(
                 item.get("evidence_digest"),
@@ -513,9 +505,7 @@ def _restore_episodes(value: JsonValue) -> EpisodeLedger:
             steps=tuple(
                 EpisodeStep.create(
                     index=_integer(step.get("index"), field="episodes.step.index"),
-                    kind=EpisodeStepKind(
-                        _text(step.get("kind"), field="episodes.step.kind")
-                    ),
+                    kind=EpisodeStepKind(_text(step.get("kind"), field="episodes.step.kind")),
                     status=EpisodeStepStatus(
                         _text(step.get("status"), field="episodes.step.status")
                     ),
@@ -577,9 +567,7 @@ def _restore_curriculum(value: JsonValue) -> CurriculumLedger | None:
                 item.get("difficulty"),
                 field="curriculum.difficulty",
             ),
-            split=CurriculumSplit(
-                _text(item.get("split"), field="curriculum.split")
-            ),
+            split=CurriculumSplit(_text(item.get("split"), field="curriculum.split")),
             prerequisite_ids=_texts(
                 item.get("prerequisite_ids"),
                 field="curriculum.prerequisite_ids",
@@ -611,9 +599,7 @@ def _restore_curriculum(value: JsonValue) -> CurriculumLedger | None:
                 field="curriculum.trial_sequence",
             ),
             score=_number(item.get("score"), field="curriculum.trial_score"),
-            status=TrialStatus(
-                _text(item.get("status"), field="curriculum.trial_status")
-            ),
+            status=TrialStatus(_text(item.get("status"), field="curriculum.trial_status")),
             evidence_digest=_digest(
                 item.get("evidence_digest"),
                 field="curriculum.trial_evidence",
@@ -634,13 +620,9 @@ def _restore_primitives(value: JsonValue) -> PrimitiveRegistry:
         PrimitiveSpec.create(
             primitive_id=_text(item.get("primitive_id"), field="primitive.id"),
             kind=PrimitiveKind(_text(item.get("kind"), field="primitive.kind")),
-            operation=PrimitiveOperation(
-                _text(item.get("operation"), field="primitive.operation")
-            ),
+            operation=PrimitiveOperation(_text(item.get("operation"), field="primitive.operation")),
             arity=_integer(item.get("arity"), field="primitive.arity"),
-            status=PrimitiveStatus(
-                _text(item.get("status"), field="primitive.status")
-            ),
+            status=PrimitiveStatus(_text(item.get("status"), field="primitive.status")),
             description=_text(
                 item.get("description"),
                 field="primitive.description",

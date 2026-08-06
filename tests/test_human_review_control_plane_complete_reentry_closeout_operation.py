@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
@@ -86,12 +85,9 @@ def _resume_operation():
 
 
 def _complete_reentry(max_steps: int = 1) -> CompleteHumanReviewReentryResult:
-    return (
-        CompleteHumanReviewReentryCoordinator.create()
-        .resume_audit_record_and_finalize(
-            resume_operation=_resume_operation(),
-            max_steps=max_steps,
-        )
+    return CompleteHumanReviewReentryCoordinator.create().resume_audit_record_and_finalize(
+        resume_operation=_resume_operation(),
+        max_steps=max_steps,
     )
 
 
@@ -105,12 +101,9 @@ def test_control_plane_coordinator_records_complete_reentry_closeout_operation()
     complete_reentry = _complete_reentry()
     closeout_report = _closeout_report(complete_reentry)
 
-    result = (
-        HumanReviewControlPlaneCoordinator.create()
-        .record_complete_reentry_closeout(
-            closeout_report=closeout_report,
-            control_plane=complete_reentry.control_plane,
-        )
+    result = HumanReviewControlPlaneCoordinator.create().record_complete_reentry_closeout(
+        closeout_report=closeout_report,
+        control_plane=complete_reentry.control_plane,
     )
 
     assert result.operation_kind() is (
@@ -120,13 +113,9 @@ def test_control_plane_coordinator_records_complete_reentry_closeout_operation()
     assert result.before_control_plane.complete_reentry_closeout_count() == 0
     assert result.after_control_plane.complete_reentry_closeout_count() == 1
     assert result.after_control_plane.latest_complete_reentry_closeout_digest() == (
-        result.after_control_plane.complete_reentry_closeout_ledger.latest()
-        .digest()
-        .value
+        result.after_control_plane.complete_reentry_closeout_ledger.latest().digest().value
     )
-    assert result.require_complete_reentry_closeout_report().digest() == (
-        closeout_report.digest()
-    )
+    assert result.require_complete_reentry_closeout_report().digest() == (closeout_report.digest())
     assert result.receipt.complete_reentry_closeout_count == 1
 
 
@@ -134,12 +123,9 @@ def test_control_plane_complete_reentry_closeout_payload_links_report() -> None:
     complete_reentry = _complete_reentry()
     closeout_report = _closeout_report(complete_reentry)
 
-    result = (
-        HumanReviewControlPlaneCoordinator.create()
-        .record_complete_reentry_closeout(
-            closeout_report=closeout_report,
-            control_plane=complete_reentry.control_plane,
-        )
+    result = HumanReviewControlPlaneCoordinator.create().record_complete_reentry_closeout(
+        closeout_report=closeout_report,
+        control_plane=complete_reentry.control_plane,
     )
     payload = result.to_payload()
 
@@ -147,9 +133,7 @@ def test_control_plane_complete_reentry_closeout_payload_links_report() -> None:
         HumanReviewControlPlaneOperationKind.COMPLETE_REENTRY_CLOSEOUT_RECORDED.value
     )
     assert payload["complete_reentry_closeout_count"] == 1
-    assert payload["complete_reentry_closeout_report_digest"] == (
-        closeout_report.digest().value
-    )
+    assert payload["complete_reentry_closeout_report_digest"] == (closeout_report.digest().value)
     assert payload["complete_reentry_count"] == 1
     assert payload["audited_reentry_count"] == 1
 

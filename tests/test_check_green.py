@@ -9,10 +9,7 @@ import check_green
 
 def test_quality_gate_commands_match_ci_tools() -> None:
     """The shared runner must retain every declared repository gate."""
-    commands = {
-        gate.name: gate.command()[1:]
-        for gate in check_green.QUALITY_GATES
-    }
+    commands = {gate.name: gate.command()[1:] for gate in check_green.QUALITY_GATES}
 
     assert commands == {
         "format": ("-m", "ruff", "format", "--check", "."),
@@ -37,9 +34,7 @@ def test_main_runs_all_gates_in_declared_order(
         *,
         repository_root: Path,
     ) -> int:
-        assert repository_root == Path(
-            check_green.__file__
-        ).resolve().parent
+        assert repository_root == Path(check_green.__file__).resolve().parent
         observed.append(gate.name)
         return 0
 
@@ -135,9 +130,7 @@ def test_main_returns_failure_after_running_selected_gates(
 def test_ci_workflow_delegates_each_gate_to_shared_runner() -> None:
     """GitHub CI must use the repository-owned gate definitions."""
     repository_root = Path(check_green.__file__).resolve().parent
-    workflow = (
-        repository_root / ".github" / "workflows" / "ci.yml"
-    ).read_text(encoding="utf-8")
+    workflow = (repository_root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
 
     for gate_name in (
         "format",

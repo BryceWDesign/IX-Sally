@@ -160,9 +160,7 @@ class UncertaintyLedger:
     def for_capability(self, capability_id: str) -> tuple[CalibrationObservation, ...]:
         """Return observations for one canonical capability."""
         requested = CanonicalKey.from_text(capability_id, field_name="capability_id")
-        return tuple(
-            item for item in self.observations if item.capability_id == requested
-        )
+        return tuple(item for item in self.observations if item.capability_id == requested)
 
     def report(
         self,
@@ -174,9 +172,7 @@ class UncertaintyLedger:
         if bin_count < 1 or bin_count > 100:
             raise FoundationError("calibration bin_count must be between 1 and 100")
         selected = (
-            self.observations
-            if capability_id is None
-            else self.for_capability(capability_id)
+            self.observations if capability_id is None else self.for_capability(capability_id)
         )
         if not selected:
             return CalibrationReport(0, 0.0, 0.0, ())
@@ -190,16 +186,11 @@ class UncertaintyLedger:
                 item
                 for item in selected
                 if lower <= item.predicted_probability
-                and (
-                    item.predicted_probability < upper
-                    or index == bin_count - 1
-                )
+                and (item.predicted_probability < upper or index == bin_count - 1)
             )
             if not members:
                 continue
-            mean_prediction = sum(
-                item.predicted_probability for item in members
-            ) / len(members)
+            mean_prediction = sum(item.predicted_probability for item in members) / len(members)
             observed_frequency = sum(1.0 if item.observed else 0.0 for item in members) / len(
                 members
             )

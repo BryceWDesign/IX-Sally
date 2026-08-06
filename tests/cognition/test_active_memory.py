@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.cognition import (
     ActiveMemoryEntry,
     ActiveMemoryStatus,
@@ -54,9 +55,7 @@ def test_truth_only_retrieval_excludes_candidates() -> None:
 
     results = store.retrieve("sky blue", truth_only=True)
 
-    assert tuple(result.entry.memory_id.value for result in results) == (
-        "verified-blue",
-    )
+    assert tuple(result.entry.memory_id.value for result in results) == ("verified-blue",)
 
 
 def test_retrieval_order_is_deterministic() -> None:

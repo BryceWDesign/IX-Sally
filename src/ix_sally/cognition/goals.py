@@ -112,8 +112,7 @@ class GoalSpec:
     def to_payload(self) -> JsonObject:
         """Return a canonical goal payload."""
         evidence: JsonArray = [
-            {"algorithm": item.algorithm, "value": item.value}
-            for item in self.evidence_digests
+            {"algorithm": item.algorithm, "value": item.value} for item in self.evidence_digests
         ]
         dependencies: JsonArray = [item.value for item in self.dependency_ids]
         return {
@@ -213,8 +212,7 @@ class GoalGraph:
         """Return whether all dependency goals are explicitly satisfied."""
         by_id = {item.goal_id: item for item in self.goals}
         return all(
-            by_id[dependency].status is GoalStatus.SATISFIED
-            for dependency in goal.dependency_ids
+            by_id[dependency].status is GoalStatus.SATISFIED for dependency in goal.dependency_ids
         )
 
     def selectable(self, world_model: WorldModel) -> tuple[GoalSpec, ...]:

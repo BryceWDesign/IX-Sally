@@ -25,7 +25,6 @@ from ix_sally.cognition.persistence import CognitiveSnapshot
 from ix_sally.cognition.planning import (
     ActionSpec,
     DeterministicPlanner,
-    FactPattern,
     Plan,
     PlanExecutionReceipt,
     PlanSimulator,
@@ -44,7 +43,7 @@ from ix_sally.cognition.uncertainty import (
 from ix_sally.cognition.values import CognitiveValue
 from ix_sally.cognition.vm import IXVirtualMachine, VMResult, VMStatus
 from ix_sally.cognition.workspace import CognitiveWorkspace, WorkspaceItem
-from ix_sally.cognition.world_model import CausalRule, WorldFact, WorldModel
+from ix_sally.cognition.world_model import CausalRule, FactPattern, WorldFact, WorldModel
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import FoundationError
 
@@ -302,11 +301,7 @@ class SallyCognitiveSystem:
             "goals": self.goals.to_payload(),
             "uncertainty": self.uncertainty.to_payload(),
             "episodes": self.episodes.to_payload(),
-            "curriculum": (
-                self.curriculum.to_payload()
-                if self.curriculum is not None
-                else None
-            ),
+            "curriculum": (self.curriculum.to_payload() if self.curriculum is not None else None),
             "primitive_registry": self.primitive_registry.to_payload(),
             "runtime_memories": runtime_memories,
             "execution_count": self.execution_count,

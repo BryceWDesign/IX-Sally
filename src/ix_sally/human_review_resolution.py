@@ -246,8 +246,7 @@ class HumanReviewResolutionAudit:
         return sum(
             1
             for resolution in self.resolutions
-            if resolution.status
-            is HumanReviewResolutionStatus.MANUAL_INVESTIGATION_REQUIRED
+            if resolution.status is HumanReviewResolutionStatus.MANUAL_INVESTIGATION_REQUIRED
         )
 
     def blocker_acknowledgment_count(self) -> int:

@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from ix_sally.agents import AgentRole, default_agent_role_registry
 from ix_sally.cognition.active_memory import ActiveMemoryStore
 from ix_sally.cognition.learning import LearningLedger
-from ix_sally.cognition.planning import ActionSpec, DeterministicPlanner, Plan
+from ix_sally.cognition.planning import ActionSpec, DeterministicPlanner, Plan, PlanStatus
 from ix_sally.cognition.workspace import CognitiveWorkspace, WorkspaceItemKind
 from ix_sally.cognition.world_model import FactPattern, FactStatus, WorldModel
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
@@ -104,7 +104,7 @@ class NinefoldCognitiveCycle:
 class NinefoldCoordinator:
     """Coordinate functional roles from shared state instead of simulated personalities."""
 
-    planner: DeterministicPlanner = DeterministicPlanner()
+    planner: DeterministicPlanner = field(default_factory=DeterministicPlanner)
 
     def run(
         self,
@@ -133,23 +133,13 @@ class NinefoldCoordinator:
                 goal=goal,
             )
 
-        risks = tuple(
-            item for item in workspace.items
-            if item.kind is WorkspaceItemKind.RISK
-        )
+        risks = tuple(item for item in workspace.items if item.kind is WorkspaceItemKind.RISK)
         hypotheses = tuple(
-            item for item in workspace.items
-            if item.kind is WorkspaceItemKind.HYPOTHESIS
+            item for item in workspace.items if item.kind is WorkspaceItemKind.HYPOTHESIS
         )
-        unsupported_hypotheses = tuple(
-            item for item in hypotheses if not item.evidence_digests
-        )
-        observed_count = sum(
-            1 for fact in world_model.facts if fact.status is FactStatus.OBSERVED
-        )
-        verified_memory_count = sum(
-            1 for entry in memory.entries if entry.is_retrievable_truth()
-        )
+        unsupported_hypotheses = tuple(item for item in hypotheses if not item.evidence_digests)
+        observed_count = sum(1 for fact in world_model.facts if fact.status is FactStatus.OBSERVED)
+        verified_memory_count = sum(1 for entry in memory.entries if entry.is_retrievable_truth())
         authority_block = plan is not None and plan.requires_human_authority()
         findings = (
             RoleFinding.create(
@@ -195,9 +185,7 @@ class NinefoldCoordinator:
                     else f"Planner result: {plan.status.value}."
                 ),
                 blocking=(
-                    plan is not None
-                    and not plan.actions
-                    and plan.status is PlanStatus.NOT_FOUND
+                    plan is not None and not plan.actions and plan.status is PlanStatus.NOT_FOUND
                 ),
                 evidence_digests=(plan.digest(),) if plan is not None else (),
             ),
@@ -239,8 +227,7 @@ class NinefoldCoordinator:
             ),
         )
         ordered = tuple(
-            next(finding for finding in findings if finding.role is role)
-            for role in AgentRole
+            next(finding for finding in findings if finding.role is role) for role in AgentRole
         )
         cycle_seed = DigestRecord.from_payload(
             {

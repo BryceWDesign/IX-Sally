@@ -37,9 +37,12 @@ def test_repository_integrity_passes_for_current_checkout() -> None:
     """The current repository must satisfy every cross-platform invariant."""
     repository_root = Path(repository_check.__file__).resolve().parent
 
-    assert repository_check.repository_violations(
-        repository_root=repository_root,
-    ) == ()
+    assert (
+        repository_check.repository_violations(
+            repository_root=repository_root,
+        )
+        == ()
+    )
 
 
 def test_repository_integrity_detects_case_collision(
@@ -47,11 +50,26 @@ def test_repository_integrity_detects_case_collision(
 ) -> None:
     """Paths differing only by case must be rejected for Windows safety."""
     _minimal_repository(tmp_path)
-    (tmp_path / "tests" / "sample.py").write_text(
-        "VALUE = 1\n",
-        encoding="utf-8",
+    paths = (
+        tmp_path / "tests" / "sample.py",
+        tmp_path / "tests" / "Sample.py",
     )
-    (tmp_path / "tests" / "Sample.py").write_text(
+
+    violations = repository_check._case_collision_violations(
+        repository_root=tmp_path,
+        paths=paths,
+    )
+
+    assert any(violation.rule == "case-collision" for violation in violations)
+
+
+def test_repository_integrity_detects_invalid_module_case(
+    tmp_path: Path,
+) -> None:
+    """Mixed-case Python module names must be rejected cross-platform."""
+    _minimal_repository(tmp_path)
+    module = tmp_path / "tests" / "Sample.py"
+    module.write_text(
         "VALUE = 2\n",
         encoding="utf-8",
     )
@@ -60,14 +78,7 @@ def test_repository_integrity_detects_case_collision(
         repository_root=tmp_path,
     )
 
-    assert any(
-        violation.rule == "case-collision"
-        for violation in violations
-    )
-    assert any(
-        violation.rule == "python-module-name"
-        for violation in violations
-    )
+    assert any(violation.rule == "python-module-name" for violation in violations)
 
 
 def test_repository_integrity_detects_missing_package_marker(
@@ -86,11 +97,14 @@ def test_repository_integrity_detects_missing_package_marker(
         repository_root=tmp_path,
     )
 
-    assert repository_check.RepositoryViolation(
-        rule="package-marker",
-        path="src/ix_sally/nested",
-        detail="Python package directory is missing __init__.py",
-    ) in violations
+    assert (
+        repository_check.RepositoryViolation(
+            rule="package-marker",
+            path="src/ix_sally/nested",
+            detail="Python package directory is missing __init__.py",
+        )
+        in violations
+    )
 
 
 def test_repository_integrity_detects_invalid_python_source(
@@ -109,8 +123,7 @@ def test_repository_integrity_detects_invalid_python_source(
     )
 
     assert any(
-        violation.rule == "python-syntax"
-        and violation.path == "src/ix_sally/invalid.py"
+        violation.rule == "python-syntax" and violation.path == "src/ix_sally/invalid.py"
         for violation in violations
     )
 
@@ -130,11 +143,14 @@ def test_repository_integrity_detects_windows_reserved_name(
         repository_root=tmp_path,
     )
 
-    assert repository_check.RepositoryViolation(
-        rule="windows-reserved-name",
-        path="tests/con.py",
-        detail="component 'con.py' is reserved on Windows",
-    ) in violations
+    assert (
+        repository_check.RepositoryViolation(
+            rule="windows-reserved-name",
+            path="tests/con.py",
+            detail="component 'con.py' is reserved on Windows",
+        )
+        in violations
+    )
 
 
 def test_repository_check_main_reports_summary(

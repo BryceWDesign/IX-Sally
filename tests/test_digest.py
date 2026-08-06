@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.digest import DigestRecord, stable_digest, stable_json
 from ix_sally.foundation import FoundationError
 

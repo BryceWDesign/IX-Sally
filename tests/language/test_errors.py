@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.language.errors import (
     DiagnosticSeverity,
     IXSyntaxError,
@@ -33,10 +34,7 @@ def test_language_diagnostic_formats_stable_message() -> None:
         "Unexpected closing brace. "
         "Hint: Remove the brace or open a matching block."
     )
-    assert (
-        diagnostic.to_payload()["formatted"]
-        == diagnostic.format()
-    )
+    assert diagnostic.to_payload()["formatted"] == diagnostic.format()
 
 
 def test_language_diagnostic_digest_is_deterministic() -> None:

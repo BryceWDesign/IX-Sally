@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
@@ -18,9 +17,9 @@ from ix_sally.runtime import NinefoldRuntimeKit
 from ix_sally.state import NinefoldRunState
 from ix_sally.state_audit import (
     StateAuditFinding,
+    StateAuditor,
     StateAuditReport,
     StateAuditSeverity,
-    StateAuditor,
 )
 
 
@@ -211,10 +210,7 @@ def test_state_auditor_blocks_on_unsupported_evidence_findings() -> None:
     report = StateAuditor().audit(state)
 
     assert report.ready_for_close() is False
-    assert any(
-        finding.reference == "evidence_support.human_review"
-        for finding in report.findings
-    )
+    assert any(finding.reference == "evidence_support.human_review" for finding in report.findings)
 
 
 def test_state_audit_digest_changes_when_findings_change() -> None:

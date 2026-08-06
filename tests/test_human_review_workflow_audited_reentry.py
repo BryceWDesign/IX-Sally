@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
@@ -100,9 +99,7 @@ def test_workflow_kit_records_audited_reentry_operation() -> None:
         audited_reentry_result=audited_reentry,
     )
 
-    assert operation.receipt.workflow_stage is (
-        HumanReviewWorkflowStage.AUDITED_REENTRY_RECORDED
-    )
+    assert operation.receipt.workflow_stage is (HumanReviewWorkflowStage.AUDITED_REENTRY_RECORDED)
     assert operation.operation_kind() is (
         HumanReviewControlPlaneOperationKind.AUDITED_REENTRY_RECORDED
     )
@@ -111,9 +108,7 @@ def test_workflow_kit_records_audited_reentry_operation() -> None:
     assert operation.control_plane.reentry_count() == 1
     assert operation.control_plane.reentry_audit_count() == 1
     assert operation.control_plane.audited_reentry_count() == 1
-    assert operation.report.status is (
-        HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_ACCEPTED
-    )
+    assert operation.report.status is (HumanReviewControlPlaneReportStatus.AUDITED_REENTRY_ACCEPTED)
     assert operation.report.audited_reentry_recorded() is True
     assert operation.report.audited_reentry_accepted() is True
     assert operation.report.requires_operator_attention() is False
@@ -146,9 +141,7 @@ def test_workflow_audited_reentry_payload_links_result_and_report() -> None:
     payload = operation.to_payload()
     report_payload = operation.report.to_payload()
 
-    assert payload["workflow_stage"] == (
-        HumanReviewWorkflowStage.AUDITED_REENTRY_RECORDED.value
-    )
+    assert payload["workflow_stage"] == (HumanReviewWorkflowStage.AUDITED_REENTRY_RECORDED.value)
     assert payload["operation_kind"] == (
         HumanReviewControlPlaneOperationKind.AUDITED_REENTRY_RECORDED.value
     )

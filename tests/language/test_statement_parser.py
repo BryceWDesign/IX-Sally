@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.foundation import FoundationError
 from ix_sally.language.ast import (
     BinaryExpression,
@@ -198,9 +199,7 @@ def test_statement_parser_rejects_unsupported_block_keyword() -> None:
     diagnostic = captured.value.diagnostic
     assert diagnostic.code.value == "syntax-unsupported-statement"
     assert diagnostic.span.label() == "blocked.ix:1:1-3"
-    assert diagnostic.message == (
-        "Unsupported executable IX statement keyword 'if'."
-    )
+    assert diagnostic.message == ("Unsupported executable IX statement keyword 'if'.")
 
 
 def test_statement_parser_rejects_non_keyword_statement_start() -> None:

@@ -58,17 +58,13 @@ class RegressionReport:
     def has_regression(self) -> bool:
         """Return whether any measured capability exceeds the allowed score drop."""
         return any(
-            finding.delta is not None
-            and finding.delta < -self.permitted_regression
+            finding.delta is not None and finding.delta < -self.permitted_regression
             for finding in self.findings
         )
 
     def complete(self) -> bool:
         """Return whether every capability exists in both compared models."""
-        return all(
-            finding.outcome is not RegressionOutcome.INCOMPLETE
-            for finding in self.findings
-        )
+        return all(finding.outcome is not RegressionOutcome.INCOMPLETE for finding in self.findings)
 
     def may_request_validation(self) -> bool:
         """Return whether evidence permits human review of a validation request."""
@@ -159,12 +155,8 @@ class AdaptationController:
                 findings.append(
                     RegressionFinding(
                         capability_id=capability_id,
-                        before_score=(
-                            before_measure.score if before_measure is not None else None
-                        ),
-                        after_score=(
-                            after_measure.score if after_measure is not None else None
-                        ),
+                        before_score=(before_measure.score if before_measure is not None else None),
+                        after_score=(after_measure.score if after_measure is not None else None),
                         delta=None,
                         outcome=RegressionOutcome.INCOMPLETE,
                     )

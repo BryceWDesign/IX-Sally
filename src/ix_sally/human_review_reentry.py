@@ -222,27 +222,16 @@ class HumanReviewReentryRunner:
         resume_operation: HumanReviewWorkflowOperation,
     ) -> None:
         """Raise unless the workflow operation is a cleared resume operation."""
-        if (
-            resume_operation.receipt.workflow_stage
-            is not HumanReviewWorkflowStage.RESUME_RECORDED
-        ):
-            raise FoundationError(
-                "human-review reentry requires a resume-recorded operation"
-            )
+        if resume_operation.receipt.workflow_stage is not HumanReviewWorkflowStage.RESUME_RECORDED:
+            raise FoundationError("human-review reentry requires a resume-recorded operation")
 
         resume_result = resume_operation.require_resume()
         if not resume_result.cleared_to_resume():
-            raise FoundationError(
-                "human-review reentry requires cleared resume authority"
-            )
+            raise FoundationError("human-review reentry requires cleared resume authority")
         if resume_result.next_stage() is RunStage.HUMAN_REVIEW:
-            raise FoundationError(
-                "human-review reentry cannot resume to human_review"
-            )
+            raise FoundationError("human-review reentry cannot resume to human_review")
         if resume_result.state.digest() != resume_operation.run_state.digest():
-            raise FoundationError(
-                "human-review reentry resume state mismatch"
-            )
+            raise FoundationError("human-review reentry resume state mismatch")
 
     def _status_from_loop(
         self,
@@ -259,6 +248,5 @@ class HumanReviewReentryRunner:
             return HumanReviewReentryStatus.STEP_LIMIT_REACHED
 
         raise FoundationError(
-            f"unsupported human-review reentry stop reason: "
-            f"{loop_result.stop_reason.value}"
+            f"unsupported human-review reentry stop reason: {loop_result.stop_reason.value}"
         )

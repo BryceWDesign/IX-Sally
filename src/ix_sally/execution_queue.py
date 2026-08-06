@@ -169,8 +169,7 @@ class ExecutionQueue:
     def from_action_ledger(cls, ledger: BoundedActionLedger) -> ExecutionQueue:
         """Queue every action currently authorized for execution."""
         return cls.create(
-            ExecutionQueueItem.from_action(action)
-            for action in ledger.executable_actions()
+            ExecutionQueueItem.from_action(action) for action in ledger.executable_actions()
         )
 
     def append(self, item: ExecutionQueueItem) -> ExecutionQueue:

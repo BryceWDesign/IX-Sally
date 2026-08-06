@@ -125,9 +125,7 @@ class NameExpression(Expression):
     def __post_init__(self) -> None:
         """Reject names outside the IX identifier grammar."""
         if not isinstance(self.name, str) or not _IDENTIFIER_PATTERN.fullmatch(self.name):
-            raise FoundationError(
-                "IX expression name must be an ASCII identifier"
-            )
+            raise FoundationError("IX expression name must be an ASCII identifier")
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible name expression."""
@@ -215,9 +213,7 @@ class BinaryExpression(Expression):
             field_name="binary right operand",
         )
         if self.left.span.start > self.right.span.start:
-            raise FoundationError(
-                "IX binary expression operands must remain in source order"
-            )
+            raise FoundationError("IX binary expression operands must remain in source order")
 
     def children(self) -> tuple[LanguageNode, ...]:
         """Return binary operands in source order."""
@@ -243,10 +239,6 @@ def _require_child_span(
 ) -> None:
     """Require one child span to belong to and fit inside its parent."""
     if parent.filename != child.filename:
-        raise FoundationError(
-            f"IX {field_name} span must use the parent filename"
-        )
+        raise FoundationError(f"IX {field_name} span must use the parent filename")
     if child.start < parent.start or child.end > parent.end:
-        raise FoundationError(
-            f"IX {field_name} span must be contained by the parent span"
-        )
+        raise FoundationError(f"IX {field_name} span must be contained by the parent span")

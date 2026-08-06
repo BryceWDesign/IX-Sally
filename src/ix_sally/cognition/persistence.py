@@ -38,13 +38,9 @@ class CognitiveSnapshot:
     def __post_init__(self) -> None:
         """Reject unsupported schemas, wrong repository identity, and tampering."""
         if self.schema_version != CURRENT_SNAPSHOT_SCHEMA:
-            raise FoundationError(
-                f"unsupported cognitive snapshot schema: {self.schema_version}"
-            )
+            raise FoundationError(f"unsupported cognitive snapshot schema: {self.schema_version}")
         if self.repository != "IX-Sally":
-            raise FoundationError(
-                f"cognitive snapshot repository mismatch: {self.repository}"
-            )
+            raise FoundationError(f"cognitive snapshot repository mismatch: {self.repository}")
         self.state_digest.require_algorithm("sha256")
         actual = DigestRecord.from_payload(self.state)
         if actual != self.state_digest:

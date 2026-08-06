@@ -55,9 +55,7 @@ class AuthorityBatchProcessingResult:
     def human_review_count(self) -> int:
         """Return how many processed actions require human review."""
         return sum(
-            1
-            for result in self.processed
-            if result.authority_decision.requires_human_review()
+            1 for result in self.processed if result.authority_decision.requires_human_review()
         )
 
     def blocked_count(self) -> int:

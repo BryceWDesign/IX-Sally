@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
@@ -19,7 +18,6 @@ from ix_sally.human_review_docket import (
     HumanReviewDocketTargetType,
 )
 from ix_sally.runtime import NinefoldRuntimeKit
-from ix_sally.stage_readiness import RunStage
 from ix_sally.state import NinefoldRunState
 
 
@@ -109,9 +107,7 @@ def test_human_review_docket_builder_collects_evidence_support_target() -> None:
     docket = HumanReviewDocketBuilder.create().build(state=state)
 
     assert docket.to_payload()["evidence_support_finding_count"] == 1
-    assert docket.targets[0].target_type is (
-        HumanReviewDocketTargetType.EVIDENCE_SUPPORT_FINDING
-    )
+    assert docket.targets[0].target_type is (HumanReviewDocketTargetType.EVIDENCE_SUPPORT_FINDING)
     assert docket.targets[0].requires_decision() is True
 
 

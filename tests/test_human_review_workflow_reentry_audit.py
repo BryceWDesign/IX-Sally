@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
@@ -102,9 +101,7 @@ def test_workflow_kit_records_reentry_audit_operation() -> None:
         control_plane=coordination.control_plane,
     )
 
-    assert operation.receipt.workflow_stage is (
-        HumanReviewWorkflowStage.REENTRY_AUDIT_RECORDED
-    )
+    assert operation.receipt.workflow_stage is (HumanReviewWorkflowStage.REENTRY_AUDIT_RECORDED)
     assert operation.operation_kind() is (
         HumanReviewControlPlaneOperationKind.REENTRY_AUDIT_RECORDED
     )
@@ -150,9 +147,7 @@ def test_workflow_reentry_audit_payload_links_report_and_operation() -> None:
     payload = operation.to_payload()
     report_payload = operation.report.to_payload()
 
-    assert payload["workflow_stage"] == (
-        HumanReviewWorkflowStage.REENTRY_AUDIT_RECORDED.value
-    )
+    assert payload["workflow_stage"] == (HumanReviewWorkflowStage.REENTRY_AUDIT_RECORDED.value)
     assert payload["operation_kind"] == (
         HumanReviewControlPlaneOperationKind.REENTRY_AUDIT_RECORDED.value
     )

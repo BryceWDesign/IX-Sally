@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.cognition import (
     CapabilityMeasure,
     ImprovementProposal,
@@ -86,19 +87,23 @@ def test_self_model_requires_evidence_and_limits() -> None:
 def test_self_model_reports_weakest_measure() -> None:
     """Metacognition must expose weakest measured capability deterministically."""
     evidence = DigestRecord.from_payload({"suite": "capabilities"})
-    model = SelfModel().update(
-        CapabilityMeasure.create(
-            capability_id="memory",
-            score=0.9,
-            evidence_digests=(evidence,),
-            limitation="Local deterministic retrieval only.",
+    model = (
+        SelfModel()
+        .update(
+            CapabilityMeasure.create(
+                capability_id="memory",
+                score=0.9,
+                evidence_digests=(evidence,),
+                limitation="Local deterministic retrieval only.",
+            )
         )
-    ).update(
-        CapabilityMeasure.create(
-            capability_id="planning",
-            score=0.6,
-            evidence_digests=(evidence,),
-            limitation="Exact-state planning only.",
+        .update(
+            CapabilityMeasure.create(
+                capability_id="planning",
+                score=0.6,
+                evidence_digests=(evidence,),
+                limitation="Exact-state planning only.",
+            )
         )
     )
 

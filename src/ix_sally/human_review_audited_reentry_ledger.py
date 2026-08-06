@@ -12,11 +12,11 @@ from ix_sally.stage_readiness import RunStage
 
 if TYPE_CHECKING:
     from ix_sally.human_review_audited_reentry import AuditedHumanReviewReentryResult
-    from ix_sally.human_review_control_plane_report import (
+    from ix_sally.human_review_control_plane_report_status import (
         HumanReviewControlPlaneReportStatus,
     )
-    from ix_sally.human_review_reentry import HumanReviewReentryStatus
-    from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditStatus
+    from ix_sally.human_review_reentry_audit_status import HumanReviewReentryAuditStatus
+    from ix_sally.human_review_reentry_status import HumanReviewReentryStatus
 
 
 @dataclass(frozen=True, slots=True)
@@ -69,13 +69,9 @@ class AuditedHumanReviewReentryLedgerEntry:
     ) -> AuditedHumanReviewReentryLedgerEntry:
         """Create a normalized audited human-review reentry ledger entry."""
         if sequence <= 0:
-            raise FoundationError(
-                "audited human-review reentry ledger sequence must be positive"
-            )
+            raise FoundationError("audited human-review reentry ledger sequence must be positive")
         if max_steps <= 0:
-            raise FoundationError(
-                "audited human-review reentry ledger max_steps must be positive"
-            )
+            raise FoundationError("audited human-review reentry ledger max_steps must be positive")
         if executed_steps < 0:
             raise FoundationError(
                 "audited human-review reentry ledger executed_steps must not be negative"
@@ -139,9 +135,7 @@ class AuditedHumanReviewReentryLedgerEntry:
             resume_operation_digest=result.receipt.resume_operation_digest,
             reentry_coordination_digest=result.receipt.reentry_coordination_digest,
             audit_report_digest=result.receipt.audit_report_digest,
-            audit_workflow_operation_digest=(
-                result.receipt.audit_workflow_operation_digest
-            ),
+            audit_workflow_operation_digest=(result.receipt.audit_workflow_operation_digest),
             before_state_digest=result.receipt.before_state_digest,
             after_state_digest=result.receipt.after_state_digest,
             before_control_plane_digest=result.receipt.before_control_plane_digest,
@@ -305,8 +299,7 @@ class AuditedHumanReviewReentryLedger:
         for entry in normalized:
             if entry.sequence in seen_sequences:
                 raise FoundationError(
-                    f"duplicate audited human-review reentry ledger sequence: "
-                    f"{entry.sequence}"
+                    f"duplicate audited human-review reentry ledger sequence: {entry.sequence}"
                 )
             if entry.entry_id.value in seen_entry_ids:
                 raise FoundationError(
@@ -319,9 +312,7 @@ class AuditedHumanReviewReentryLedger:
                     f"{entry.audited_reentry_result_digest.value}"
                 )
             if entry.sequence <= previous_sequence:
-                raise FoundationError(
-                    "audited human-review reentry ledger sequences must increase"
-                )
+                raise FoundationError("audited human-review reentry ledger sequences must increase")
 
             seen_sequences.add(entry.sequence)
             seen_entry_ids.add(entry.entry_id.value)
@@ -429,18 +420,12 @@ class AuditedHumanReviewReentryLedger:
             "waiting_entry_count": len(self.waiting_entries()),
             "operator_attention_entry_count": len(self.operator_attention_entries()),
             "changed_state_entry_count": len(self.changed_state_entries()),
-            "forge_dispatch_entry_count": len(
-                self.entries_for_stage(RunStage.FORGE_DISPATCH)
-            ),
+            "forge_dispatch_entry_count": len(self.entries_for_stage(RunStage.FORGE_DISPATCH)),
             "forge_result_processing_entry_count": len(
                 self.entries_for_stage(RunStage.FORGE_RESULT_PROCESSING)
             ),
             "passed_audit_entry_count": len(
-                [
-                    entry
-                    for entry in self.entries
-                    if entry.audit_status.value == "passed"
-                ]
+                [entry for entry in self.entries if entry.audit_status.value == "passed"]
             ),
             "waiting_audit_entry_count": len(
                 [
@@ -450,11 +435,7 @@ class AuditedHumanReviewReentryLedger:
                 ]
             ),
             "advanced_reentry_entry_count": len(
-                [
-                    entry
-                    for entry in self.entries
-                    if entry.reentry_status.value == "advanced"
-                ]
+                [entry for entry in self.entries if entry.reentry_status.value == "advanced"]
             ),
             "waiting_reentry_entry_count": len(
                 [

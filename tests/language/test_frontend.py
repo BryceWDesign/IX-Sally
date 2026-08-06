@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 import pytest
+
 from ix_sally.digest import DigestRecord
 from ix_sally.foundation import FoundationError
 from ix_sally.language.errors import IXSyntaxError, IXValidationError
@@ -45,12 +46,8 @@ def test_frontend_analyzes_complete_valid_program() -> None:
 def test_frontend_context_seeds_semantic_and_type_analysis() -> None:
     """Typed host context must remain aligned across both analysis stages."""
     context = IXFrontendContext(
-        local_types=(
-            IXTypeBinding("input_value", IXValueType.FLOAT),
-        ),
-        memory_types=(
-            IXTypeBinding("prior_result", IXValueType.STRING),
-        ),
+        local_types=(IXTypeBinding("input_value", IXValueType.FLOAT),),
+        memory_types=(IXTypeBinding("prior_result", IXValueType.STRING),),
     )
 
     analysis = IXFrontendAnalyzer(context=context).analyze(
@@ -91,9 +88,7 @@ def test_frontend_fail_closed_boundary_raises_first_error() -> None:
             filename="invalid.ix",
         )
 
-    assert captured.value.diagnostic.code.value == (
-        "typing-invalid-operator-operands"
-    )
+    assert captured.value.diagnostic.code.value == ("typing-invalid-operator-operands")
     assert captured.value.diagnostic.span.label() == "invalid.ix:1:11-21"
 
 

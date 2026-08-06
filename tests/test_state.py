@@ -1,5 +1,3 @@
-
-
 from __future__ import annotations
 
 from ix_sally.agents import AgentRole
@@ -126,10 +124,7 @@ def test_run_state_appends_artifact_claim_evidence_and_memory() -> None:
     )
 
     updated = (
-        state.with_artifact(artifact)
-        .with_claim(claim)
-        .with_evidence(evidence)
-        .with_memory(memory)
+        state.with_artifact(artifact).with_claim(claim).with_evidence(evidence).with_memory(memory)
     )
 
     assert len(updated.artifacts.artifacts) == 1
@@ -181,10 +176,7 @@ def test_run_state_payload_records_ledger_counts_and_digests() -> None:
     assert payload["claim_ledger_digest"] == state.claims.digest().value
     assert payload["evidence_ledger_digest"] == state.evidence.digest().value
     assert payload["memory_ledger_digest"] == state.memory.digest().value
-    assert (
-        payload["authority_decision_ledger_digest"]
-        == state.authority_decisions.digest().value
-    )
+    assert payload["authority_decision_ledger_digest"] == state.authority_decisions.digest().value
     assert payload["cycle_ledger_digest"] == state.cycles.digest().value
     assert payload["event_count"] == 1
     assert payload["artifact_count"] == 0

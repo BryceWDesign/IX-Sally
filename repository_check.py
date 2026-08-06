@@ -20,9 +20,7 @@ _WINDOWS_RESERVED_NAMES: Final[frozenset[str]] = frozenset(
     }
 )
 _PYTHON_MODULE_PATTERN: Final = re.compile(r"^[a-z][a-z0-9_]*\.py$")
-_SPECIAL_PYTHON_FILES: Final[frozenset[str]] = frozenset(
-    {"__init__.py", "__main__.py"}
-)
+_SPECIAL_PYTHON_FILES: Final[frozenset[str]] = frozenset({"__init__.py", "__main__.py"})
 _REQUIRED_PATHS: Final[tuple[str, ...]] = (
     "LICENSE",
     "pyproject.toml",
@@ -124,9 +122,7 @@ def _path_component_violations(
                     RepositoryViolation(
                         rule="path-component",
                         path=relative,
-                        detail=(
-                            f"component {component!r} ends with a space or period"
-                        ),
+                        detail=(f"component {component!r} ends with a space or period"),
                     )
                 )
 
@@ -162,9 +158,7 @@ def _python_filename_violations(
                         repository_root=repository_root,
                         path=path,
                     ),
-                    detail=(
-                        "Python modules must use lowercase snake_case filenames"
-                    ),
+                    detail=("Python modules must use lowercase snake_case filenames"),
                 )
             )
     return tuple(violations)
@@ -181,11 +175,7 @@ def _package_marker_violations(
 
     violations: list[RepositoryViolation] = []
     directories = {package_root}
-    directories.update(
-        path.parent
-        for path in package_root.rglob("*.py")
-        if path.is_file()
-    )
+    directories.update(path.parent for path in package_root.rglob("*.py") if path.is_file())
 
     for directory in sorted(directories):
         marker = directory / "__init__.py"
@@ -233,18 +223,12 @@ def _python_source_violations(
         try:
             ast.parse(source, filename=str(path))
         except SyntaxError as error:
-            location = (
-                f"line {error.lineno}"
-                if error.lineno is not None
-                else "unknown line"
-            )
+            location = f"line {error.lineno}" if error.lineno is not None else "unknown line"
             violations.append(
                 RepositoryViolation(
                     rule="python-syntax",
                     path=relative,
-                    detail=(
-                        f"source does not parse at {location}: {error.msg}"
-                    ),
+                    detail=(f"source does not parse at {location}: {error.msg}"),
                 )
             )
     return tuple(violations)
@@ -306,13 +290,10 @@ def main() -> int:
         return 1
 
     scanned_files = sum(
-        1
-        for path in _scanned_paths(repository_root=repository_root)
-        if path.is_file()
+        1 for path in _scanned_paths(repository_root=repository_root) if path.is_file()
     )
     sys.stdout.write(
-        "IX-Sally repository integrity passed: "
-        f"{scanned_files} source/test files, 0 violations.\n"
+        f"IX-Sally repository integrity passed: {scanned_files} source/test files, 0 violations.\n"
     )
     return 0
 

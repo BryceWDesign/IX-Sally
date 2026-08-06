@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.agents import AgentRole
 from ix_sally.claims import ClaimLedger, ClaimRecord, ClaimStatus
 from ix_sally.digest import DigestRecord

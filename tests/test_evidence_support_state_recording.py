@@ -1,5 +1,3 @@
-
-
 from __future__ import annotations
 
 from ix_sally.agents import AgentRole

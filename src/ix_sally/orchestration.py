@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from ix_sally.authority_processing import AuthorityProcessor
-from ix_sally.chamber_closing import ChamberCloseResult, ChamberCloser
+from ix_sally.chamber_closing import ChamberCloser, ChamberCloseResult
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.evidence_support_processing import EvidenceSupportProcessor
 from ix_sally.execution_dispatch import ExecutionDispatcher
@@ -127,36 +127,36 @@ class StageOrchestrator:
             )
 
         if snapshot.stage is RunStage.AUTHORITY_PROCESSING:
-            result = self.authority_processor.process_all_proposed(state=state)
+            authority_result = self.authority_processor.process_all_proposed(state=state)
             return StageAdvanceResult(
-                state=result.state,
+                state=authority_result.state,
                 before_snapshot=snapshot,
                 gate_decision=decision,
                 kind=StageAdvanceKind.AUTHORITY_PROCESSED,
                 detail="Processed proposed bounded actions through authority gates.",
-                processor_digest=result.digest(),
+                processor_digest=authority_result.digest(),
             )
 
         if snapshot.stage is RunStage.EXECUTION_PLANNING:
-            result = self.execution_planner.queue_all_authorized(state=state)
+            planning_result = self.execution_planner.queue_all_authorized(state=state)
             return StageAdvanceResult(
-                state=result.state,
+                state=planning_result.state,
                 before_snapshot=snapshot,
                 gate_decision=decision,
                 kind=StageAdvanceKind.EXECUTION_PLANNED,
                 detail="Queued authorized bounded actions for IX-Forge dispatch.",
-                processor_digest=result.digest(),
+                processor_digest=planning_result.digest(),
             )
 
         if snapshot.stage is RunStage.FORGE_DISPATCH:
-            result = self.execution_dispatcher.dispatch_all_queued(state=state)
+            dispatch_result = self.execution_dispatcher.dispatch_all_queued(state=state)
             return StageAdvanceResult(
-                state=result.state,
+                state=dispatch_result.state,
                 before_snapshot=snapshot,
                 gate_decision=decision,
                 kind=StageAdvanceKind.EXECUTION_DISPATCHED,
                 detail="Dispatched queued execution items to the Forge boundary.",
-                processor_digest=result.digest(),
+                processor_digest=dispatch_result.digest(),
             )
 
         if snapshot.stage is RunStage.FORGE_RESULT_PROCESSING:
@@ -169,28 +169,28 @@ class StageOrchestrator:
                     detail="Dispatched execution items are waiting for supplied Forge results.",
                 )
 
-            result = self.forge_result_processor.process_results(
+            forge_result = self.forge_result_processor.process_results(
                 state=state,
                 results=normalized_results,
             )
             return StageAdvanceResult(
-                state=result.state,
+                state=forge_result.state,
                 before_snapshot=snapshot,
                 gate_decision=decision,
                 kind=StageAdvanceKind.FORGE_RESULTS_PROCESSED,
                 detail="Processed supplied Forge results into action state.",
-                processor_digest=result.digest(),
+                processor_digest=forge_result.digest(),
             )
 
         if snapshot.stage is RunStage.EVIDENCE_SUPPORT_REVIEW:
-            result = self.evidence_support_processor.process_all_unreviewed(state=state)
+            evidence_result = self.evidence_support_processor.process_all_unreviewed(state=state)
             return StageAdvanceResult(
-                state=result.state,
+                state=evidence_result.state,
                 before_snapshot=snapshot,
                 gate_decision=decision,
                 kind=StageAdvanceKind.EVIDENCE_SUPPORT_REVIEWED,
                 detail="Reviewed unreviewed claims against recorded evidence.",
-                processor_digest=result.digest(),
+                processor_digest=evidence_result.digest(),
             )
 
         if snapshot.stage is RunStage.HUMAN_REVIEW:

@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.actions import BoundedActionRecord
 from ix_sally.agents import AgentRole
 from ix_sally.authorization import AuthorityDecision, AuthorityDecisionStatus
@@ -130,8 +129,12 @@ def test_resolution_audit_marks_evidence_card_manual_investigation() -> None:
 
 
 def test_resolution_audit_combines_resolved_and_manual_cards() -> None:
-    state = _state().with_action(_review_action()).with_evidence_support_finding(
-        _unsupported_finding(),
+    state = (
+        _state()
+        .with_action(_review_action())
+        .with_evidence_support_finding(
+            _unsupported_finding(),
+        )
     )
     action = state.actions.human_review_actions()[0]
     bundle = HumanReviewBundleAssembler.create().assemble(state=state)

@@ -73,11 +73,15 @@ class ActiveMemoryEntry:
             digest.require_algorithm("sha256")
         if status is ActiveMemoryStatus.VERIFIED and not evidence:
             raise FoundationError("verified active memory requires evidence")
-        if status in {
-            ActiveMemoryStatus.CONTRADICTED,
-            ActiveMemoryStatus.QUARANTINED,
-            ActiveMemoryStatus.RETIRED,
-        } and not reason:
+        if (
+            status
+            in {
+                ActiveMemoryStatus.CONTRADICTED,
+                ActiveMemoryStatus.QUARANTINED,
+                ActiveMemoryStatus.RETIRED,
+            }
+            and not reason
+        ):
             raise FoundationError("inactive active memory requires a reason")
         return cls(
             memory_id=CanonicalKey.from_text(memory_id, field_name="memory_id"),
@@ -98,9 +102,7 @@ class ActiveMemoryEntry:
             ),
             tags=tuple(
                 sorted(
-                    {
-                        CanonicalKey.from_text(tag, field_name="tag") for tag in tags
-                    },
+                    {CanonicalKey.from_text(tag, field_name="tag") for tag in tags},
                     key=lambda item: item.value,
                 )
             ),
@@ -281,7 +283,8 @@ class ActiveMemoryStore:
     def to_payload(self) -> JsonObject:
         """Return a canonical memory-store payload."""
         entries: JsonArray = [
-            entry.to_payload() for entry in sorted(
+            entry.to_payload()
+            for entry in sorted(
                 self.entries,
                 key=lambda candidate: candidate.memory_id.value,
             )

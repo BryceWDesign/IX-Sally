@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 
 from ix_sally.cognition.active_memory import ActiveMemoryStore
@@ -58,35 +58,33 @@ class ExecutiveDecision:
         """Create a decision with coherent status and evidence references."""
         if not 0.0 <= confidence <= 1.0:
             raise FoundationError("executive confidence must be between 0 and 1")
-        normalized_blockers = tuple(
-            require_text(item, field_name="blocker") for item in blockers
-        )
+        normalized_blockers = tuple(require_text(item, field_name="blocker") for item in blockers)
         evidence = tuple(evidence_digests)
         if not evidence:
             raise FoundationError("executive decision requires evidence digests")
         for digest in evidence:
             digest.require_algorithm("sha256")
-        if status in {
-            ExecutiveDecisionStatus.PLAN_READY,
-            ExecutiveDecisionStatus.REQUIRES_HUMAN,
-            ExecutiveDecisionStatus.BLOCKED_RISK,
-        } and plan is None:
+        if (
+            status
+            in {
+                ExecutiveDecisionStatus.PLAN_READY,
+                ExecutiveDecisionStatus.REQUIRES_HUMAN,
+                ExecutiveDecisionStatus.BLOCKED_RISK,
+            }
+            and plan is None
+        ):
             raise FoundationError(f"{status.value} executive decision requires a plan")
-        if status is ExecutiveDecisionStatus.PLAN_NOT_FOUND:
-            if plan is None or plan.status not in {
-                PlanStatus.NOT_FOUND,
-                PlanStatus.SEARCH_LIMIT,
-            }:
-                raise FoundationError("plan-not-found decision requires a failed plan")
+        if status is ExecutiveDecisionStatus.PLAN_NOT_FOUND and (
+            plan is None or plan.status not in {PlanStatus.NOT_FOUND, PlanStatus.SEARCH_LIMIT}
+        ):
+            raise FoundationError("plan-not-found decision requires a failed plan")
         if status is ExecutiveDecisionStatus.NO_SELECTABLE_GOAL and selected_goal is not None:
             raise FoundationError("no-selectable-goal decision must not select a goal")
         seed = DigestRecord.from_payload(
             {
                 "task": task,
                 "status": status.value,
-                "goal": (
-                    selected_goal.goal_id.value if selected_goal is not None else None
-                ),
+                "goal": (selected_goal.goal_id.value if selected_goal is not None else None),
                 "plan": plan.digest().value if plan is not None else None,
                 "evidence": [item.value for item in evidence],
             }
@@ -116,8 +114,7 @@ class ExecutiveDecision:
     def to_payload(self) -> JsonObject:
         """Return a canonical executive-decision payload."""
         evidence: JsonArray = [
-            {"algorithm": item.algorithm, "value": item.value}
-            for item in self.evidence_digests
+            {"algorithm": item.algorithm, "value": item.value} for item in self.evidence_digests
         ]
         blockers: JsonArray = list(self.blockers)
         return {
@@ -125,9 +122,7 @@ class ExecutiveDecision:
             "status": self.status.value,
             "task": self.task,
             "selected_goal": (
-                self.selected_goal.to_payload()
-                if self.selected_goal is not None
-                else None
+                self.selected_goal.to_payload() if self.selected_goal is not None else None
             ),
             "plan": self.plan.to_payload() if self.plan is not None else None,
             "blockers": blockers,
@@ -146,15 +141,13 @@ class ExecutiveDecision:
 class ExecutiveController:
     """Select one goal and produce a bounded plan proposal under explicit gates."""
 
-    planner: DeterministicPlanner = DeterministicPlanner()
+    planner: DeterministicPlanner = field(default_factory=DeterministicPlanner)
     maximum_calibration_error: float = 0.25
 
     def __post_init__(self) -> None:
         """Require a valid uncertainty gate."""
         if not 0.0 <= self.maximum_calibration_error <= 1.0:
-            raise FoundationError(
-                "maximum calibration error must be between 0 and 1"
-            )
+            raise FoundationError("maximum calibration error must be between 0 and 1")
 
     def deliberate(
         self,
@@ -178,9 +171,7 @@ class ExecutiveController:
             world_model.digest(),
         )
         if selected is None:
-            satisfied = tuple(
-                goal for goal in reconciled.goals if goal.status.value == "satisfied"
-            )
+            satisfied = tuple(goal for goal in reconciled.goals if goal.status.value == "satisfied")
             status = (
                 ExecutiveDecisionStatus.GOAL_SATISFIED
                 if satisfied
@@ -200,21 +191,19 @@ class ExecutiveController:
                     else "No goal currently satisfies dependency and lifecycle gates."
                 ),
             )
+        evidence: tuple[DigestRecord, ...] = base_evidence
         if calibration is not None:
-            evidence = (*base_evidence, calibration.digest())
+            evidence = (*evidence, calibration.digest())
             if (
                 calibration.observation_count > 0
-                and calibration.expected_calibration_error
-                > self.maximum_calibration_error
+                and calibration.expected_calibration_error > self.maximum_calibration_error
             ):
                 return ExecutiveDecision.create(
                     task=normalized_task,
                     status=ExecutiveDecisionStatus.BLOCKED_UNCERTAINTY,
                     selected_goal=selected,
                     plan=None,
-                    blockers=(
-                        "Calibration error exceeds the configured executive threshold.",
-                    ),
+                    blockers=("Calibration error exceeds the configured executive threshold.",),
                     confidence=max(
                         0.0,
                         1.0 - calibration.expected_calibration_error,
@@ -222,8 +211,6 @@ class ExecutiveController:
                     evidence_digests=evidence,
                     rationale="Planning was withheld because confidence is miscalibrated.",
                 )
-        else:
-            evidence = base_evidence
         plan = self.planner.plan(
             world_model=world_model,
             actions=tuple(actions),

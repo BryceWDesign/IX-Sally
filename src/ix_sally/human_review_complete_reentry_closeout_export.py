@@ -171,14 +171,12 @@ class CompleteHumanReviewReentryCloseoutExportPacket:
         result: CompleteHumanReviewReentryCloseoutCoordinationResult,
     ) -> CompleteHumanReviewReentryCloseoutExportPacket:
         """Create a complete reentry closeout export packet from a coordination result."""
-        closeout_ledger = CompleteHumanReviewReentryCloseoutLedger.create(
-            ()
-        ).append_report(result.closeout_report)
-        coordination_ledger = (
-            CompleteHumanReviewReentryCloseoutCoordinationLedger.create(
-                ()
-            ).append_result(result)
+        closeout_ledger = CompleteHumanReviewReentryCloseoutLedger.create(()).append_report(
+            result.closeout_report
         )
+        coordination_ledger = CompleteHumanReviewReentryCloseoutCoordinationLedger.create(
+            ()
+        ).append_result(result)
 
         artifacts = (
             CompleteHumanReviewReentryCloseoutExportArtifact.create(
@@ -211,9 +209,7 @@ class CompleteHumanReviewReentryCloseoutExportPacket:
             coordination_result_digest=result.digest(),
             coordination_receipt_digest=result.receipt.digest(),
             closeout_report_digest=result.closeout_report.digest(),
-            closeout_workflow_operation_digest=(
-                result.closeout_workflow_operation.digest()
-            ),
+            closeout_workflow_operation_digest=(result.closeout_workflow_operation.digest()),
             final_state_digest=result.state.digest(),
             final_control_plane_digest=result.control_plane.digest(),
             closeout_ledger_digest=closeout_ledger.digest(),
@@ -234,9 +230,7 @@ class CompleteHumanReviewReentryCloseoutExportPacket:
     def missing_required_artifact_labels(self) -> tuple[str, ...]:
         """Return labels for required artifacts whose digest is empty."""
         return tuple(
-            artifact.label
-            for artifact in self.required_artifacts()
-            if not artifact.digest.value
+            artifact.label for artifact in self.required_artifacts() if not artifact.digest.value
         )
 
     def complete(self) -> bool:
@@ -293,9 +287,7 @@ class CompleteHumanReviewReentryCloseoutExportPacket:
             "requires_operator_attention": self.requires_operator_attention,
             "artifact_count": len(self.artifacts),
             "required_artifact_count": len(self.required_artifacts()),
-            "missing_required_artifact_labels": list(
-                self.missing_required_artifact_labels()
-            ),
+            "missing_required_artifact_labels": list(self.missing_required_artifact_labels()),
             "complete": self.complete(),
             "exportable_without_operator": self.exportable_without_operator(),
             "artifacts": artifact_payload,

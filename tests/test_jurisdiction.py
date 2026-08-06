@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.agents import AgentRole, default_agent_role_registry
 from ix_sally.foundation import FoundationError
 from ix_sally.jurisdiction import JurisdictionGate, JurisdictionStatus

@@ -77,19 +77,15 @@ class VMResult:
     def to_payload(self) -> JsonObject:
         """Return a deterministic receipt payload."""
         local_values: JsonArray = [
-            {"name": name, "value": value.to_payload()}
-            for name, value in self.local_values
+            {"name": name, "value": value.to_payload()} for name, value in self.local_values
         ]
         memory_values: JsonArray = [
-            {"name": name, "value": value.to_payload()}
-            for name, value in self.memories
+            {"name": name, "value": value.to_payload()} for name, value in self.memories
         ]
         outputs: JsonArray = [value.to_payload() for value in self.outputs]
         replies: JsonArray = [value.to_payload() for value in self.replies]
         traces: JsonArray = [value.to_payload() for value in self.traces]
-        instruction_trace: JsonArray = [
-            entry.to_payload() for entry in self.instruction_trace
-        ]
+        instruction_trace: JsonArray = [entry.to_payload() for entry in self.instruction_trace]
         return {
             "status": self.status.value,
             "program_digest": {
@@ -245,9 +241,7 @@ class IXVirtualMachine:
             return False
         if opcode is OpCode.LOAD_MEMORY:
             assert instruction.name is not None
-            stack.append(
-                self._require_name(memories, instruction.name, namespace="memory")
-            )
+            stack.append(self._require_name(memories, instruction.name, namespace="memory"))
             return False
         if opcode is OpCode.STORE_MEMORY:
             assert instruction.name is not None
@@ -284,9 +278,7 @@ class IXVirtualMachine:
     def _unary(self, opcode: OpCode, value: CognitiveValue) -> CognitiveValue:
         """Evaluate one unary operation without silent coercion."""
         if opcode is OpCode.UNARY_NOT:
-            return CognitiveValue.from_python(
-                not value.require_boolean(operation=opcode.value)
-            )
+            return CognitiveValue.from_python(not value.require_boolean(operation=opcode.value))
         number = value.require_numeric(operation=opcode.value)
         if opcode is OpCode.UNARY_POSITIVE:
             return CognitiveValue.from_python(+number)
@@ -320,7 +312,8 @@ class IXVirtualMachine:
         ):
             if left.value_type is not right.value_type:
                 raise FoundationError("string addition requires two strings")
-            assert isinstance(left.value, str) and isinstance(right.value, str)
+            assert isinstance(left.value, str)
+            assert isinstance(right.value, str)
             return CognitiveValue.from_python(left.value + right.value)
         left_number = left.require_numeric(operation=opcode.value)
         right_number = right.require_numeric(operation=opcode.value)

@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 
 import pytest
+
 from ix_sally.foundation import FoundationError
 from ix_sally.language.ast import (
     BinaryExpression,
@@ -218,7 +219,4 @@ def test_nested_expression_walk_is_preorder() -> None:
         negation,
         name,
     )
-    assert (
-        group.to_payload()["expression"]
-        == negation.to_payload()
-    )
+    assert group.to_payload()["expression"] == negation.to_payload()

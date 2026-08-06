@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.foundation import FoundationError
 from ix_sally.language.errors import IXSyntaxError
 from ix_sally.language.lexer import IXLexer, tokenize_ix
@@ -12,12 +13,7 @@ from ix_sally.language.tokens import Keyword, TokenKind
 
 def test_lexer_tokenizes_governed_ix_source_with_exact_spans() -> None:
     """Keywords, values, operators, and blocks must retain source locations."""
-    source = (
-        "let score = 80\n"
-        "if score >= 75 {\n"
-        '    reply "pass\\nready"\n'
-        "}\n"
-    )
+    source = 'let score = 80\nif score >= 75 {\n    reply "pass\\nready"\n}\n'
 
     tokens = tokenize_ix(source, filename="review.ix")
 

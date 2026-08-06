@@ -5,8 +5,9 @@ from __future__ import annotations
 import subprocess
 import sys
 
-import ix_sally
 import pytest
+
+import ix_sally
 from ix_sally.state import NinefoldRunState
 from tests.subprocess_support import repository_subprocess_environment
 

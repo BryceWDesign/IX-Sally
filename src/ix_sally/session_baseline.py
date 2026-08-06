@@ -67,8 +67,7 @@ def session_one_baseline_payload() -> JsonObject:
                 "role": definition.role.value,
                 "title": definition.title,
                 "prohibited_authorities": [
-                    authority.value
-                    for authority in definition.prohibited_authorities
+                    authority.value for authority in definition.prohibited_authorities
                 ],
             }
         )
@@ -80,12 +79,8 @@ def session_one_baseline_payload() -> JsonObject:
         "runtime": kit.to_payload(),
         "opening_event_type": opening_event.event_type.value,
         "opening_event_digest": opening_event.digest().value,
-        "doctrine_rule_count": len(
-            kit.chamber.doctrine_catalog.rules
-        ),
-        "role_count": len(
-            kit.role_registry.definitions
-        ),
+        "doctrine_rule_count": len(kit.chamber.doctrine_catalog.rules),
+        "role_count": len(kit.role_registry.definitions),
         "roles": roles_payload,
         "contract_mode": kit.chamber.contract.mode.value,
         "max_cycles": kit.chamber.contract.max_cycles,
@@ -96,6 +91,4 @@ def session_one_baseline_payload() -> JsonObject:
 
 def session_one_baseline_digest() -> DigestRecord:
     """Return a deterministic digest for the session-one baseline payload."""
-    return DigestRecord.from_payload(
-        session_one_baseline_payload()
-    )
+    return DigestRecord.from_payload(session_one_baseline_payload())

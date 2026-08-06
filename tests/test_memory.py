@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.agents import AgentRole
 from ix_sally.digest import DigestRecord
 from ix_sally.foundation import CanonicalKey, FoundationError
@@ -16,9 +15,7 @@ def test_memory_record_normalizes_content_and_generates_id() -> None:
         content="  Failed repair pattern should be quarantined.  ",
     )
 
-    assert record.memory_id.value == (
-        "ix-mnemosyne-2-failed-repair-pattern-should-be-quarantined"
-    )
+    assert record.memory_id.value == ("ix-mnemosyne-2-failed-repair-pattern-should-be-quarantined")
     assert record.content == "Failed repair pattern should be quarantined."
     assert record.status is MemoryStatus.CANDIDATE
     assert record.is_truth_claim is False
@@ -196,6 +193,7 @@ def test_memory_ledger_digest_changes_when_memory_status_changes() -> None:
         reason="Human boundary rejected this memory.",
     )
 
-    assert MemoryLedger.create((candidate,)).digest().value != MemoryLedger.create(
-        (rejected,)
-    ).digest().value
+    assert (
+        MemoryLedger.create((candidate,)).digest().value
+        != MemoryLedger.create((rejected,)).digest().value
+    )

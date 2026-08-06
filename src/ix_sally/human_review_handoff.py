@@ -67,14 +67,10 @@ class HumanReviewHandoffReceipt:
             )
 
         surfaced_count = (
-            gateway_resolvable_count
-            + manual_investigation_count
-            + blocker_acknowledgment_count
+            gateway_resolvable_count + manual_investigation_count + blocker_acknowledgment_count
         )
         if surfaced_count != target_count:
-            raise FoundationError(
-                "human-review handoff surfaced counts must equal target_count"
-            )
+            raise FoundationError("human-review handoff surfaced counts must equal target_count")
 
         before_ledger_digest.require_algorithm("sha256")
         after_ledger_digest.require_algorithm("sha256")
@@ -243,8 +239,7 @@ class HumanReviewHandoffCoordinator:
         state: NinefoldRunState,
         ledger: HumanReviewBundleLedger,
         authority_note: str = (
-            "Human authority is required before IX-Sally may treat these "
-            "targets as resolved."
+            "Human authority is required before IX-Sally may treat these targets as resolved."
         ),
     ) -> HumanReviewHandoffResult:
         """Assemble and append one human-review handoff to the provided ledger."""

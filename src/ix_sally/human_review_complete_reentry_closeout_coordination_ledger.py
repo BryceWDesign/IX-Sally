@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError
-from ix_sally.human_review_complete_reentry_report import (
+from ix_sally.human_review_complete_reentry_closeout_status import (
     CompleteHumanReviewReentryCloseoutStatus,
 )
 from ix_sally.stage_readiness import RunStage
@@ -17,11 +17,11 @@ if TYPE_CHECKING:
     from ix_sally.human_review_complete_reentry_closeout_coordination import (
         CompleteHumanReviewReentryCloseoutCoordinationResult,
     )
-    from ix_sally.human_review_control_plane_report import (
+    from ix_sally.human_review_control_plane_report_status import (
         HumanReviewControlPlaneReportStatus,
     )
-    from ix_sally.human_review_reentry import HumanReviewReentryStatus
-    from ix_sally.human_review_reentry_audit import HumanReviewReentryAuditStatus
+    from ix_sally.human_review_reentry_audit_status import HumanReviewReentryAuditStatus
+    from ix_sally.human_review_reentry_status import HumanReviewReentryStatus
 
 
 @dataclass(frozen=True, slots=True)
@@ -79,23 +79,19 @@ class CompleteHumanReviewReentryCloseoutCoordinationLedgerEntry:
         """Create a normalized closeout coordination ledger entry."""
         if sequence <= 0:
             raise FoundationError(
-                "complete reentry closeout coordination ledger sequence "
-                "must be positive"
+                "complete reentry closeout coordination ledger sequence must be positive"
             )
         if max_steps <= 0:
             raise FoundationError(
-                "complete reentry closeout coordination ledger max_steps "
-                "must be positive"
+                "complete reentry closeout coordination ledger max_steps must be positive"
             )
         if executed_steps < 0:
             raise FoundationError(
-                "complete reentry closeout coordination ledger executed_steps "
-                "must not be negative"
+                "complete reentry closeout coordination ledger executed_steps must not be negative"
             )
         if executed_steps > max_steps:
             raise FoundationError(
-                "complete reentry closeout coordination ledger executed_steps "
-                "exceeds max_steps"
+                "complete reentry closeout coordination ledger executed_steps exceeds max_steps"
             )
 
         coordination_result_digest.require_algorithm("sha256")
@@ -154,16 +150,10 @@ class CompleteHumanReviewReentryCloseoutCoordinationLedgerEntry:
             coordination_result_digest=result.digest(),
             coordination_receipt_digest=result.receipt.digest(),
             resume_operation_digest=result.receipt.resume_operation_digest,
-            complete_reentry_result_digest=(
-                result.receipt.complete_reentry_result_digest
-            ),
-            complete_reentry_receipt_digest=(
-                result.receipt.complete_reentry_receipt_digest
-            ),
+            complete_reentry_result_digest=(result.receipt.complete_reentry_result_digest),
+            complete_reentry_receipt_digest=(result.receipt.complete_reentry_receipt_digest),
             closeout_report_digest=result.receipt.closeout_report_digest,
-            closeout_workflow_operation_digest=(
-                result.receipt.closeout_workflow_operation_digest
-            ),
+            closeout_workflow_operation_digest=(result.receipt.closeout_workflow_operation_digest),
             before_state_digest=result.receipt.before_state_digest,
             after_state_digest=result.receipt.after_state_digest,
             before_control_plane_digest=result.receipt.before_control_plane_digest,
@@ -330,8 +320,7 @@ class CompleteHumanReviewReentryCloseoutCoordinationLedger:
                 )
             if entry.sequence <= previous_sequence:
                 raise FoundationError(
-                    "complete reentry closeout coordination ledger sequences "
-                    "must increase"
+                    "complete reentry closeout coordination ledger sequences must increase"
                 )
 
             seen_sequences.add(entry.sequence)
@@ -352,9 +341,7 @@ class CompleteHumanReviewReentryCloseoutCoordinationLedger:
         entry: CompleteHumanReviewReentryCloseoutCoordinationLedgerEntry,
     ) -> CompleteHumanReviewReentryCloseoutCoordinationLedger:
         """Return a new ledger with an appended coordination entry."""
-        return CompleteHumanReviewReentryCloseoutCoordinationLedger.create(
-            (*self.entries, entry)
-        )
+        return CompleteHumanReviewReentryCloseoutCoordinationLedger.create((*self.entries, entry))
 
     def append_result(
         self,
@@ -424,9 +411,7 @@ class CompleteHumanReviewReentryCloseoutCoordinationLedger:
         status: CompleteHumanReviewReentryCloseoutStatus,
     ) -> tuple[CompleteHumanReviewReentryCloseoutCoordinationLedgerEntry, ...]:
         """Return coordination entries matching the requested closeout status."""
-        return tuple(
-            entry for entry in self.entries if entry.matches_closeout_status(status)
-        )
+        return tuple(entry for entry in self.entries if entry.matches_closeout_status(status))
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible closeout coordination ledger."""
@@ -447,9 +432,7 @@ class CompleteHumanReviewReentryCloseoutCoordinationLedger:
             "operator_attention_entry_count": len(self.operator_attention_entries()),
             "changed_state_entry_count": len(self.changed_state_entries()),
             "recorded_closeout_entry_count": len(self.recorded_closeout_entries()),
-            "forge_dispatch_entry_count": len(
-                self.entries_for_stage(RunStage.FORGE_DISPATCH)
-            ),
+            "forge_dispatch_entry_count": len(self.entries_for_stage(RunStage.FORGE_DISPATCH)),
             "forge_result_processing_entry_count": len(
                 self.entries_for_stage(RunStage.FORGE_RESULT_PROCESSING)
             ),

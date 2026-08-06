@@ -187,9 +187,9 @@ class LearningLedger:
         if recent_window <= 0:
             raise FoundationError("retention recent_window must be positive")
         requested = CanonicalKey.from_text(skill_id, field_name="skill_id")
-        relevant = [
-            outcome.score for outcome in self.outcomes if outcome.skill_id == requested
-        ][-recent_window:]
+        relevant = [outcome.score for outcome in self.outcomes if outcome.skill_id == requested][
+            -recent_window:
+        ]
         if not relevant:
             return 0.0
         return round(sum(relevant) / len(relevant), 12)

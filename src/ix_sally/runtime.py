@@ -84,8 +84,7 @@ class NinefoldRuntimeKit:
             cycle=0,
             event_type=RuntimeEventType.CHAMBER_OPENED,
             summary=(
-                "IX-Sally chamber opened with doctrine, ninefold roles, "
-                "and jurisdiction gates."
+                "IX-Sally chamber opened with doctrine, ninefold roles, and jurisdiction gates."
             ),
             payload={
                 "contract_digest": self.chamber.contract.digest().value,

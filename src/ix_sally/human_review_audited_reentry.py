@@ -7,19 +7,17 @@ from dataclasses import dataclass
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import CanonicalKey, FoundationError
 from ix_sally.human_review_control_plane import HumanReviewControlPlaneState
-from ix_sally.human_review_control_plane_report import (
-    HumanReviewControlPlaneReportStatus,
-)
-from ix_sally.human_review_reentry import HumanReviewReentryStatus
+from ix_sally.human_review_control_plane_report_status import HumanReviewControlPlaneReportStatus
 from ix_sally.human_review_reentry_audit import (
-    HumanReviewReentryAuditReport,
-    HumanReviewReentryAuditStatus,
     HumanReviewReentryAuditor,
+    HumanReviewReentryAuditReport,
 )
+from ix_sally.human_review_reentry_audit_status import HumanReviewReentryAuditStatus
 from ix_sally.human_review_reentry_coordination import (
     HumanReviewReentryCoordinationResult,
     HumanReviewReentryCoordinator,
 )
+from ix_sally.human_review_reentry_status import HumanReviewReentryStatus
 from ix_sally.human_review_workflow import (
     HumanReviewWorkflowKit,
     HumanReviewWorkflowOperation,
@@ -79,9 +77,7 @@ class AuditedHumanReviewReentryReceipt:
                 "audited human-review reentry executed_steps must not be negative"
             )
         if executed_steps > max_steps:
-            raise FoundationError(
-                "audited human-review reentry executed_steps exceeds max_steps"
-            )
+            raise FoundationError("audited human-review reentry executed_steps exceeds max_steps")
 
         resume_operation_digest.require_algorithm("sha256")
         reentry_coordination_digest.require_algorithm("sha256")
@@ -140,10 +136,7 @@ class AuditedHumanReviewReentryReceipt:
 
     def waiting_for_external_input(self) -> bool:
         """Return whether the audited reentry is valid but waiting externally."""
-        return (
-            self.audit_status
-            is HumanReviewReentryAuditStatus.WAITING_FOR_EXTERNAL_INPUT
-        )
+        return self.audit_status is HumanReviewReentryAuditStatus.WAITING_FOR_EXTERNAL_INPUT
 
     def to_payload(self) -> JsonObject:
         """Return a stable JSON-compatible audited reentry receipt."""
@@ -226,9 +219,7 @@ class AuditedHumanReviewReentryResult:
     ) -> AuditedHumanReviewReentryResult:
         """Create a normalized audited reentry result and validate all links."""
         if resume_operation.receipt.workflow_stage is not HumanReviewWorkflowStage.RESUME_RECORDED:
-            raise FoundationError(
-                "audited human-review reentry requires resume-recorded operation"
-            )
+            raise FoundationError("audited human-review reentry requires resume-recorded operation")
         if reentry_coordination.resume_operation.digest() != resume_operation.digest():
             raise FoundationError("audited human-review reentry resume mismatch")
         if audit_report.coordination_digest != reentry_coordination.digest():
@@ -237,39 +228,26 @@ class AuditedHumanReviewReentryResult:
             audit_workflow_operation.receipt.workflow_stage
             is not HumanReviewWorkflowStage.REENTRY_AUDIT_RECORDED
         ):
-            raise FoundationError(
-                "audited human-review reentry requires audit-recorded workflow"
-            )
+            raise FoundationError("audited human-review reentry requires audit-recorded workflow")
         if (
             audit_workflow_operation.require_reentry_audit_report().digest()
             != audit_report.digest()
         ):
-            raise FoundationError(
-                "audited human-review reentry workflow audit mismatch"
-            )
+            raise FoundationError("audited human-review reentry workflow audit mismatch")
         if audit_workflow_operation.run_state.digest() != audit_report.state_digest:
             raise FoundationError("audited human-review reentry state mismatch")
         if receipt.resume_operation_digest != resume_operation.digest():
             raise FoundationError("audited human-review reentry receipt resume mismatch")
         if receipt.reentry_coordination_digest != reentry_coordination.digest():
-            raise FoundationError(
-                "audited human-review reentry receipt coordination mismatch"
-            )
+            raise FoundationError("audited human-review reentry receipt coordination mismatch")
         if receipt.audit_report_digest != audit_report.digest():
             raise FoundationError("audited human-review reentry receipt audit mismatch")
         if receipt.audit_workflow_operation_digest != audit_workflow_operation.digest():
-            raise FoundationError(
-                "audited human-review reentry receipt workflow mismatch"
-            )
+            raise FoundationError("audited human-review reentry receipt workflow mismatch")
         if receipt.after_state_digest != audit_workflow_operation.run_state.digest():
             raise FoundationError("audited human-review reentry receipt state mismatch")
-        if (
-            receipt.after_control_plane_digest
-            != audit_workflow_operation.control_plane.digest()
-        ):
-            raise FoundationError(
-                "audited human-review reentry receipt control-plane mismatch"
-            )
+        if receipt.after_control_plane_digest != audit_workflow_operation.control_plane.digest():
+            raise FoundationError("audited human-review reentry receipt control-plane mismatch")
 
         return cls(
             resume_operation=resume_operation,
@@ -334,9 +312,7 @@ class AuditedHumanReviewReentryResult:
             "resume_operation_digest": self.resume_operation.digest().value,
             "reentry_coordination_digest": self.reentry_coordination.digest().value,
             "audit_report_digest": self.audit_report.digest().value,
-            "audit_workflow_operation_digest": (
-                self.audit_workflow_operation.digest().value
-            ),
+            "audit_workflow_operation_digest": (self.audit_workflow_operation.digest().value),
             "receipt_digest": self.receipt.digest().value,
             "state_digest": self.state.digest().value,
             "control_plane_digest": self.control_plane.digest().value,
@@ -385,9 +361,7 @@ class AuditedHumanReviewReentryCoordinator:
     ) -> AuditedHumanReviewReentryResult:
         """Run reentry, audit it, and record the audit in one operation."""
         if resume_operation.receipt.workflow_stage is not HumanReviewWorkflowStage.RESUME_RECORDED:
-            raise FoundationError(
-                "audited human-review reentry requires resume-recorded operation"
-            )
+            raise FoundationError("audited human-review reentry requires resume-recorded operation")
 
         reentry_coordination = self.reentry_coordinator.resume_and_record(
             resume_operation=resume_operation,

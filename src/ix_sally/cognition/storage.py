@@ -107,17 +107,15 @@ class SnapshotRepository:
                 handle.write(encoded)
                 handle.flush()
                 os.fsync(handle.fileno())
-            restored = CognitiveSnapshot.from_json(
-                self.temporary_path.read_text(encoding="utf-8")
-            )
+            restored = CognitiveSnapshot.from_json(self.temporary_path.read_text(encoding="utf-8"))
             if restored.state_digest != snapshot.state_digest:
                 raise FoundationError("temporary snapshot verification failed")
             if self.path.exists():
-                current = CognitiveSnapshot.from_json(
-                    self.path.read_text(encoding="utf-8")
-                )
-                self.backup_path.write_text(current.to_json(), encoding="utf-8")
-                with self.backup_path.open("rb") as handle:
+                current = CognitiveSnapshot.from_json(self.path.read_text(encoding="utf-8"))
+                backup_encoded = current.to_json().encode("utf-8")
+                with self.backup_path.open("wb") as handle:
+                    handle.write(backup_encoded)
+                    handle.flush()
                     os.fsync(handle.fileno())
                 backup_created = True
             self.temporary_path.replace(self.path)
@@ -140,18 +138,14 @@ class SnapshotRepository:
         """Load the primary snapshot or a separately validated backup."""
         primary_error: str | None = None
         try:
-            snapshot = CognitiveSnapshot.from_json(
-                self.path.read_text(encoding="utf-8")
-            )
+            snapshot = CognitiveSnapshot.from_json(self.path.read_text(encoding="utf-8"))
             return SnapshotLoadResult(snapshot, SnapshotSource.PRIMARY)
         except (OSError, UnicodeError, FoundationError) as exc:
             primary_error = f"{type(exc).__name__}: {exc}"
         if not allow_backup:
             raise FoundationError(f"primary cognitive snapshot failed: {primary_error}")
         try:
-            snapshot = CognitiveSnapshot.from_json(
-                self.backup_path.read_text(encoding="utf-8")
-            )
+            snapshot = CognitiveSnapshot.from_json(self.backup_path.read_text(encoding="utf-8"))
         except (OSError, UnicodeError, FoundationError) as exc:
             backup_error = f"{type(exc).__name__}: {exc}"
             raise FoundationError(

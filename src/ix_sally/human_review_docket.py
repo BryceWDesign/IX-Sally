@@ -132,9 +132,7 @@ class HumanReviewDocketTarget:
             else HumanReviewDocketSeverity.REVIEW_REQUIRED
         )
         rationale = (
-            result.boundary_note
-            or result.failure_reason
-            or "Forge result requires human review."
+            result.boundary_note or result.failure_reason or "Forge result requires human review."
         )
 
         return cls.create(
@@ -295,9 +293,7 @@ class HumanReviewDocket:
                 self.targets_by_type(HumanReviewDocketTargetType.BOUNDED_ACTION)
             ),
             "evidence_support_finding_count": len(
-                self.targets_by_type(
-                    HumanReviewDocketTargetType.EVIDENCE_SUPPORT_FINDING
-                )
+                self.targets_by_type(HumanReviewDocketTargetType.EVIDENCE_SUPPORT_FINDING)
             ),
             "forge_result_count": len(
                 self.targets_by_type(HumanReviewDocketTargetType.FORGE_RESULT)

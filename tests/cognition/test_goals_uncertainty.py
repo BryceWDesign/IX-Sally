@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.cognition import CognitiveValue, FactPattern, FactStatus, WorldFact, WorldModel
 from ix_sally.cognition.goals import GoalGraph, GoalSpec, GoalStatus
 from ix_sally.cognition.uncertainty import CalibrationObservation, UncertaintyLedger

@@ -289,11 +289,7 @@ class HumanReviewGateway:
             decision=decision,
         )
         updated_state = self._record_decision_event(
-            state=(
-                state
-                if after_action == before_action
-                else state.replace_action(after_action)
-            ),
+            state=(state if after_action == before_action else state.replace_action(after_action)),
             before_action=before_action,
             after_action=after_action,
             decision=decision,
@@ -327,9 +323,7 @@ class HumanReviewGateway:
     ) -> BoundedActionRecord:
         """Return the bounded action after applying the human decision."""
         if action.authority_decision_digest is None:
-            raise FoundationError(
-                "human-review actions require an authority decision digest"
-            )
+            raise FoundationError("human-review actions require an authority decision digest")
 
         if decision.approves_target():
             return BoundedActionRecord.create(

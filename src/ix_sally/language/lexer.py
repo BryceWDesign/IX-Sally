@@ -133,9 +133,7 @@ class IXLexer:
             return True
 
         if character == "=":
-            self._emit(
-                TokenKind.EQUAL_EQUAL if self._match("=") else TokenKind.EQUAL
-            )
+            self._emit(TokenKind.EQUAL_EQUAL if self._match("=") else TokenKind.EQUAL)
             return True
 
         if character == "!":
@@ -148,17 +146,11 @@ class IXLexer:
                 hint="Use the 'not' keyword for logical negation.",
             )
         if character == ">":
-            self._emit(
-                TokenKind.GREATER_EQUAL
-                if self._match("=")
-                else TokenKind.GREATER
-            )
+            self._emit(TokenKind.GREATER_EQUAL if self._match("=") else TokenKind.GREATER)
             return True
 
         if character == "<":
-            self._emit(
-                TokenKind.LESS_EQUAL if self._match("=") else TokenKind.LESS
-            )
+            self._emit(TokenKind.LESS_EQUAL if self._match("=") else TokenKind.LESS)
             return True
 
         return False
@@ -205,11 +197,7 @@ class IXLexer:
                 self._advance()
 
         lexeme = self._lexeme()
-        literal: int | float
-        if token_kind is TokenKind.INTEGER:
-            literal = int(lexeme)
-        else:
-            literal = float(lexeme)
+        literal: int | float = int(lexeme) if token_kind is TokenKind.INTEGER else float(lexeme)
 
         self._tokens.append(
             LanguageToken(
@@ -242,7 +230,7 @@ class IXLexer:
                 self._raise_syntax(
                     code="syntax.unterminated-string",
                     message="String literal must close before the end of the line.",
-                    hint='Add a closing double quote (\").',
+                    hint='Add a closing double quote (").',
                 )
 
             if character == "\\":
@@ -252,7 +240,7 @@ class IXLexer:
                     self._raise_syntax(
                         code="syntax.unterminated-string",
                         message="String literal ends after an escape marker.",
-                        hint='Add an escaped character and a closing double quote (\").',
+                        hint='Add an escaped character and a closing double quote (").',
                     )
 
                 escaped = self._advance()
@@ -269,7 +257,7 @@ class IXLexer:
                             severity=DiagnosticSeverity.ERROR,
                             message=f"Unsupported string escape '\\{escaped}'.",
                             span=span,
-                            hint='Use one of: \", \\\\, \\n, \\r, or \\t.',
+                            hint='Use one of: ", \\\\, \\n, \\r, or \\t.',
                         )
                     )
                 value_parts.append(value)
@@ -280,7 +268,7 @@ class IXLexer:
         self._raise_syntax(
             code="syntax.unterminated-string",
             message="String literal reaches the end of the source without closing.",
-            hint='Add a closing double quote (\").',
+            hint='Add a closing double quote (").',
         )
 
     def _emit(self, kind: TokenKind) -> None:
@@ -297,7 +285,7 @@ class IXLexer:
         self,
         *,
         code: str,
-              message: str,
+        message: str,
         hint: str | None = None,
     ) -> NoReturn:
         """Raise a structured syntax error for the current token range."""
@@ -371,11 +359,7 @@ def _is_ascii_digit(character: str) -> bool:
 
 def _is_identifier_start(character: str) -> bool:
     """Return whether ``character`` may begin an IX identifier."""
-    return (
-        character == "_"
-        or "a" <= character <= "z"
-        or "A" <= character <= "Z"
-    )
+    return character == "_" or "a" <= character <= "z" or "A" <= character <= "Z"
 
 
 def _is_identifier_continue(character: str) -> bool:

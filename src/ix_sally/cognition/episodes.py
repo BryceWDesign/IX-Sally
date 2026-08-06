@@ -74,12 +74,10 @@ class EpisodeStep:
     def to_payload(self) -> JsonObject:
         """Return a canonical step payload."""
         inputs: JsonArray = [
-            {"algorithm": item.algorithm, "value": item.value}
-            for item in self.input_digests
+            {"algorithm": item.algorithm, "value": item.value} for item in self.input_digests
         ]
         outputs: JsonArray = [
-            {"algorithm": item.algorithm, "value": item.value}
-            for item in self.output_digests
+            {"algorithm": item.algorithm, "value": item.value} for item in self.output_digests
         ]
         return {
             "index": self.index,

@@ -237,28 +237,24 @@ class PrimitiveExecutor:
         if operation is PrimitiveOperation.FIRST:
             return inputs[0]
         if operation in {PrimitiveOperation.ALL, PrimitiveOperation.ANY}:
-            booleans = tuple(
-                value.require_boolean(operation=operation.value) for value in inputs
-            )
-            result = all(booleans) if operation is PrimitiveOperation.ALL else any(booleans)
-            return CognitiveValue.from_python(result)
+            booleans = tuple(value.require_boolean(operation=operation.value) for value in inputs)
+            boolean_result = all(booleans) if operation is PrimitiveOperation.ALL else any(booleans)
+            return CognitiveValue.from_python(boolean_result)
         if operation is PrimitiveOperation.EQUAL:
             left, right = inputs
             return CognitiveValue.from_python(
                 left.value_type is right.value_type and left.value == right.value
             )
-        numeric = tuple(
-            value.require_numeric(operation=operation.value) for value in inputs
-        )
+        numeric = tuple(value.require_numeric(operation=operation.value) for value in inputs)
         if operation is PrimitiveOperation.ADD:
             return CognitiveValue.from_python(sum(numeric))
         if operation is PrimitiveOperation.SUBTRACT:
             return CognitiveValue.from_python(numeric[0] - numeric[1])
         if operation is PrimitiveOperation.MULTIPLY:
-            result: int | float = 1
+            product: int | float = 1
             for number in numeric:
-                result *= number
-            return CognitiveValue.from_python(result)
+                product *= number
+            return CognitiveValue.from_python(product)
         if operation is PrimitiveOperation.GREATER:
             return CognitiveValue.from_python(numeric[0] > numeric[1])
         if operation is PrimitiveOperation.LESS:

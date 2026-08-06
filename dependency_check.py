@@ -31,17 +31,11 @@ class DependencyGraph:
 
     def adjacency(self) -> dict[str, tuple[str, ...]]:
         """Return deterministic adjacency entries for every known module."""
-        targets: dict[str, set[str]] = {
-            module: set()
-            for module in self.modules
-        }
+        targets: dict[str, set[str]] = {module: set() for module in self.modules}
         for dependency in self.dependencies:
             targets[dependency.source].add(dependency.target)
 
-        return {
-            module: tuple(sorted(module_targets))
-            for module, module_targets in targets.items()
-        }
+        return {module: tuple(sorted(module_targets)) for module, module_targets in targets.items()}
 
     def cycles(self) -> tuple[tuple[str, ...], ...]:
         """Return deterministic strongly connected runtime dependency cycles."""
@@ -95,10 +89,7 @@ class DependencyGraph:
             component
             for component in components
             if len(component) > 1
-            or (
-                len(component) == 1
-                and component[0] in adjacency[component[0]]
-            )
+            or (len(component) == 1 and component[0] in adjacency[component[0]])
         ]
         return tuple(sorted(cyclic_components))
 
@@ -249,10 +240,7 @@ def _internal_import_targets(
     ) -> None:
         for statement in statements:
             if isinstance(statement, ast.If):
-                guarded = (
-                    type_checking_only
-                    or _is_type_checking_guard(statement.test)
-                )
+                guarded = type_checking_only or _is_type_checking_guard(statement.test)
                 visit_statements(
                     statement.body,
                     type_checking_only=guarded,
@@ -263,10 +251,7 @@ def _internal_import_targets(
                 )
                 continue
 
-            if (
-                isinstance(statement, ast.ImportFrom)
-                and not type_checking_only
-            ):
+            if isinstance(statement, ast.ImportFrom) and not type_checking_only:
                 for target in _from_import_targets(
                     statement,
                     source_module=source_module,
@@ -276,17 +261,14 @@ def _internal_import_targets(
                     imports.add((target, statement.lineno))
                 continue
 
-            if (
-                isinstance(statement, ast.Import)
-                and not type_checking_only
-            ):
+            if isinstance(statement, ast.Import) and not type_checking_only:
                 for alias in statement.names:
-                    target = _nearest_known_module(
+                    resolved_target = _nearest_known_module(
                         alias.name,
                         known_modules=known_modules,
                     )
-                    if target is not None:
-                        imports.add((target, statement.lineno))
+                    if resolved_target is not None:
+                        imports.add((resolved_target, statement.lineno))
                 continue
 
             nested_statements: list[ast.stmt] = []
@@ -392,17 +374,10 @@ def _cycle_message(
 ) -> str:
     """Return a readable failure message for dependency cycles."""
     dependency_lines: dict[tuple[str, str], list[int]] = {}
-    cycle_modules = {
-        module
-        for cycle in cycles
-        for module in cycle
-    }
+    cycle_modules = {module for cycle in cycles for module in cycle}
 
     for dependency in dependencies:
-        if (
-            dependency.source in cycle_modules
-            and dependency.target in cycle_modules
-        ):
+        if dependency.source in cycle_modules and dependency.target in cycle_modules:
             pair = (
                 dependency.source,
                 dependency.target,
@@ -428,14 +403,8 @@ def _cycle_message(
                     )
                 )
                 if locations:
-                    rendered = ", ".join(
-                        str(line)
-                        for line in sorted(locations)
-                    )
-                    lines.append(
-                        f"  {source} imports {target} "
-                        f"at line(s) {rendered}"
-                    )
+                    rendered = ", ".join(str(line) for line in sorted(locations))
+                    lines.append(f"  {source} imports {target} at line(s) {rendered}")
 
     return "\n".join(lines)
 
@@ -449,9 +418,7 @@ def main() -> int:
     cycles = graph.cycles()
 
     if cycles:
-        sys.stderr.write(
-            f"{_cycle_message(cycles, graph.dependencies)}\n"
-        )
+        sys.stderr.write(f"{_cycle_message(cycles, graph.dependencies)}\n")
         return 1
 
     sys.stdout.write(

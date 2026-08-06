@@ -114,17 +114,14 @@ class ActionSpec:
     def applicable(self, state: Mapping[StateKey, CognitiveValue]) -> bool:
         """Return whether all exact preconditions hold in a plain planning state."""
         return all(
-            state.get((condition.subject.value, condition.predicate.value))
-            == condition.value
+            state.get((condition.subject.value, condition.predicate.value)) == condition.value
             for condition in self.preconditions
         )
 
     def apply(self, state: Mapping[StateKey, CognitiveValue]) -> StateMap:
         """Return a copied state with all declared effects applied."""
         if not self.applicable(state):
-            raise FoundationError(
-                f"action preconditions are not satisfied: {self.action_id.value}"
-            )
+            raise FoundationError(f"action preconditions are not satisfied: {self.action_id.value}")
         updated = dict(state)
         for effect in self.effects:
             updated[effect.key()] = effect.value
@@ -132,9 +129,7 @@ class ActionSpec:
 
     def to_payload(self) -> JsonObject:
         """Return a canonical action payload."""
-        preconditions: JsonArray = [
-            condition.to_payload() for condition in self.preconditions
-        ]
+        preconditions: JsonArray = [condition.to_payload() for condition in self.preconditions]
         effects: JsonArray = [effect.to_payload() for effect in self.effects]
         return {
             "action_id": self.action_id.value,
@@ -400,10 +395,7 @@ class PlanSimulator:
             for effect_index, effect in enumerate(action.effects):
                 model = model.observe(
                     WorldFact.create(
-                        fact_id=(
-                            f"simulated-{plan.digest().value[:12]}-"
-                            f"{index}-{effect_index}"
-                        ),
+                        fact_id=(f"simulated-{plan.digest().value[:12]}-{index}-{effect_index}"),
                         subject=effect.subject.value,
                         predicate=effect.predicate.value,
                         value=effect.value,

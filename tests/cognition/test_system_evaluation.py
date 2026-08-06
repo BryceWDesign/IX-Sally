@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 
 import pytest
+
 from ix_sally.agents import AgentRole
 from ix_sally.cognition import (
     CognitiveSnapshot,

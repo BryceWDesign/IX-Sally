@@ -1,8 +1,7 @@
-
-
 from __future__ import annotations
 
 import pytest
+
 from ix_sally.digest import DigestRecord
 from ix_sally.foundation import FoundationError
 from ix_sally.human_review_audited_reentry_ledger import (
@@ -69,9 +68,7 @@ def test_control_plane_state_tracks_audited_reentry_ledger() -> None:
     assert state.has_recorded_audited_reentries() is True
     assert state.latest_audited_reentry_digest() == ledger.latest().digest().value
     assert state.to_payload()["audited_reentry_count"] == 1
-    assert state.to_payload()["latest_audited_reentry_digest"] == (
-        ledger.latest().digest().value
-    )
+    assert state.to_payload()["latest_audited_reentry_digest"] == (ledger.latest().digest().value)
 
 
 def test_control_plane_status_tracks_audited_reentry_counts() -> None:
@@ -102,9 +99,7 @@ def test_control_plane_snapshot_includes_audited_reentry_ledger_digest() -> None
     snapshot = HumanReviewControlPlaneSnapshot.from_state(state)
     payload = snapshot.to_payload()
 
-    assert payload["audited_reentry_ledger_digest"] == (
-        state.audited_reentry_ledger.digest().value
-    )
+    assert payload["audited_reentry_ledger_digest"] == (state.audited_reentry_ledger.digest().value)
     assert payload["status"]["audited_reentry_count"] == 1
 
 
@@ -138,9 +133,7 @@ def test_control_plane_snapshot_rejects_audited_reentry_count_mismatch() -> None
         operator_attention_audited_reentry_count=(
             good_status.operator_attention_audited_reentry_count
         ),
-        changed_state_audited_reentry_count=(
-            good_status.changed_state_audited_reentry_count
-        ),
+        changed_state_audited_reentry_count=(good_status.changed_state_audited_reentry_count),
     )
 
     with pytest.raises(FoundationError, match="audited reentry count mismatch"):

@@ -148,8 +148,7 @@ class EvidenceSupportLedger:
         for finding in normalized:
             if finding.finding_id.value in seen:
                 raise FoundationError(
-                    "duplicate evidence support finding id: "
-                    f"{finding.finding_id.value}"
+                    f"duplicate evidence support finding id: {finding.finding_id.value}"
                 )
             seen.add(finding.finding_id.value)
 
@@ -267,8 +266,7 @@ class VerityEvidenceSupportReview:
     ) -> EvidenceSupportLedger:
         """Review multiple claims in ledger order."""
         return EvidenceSupportLedger.create(
-            self.review_claim(claim=claim, evidence_records=evidence_records)
-            for claim in claims
+            self.review_claim(claim=claim, evidence_records=evidence_records) for claim in claims
         )
 
     def _claim_terms(self, statement: str) -> tuple[str, ...]:

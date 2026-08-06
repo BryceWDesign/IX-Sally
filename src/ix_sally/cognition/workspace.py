@@ -98,9 +98,7 @@ class WorkspaceItem:
             WorkspaceItemKind.HYPOTHESIS: 0.8,
             WorkspaceItemKind.BELIEF: 0.75,
         }[self.kind]
-        score = status_weight * kind_weight * (
-            0.65 * self.salience + 0.35 * self.confidence
-        )
+        score = status_weight * kind_weight * (0.65 * self.salience + 0.35 * self.confidence)
         return round(score, 12)
 
     def to_payload(self) -> JsonObject:
@@ -170,8 +168,7 @@ class CognitiveWorkspace:
             raise FoundationError(f"unknown workspace item: {item.item_id.value}")
         return CognitiveWorkspace(
             items=tuple(
-                item if existing.item_id == item.item_id else existing
-                for existing in self.items
+                item if existing.item_id == item.item_id else existing for existing in self.items
             ),
             capacity=self.capacity,
         )
@@ -180,9 +177,7 @@ class CognitiveWorkspace:
         """Return the highest-attention active items."""
         if limit <= 0:
             raise FoundationError("workspace focus limit must be positive")
-        active = (
-            item for item in self.items if item.status is WorkspaceItemStatus.ACTIVE
-        )
+        active = (item for item in self.items if item.status is WorkspaceItemStatus.ACTIVE)
         return tuple(
             sorted(
                 active,
@@ -193,14 +188,14 @@ class CognitiveWorkspace:
     def goals(self) -> tuple[WorkspaceItem, ...]:
         """Return active goals in attention order."""
         return tuple(
-            item for item in self.focus(limit=self.capacity)
-            if item.kind is WorkspaceItemKind.GOAL
+            item for item in self.focus(limit=self.capacity) if item.kind is WorkspaceItemKind.GOAL
         )
 
     def to_payload(self) -> JsonObject:
         """Return a deterministic workspace payload."""
         items: JsonArray = [
-            item.to_payload() for item in sorted(
+            item.to_payload()
+            for item in sorted(
                 self.items,
                 key=lambda candidate: candidate.item_id.value,
             )
