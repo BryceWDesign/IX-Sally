@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
+from ix_sally.cli import main
 from ix_sally.cognition import (
     ActionPrimitive,
     ActivePerceptionPlanner,
@@ -197,11 +200,14 @@ def test_structural_rule_transfers_across_surface_domains() -> None:
     engine = StructuralAnalogyEngine()
     rule = engine.learn_affine(examples=((1, 3), (2, 5), (3, 7)), adapter=numbers)
 
-    assert engine.evaluate_transfer(
-        rule,
-        examples=(("A", "B"), ("B", "D"), ("C", "F")),
-        adapter=letters,
-    ) == 1.0
+    assert (
+        engine.evaluate_transfer(
+            rule,
+            examples=(("A", "B"), ("B", "D"), ("C", "F")),
+            adapter=letters,
+        )
+        == 1.0
+    )
 
 
 def test_lifelong_store_persists_revises_and_restructures_knowledge() -> None:
@@ -352,9 +358,7 @@ def test_goal_conflict_can_defer_or_choose_and_goal_can_die() -> None:
 
 
 def test_raw_signal_grounding_and_counterfactual_imagination_are_non_destructive() -> None:
-    grounded = RawSignalGrounder().ground(
-        RawSignal("raw", (0.0, 0.1, 0.2, 7.0, 7.1, 7.2))
-    )
+    grounded = RawSignalGrounder().ground(RawSignal("raw", (0.0, 0.1, 0.2, 7.0, 7.1, 7.2)))
     futures = CounterfactualSimulator().imagine(
         initial_state=2,
         actions=(
@@ -378,7 +382,7 @@ def test_blind_evaluator_nonce_commitments_detect_tampering() -> None:
     result = BlindEvaluatorHarness().evaluate(
         challenges=challenges,
         commitments=commitments,
-        agent=lambda values: sum(values),
+        agent=sum,
     )
 
     assert result.accuracy == 1.0
@@ -388,7 +392,7 @@ def test_blind_evaluator_nonce_commitments_detect_tampering() -> None:
         BlindEvaluatorHarness().evaluate(
             challenges=challenges,
             commitments=bad,
-            agent=lambda values: sum(values),
+            agent=sum,
         )
 
 
@@ -409,9 +413,6 @@ def test_system_persists_lifelong_knowledge_across_snapshot_restore() -> None:
 
 
 def test_cli_cuc5_reports_integrated_capabilities(capsys: pytest.CaptureFixture[str]) -> None:
-    import json
-    from ix_sally.cli import main
-
     result = main(["--cuc5-experiment"])
     captured = capsys.readouterr()
     payload = json.loads(captured.out)

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 from ix_sally.cognition.goals import GoalGraph, GoalSpec, GoalStatus
 from ix_sally.foundation import FoundationError
@@ -77,13 +77,18 @@ class GoalArbiter:
                 selected_goal_id=None,
                 conflicting_goal_ids=tuple(sorted(conflicts)),
                 scores=tuple(scored),
-                reason="Evidence does not justify forcing a winner; defer and gather more information.",
+                reason=(
+                    "Evidence does not justify forcing a winner; defer and gather more information."
+                ),
             )
         return GoalResolution(
             selected_goal_id=scored[0][0],
             conflicting_goal_ids=tuple(sorted(conflicts)),
             scores=tuple(scored),
-            reason="Selected by current premise support, utility, information value, risk, and priority.",
+            reason=(
+                "Selected by current premise support, utility, information value, risk, "
+                "and priority."
+            ),
         )
 
     @staticmethod

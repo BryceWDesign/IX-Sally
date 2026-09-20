@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
-from ix_sally.cognition.goals import GoalSpec, GoalStatus
 from ix_sally.cognition.goal_reasoning import GoalEvidence
+from ix_sally.cognition.goals import GoalSpec, GoalStatus
 from ix_sally.foundation import FoundationError
 
 

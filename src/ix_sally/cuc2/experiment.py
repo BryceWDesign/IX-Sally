@@ -74,9 +74,7 @@ class CUC2Report:
             "offered_menu_has_solution": self.offered_menu_has_solution,
             "constructed_action": self.open_choice.selected.action_id,
             "constructed_result": self.open_choice.selected.result_state,
-            "constructed_outside_offered_menu": (
-                self.open_choice.constructed_outside_offered_menu
-            ),
+            "constructed_outside_offered_menu": (self.open_choice.constructed_outside_offered_menu),
             "explored_programs": self.open_choice.explored_programs,
             "minimized_action": self.minimized_action.action_id,
             "minimized_result": self.minimized_action.result_state,

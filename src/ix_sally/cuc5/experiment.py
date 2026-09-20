@@ -10,7 +10,9 @@ spot, change learning strategy from evidence, and propose (not self-authorize) i
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
+from typing import cast
 
 from ix_sally.cognition.active_inference import (
     ActivePerceptionPlanner,
@@ -20,6 +22,7 @@ from ix_sally.cognition.active_inference import (
     CounterfactualSimulator,
     PerceptionProbe,
 )
+from ix_sally.cognition.external_evaluation import BlindEvaluatorHarness
 from ix_sally.cognition.goal_reasoning import GoalArbiter, GoalEvidence, GoalRevisionEngine
 from ix_sally.cognition.goals import GoalGraph, GoalSpec, GoalStatus
 from ix_sally.cognition.lifelong import (
@@ -45,7 +48,10 @@ from ix_sally.cognition.meta_learning import (
 from ix_sally.cognition.metacognition import CapabilityMeasure, SelfModel
 from ix_sally.cognition.open_choice import ActionPrimitive
 from ix_sally.cognition.raw_perception import RawSignal, RawSignalGrounder
-from ix_sally.cognition.recursive_bootstrap import RecursiveBootstrapReport, RecursiveCognitionEngine
+from ix_sally.cognition.recursive_bootstrap import (
+    RecursiveBootstrapReport,
+    RecursiveCognitionEngine,
+)
 from ix_sally.cognition.representation import RepresentationInventor, RepresentationObservation
 from ix_sally.cognition.tool_forge import ToolValidationCase
 from ix_sally.cognition.unknowns import PredictionResidual
@@ -211,7 +217,9 @@ class CUC5Report:
                 "unknown_unknown_detection": self.unknown_unknown_detection,
                 "adaptive_search_management": self.adaptive_search_management,
                 "meta_learning": self.meta_learning,
-                "unfamiliar_environment_competence_procedural": self.unfamiliar_environment_competence,
+                "unfamiliar_environment_competence_procedural": (
+                    self.unfamiliar_environment_competence
+                ),
                 "blind_evaluator_interface_ready": self.blind_evaluator_interface_ready,
             },
             "demonstrated_count": self.demonstrated_count,
@@ -257,10 +265,9 @@ def run_cuc5_experiment() -> CUC5Report:
         and bootstrap.first_representation.training_accuracy
         > bootstrap.first_representation.atomic_baseline_accuracy
     )
-    semantic_primitive_ok = (
-        bootstrap.first_semantic_primitive.evaluate((2.0, 1.0))
-        and not bootstrap.first_semantic_primitive.evaluate((2.0, -1.0))
-    )
+    semantic_primitive_ok = bootstrap.first_semantic_primitive.evaluate(
+        (2.0, 1.0)
+    ) and not bootstrap.first_semantic_primitive.evaluate((2.0, -1.0))
 
     # Long horizon: the model expects +1, but one real transition unexpectedly stalls.
     horizon_action = HorizonAction(
@@ -275,10 +282,18 @@ def run_cuc5_experiment() -> CUC5Report:
         max_steps=10,
         max_plan_depth=8,
     )
-    horizon_ok = horizon.success and horizon.replans >= 1 and any(step.model_surprise for step in horizon.steps)
+    horizon_ok = (
+        horizon.success
+        and horizon.replans >= 1
+        and any(step.model_surprise for step in horizon.steps)
+    )
 
     # Cross-domain transfer: learn 2x+1 on numbers, reuse unchanged relation on letters.
-    numbers = DomainAdapter("numbers", int, int)
+    numbers = DomainAdapter(
+        "numbers",
+        cast(Callable[[object], int], int),
+        int,
+    )
     letters = DomainAdapter(
         "letters",
         encode=lambda value: ord(str(value).upper()) - ord("A"),
@@ -359,19 +374,28 @@ def run_cuc5_experiment() -> CUC5Report:
             PerceptionProbe("discriminating-probe", (0.95, 0.05), cost=0.05),
         ),
     )
-    perception_ok = perception.probe_id == "discriminating-probe" and perception.expected_information_gain > 0.5
+    perception_ok = (
+        perception.probe_id == "discriminating-probe" and perception.expected_information_gain > 0.5
+    )
 
     imagined = CounterfactualSimulator().imagine(
         initial_state=2,
         actions=(
             CounterfactualAction("increment", lambda state: state + 1, lambda state: state / 20),
-            CounterfactualAction("double", lambda state: state * 2, lambda state: state / 20, risk=0.05),
+            CounterfactualAction(
+                "double", lambda state: state * 2, lambda state: state / 20, risk=0.05
+            ),
         ),
         depth=2,
     )
-    imagination_ok = len(imagined) >= 4 and imagined[0].states[0] == 2 and len(imagined[0].states) == 3
+    imagination_ok = (
+        len(imagined) >= 4 and imagined[0].states[0] == 2 and len(imagined[0].states) == 3
+    )
 
-    tool_ok = bootstrap.forged_tool.validation_accuracy == 1.0 and bootstrap.forged_tool.tool_id.startswith("tool-")
+    tool_ok = (
+        bootstrap.forged_tool.validation_accuracy == 1.0
+        and bootstrap.forged_tool.tool_id.startswith("tool-")
+    )
 
     diagnostics = SelfDiagnostic().diagnose(
         (
@@ -381,7 +405,9 @@ def run_cuc5_experiment() -> CUC5Report:
         )
     )
     diagnostic = diagnostics[0]
-    diagnostic_ok = diagnostic.blind_spot_detected and diagnostic.dominant_failure_mode == "candidate-explosion"
+    diagnostic_ok = (
+        diagnostic.blind_spot_detected and diagnostic.dominant_failure_mode == "candidate-explosion"
+    )
 
     improvement = SelfImprovementLab().propose(
         self_model=self_model,
@@ -425,7 +451,9 @@ def run_cuc5_experiment() -> CUC5Report:
             GoalEvidence("seek-right", 0.3, 0.5, 0.2),
         ),
     )
-    conflict_ok = resolution.selected_goal_id == "seek-left" and len(resolution.conflicting_goal_ids) == 2
+    conflict_ok = (
+        resolution.selected_goal_id == "seek-left" and len(resolution.conflicting_goal_ids) == 2
+    )
     graph = GoalGraph.create((goal_a,))
     revised = GoalRevisionEngine().revise(
         graph,
@@ -444,7 +472,9 @@ def run_cuc5_experiment() -> CUC5Report:
         ),
         total_budget=20,
     )
-    search_ok = allocation.budget_for("evidence-guided") > allocation.budget_for("blind-enumeration")
+    search_ok = allocation.budget_for("evidence-guided") > allocation.budget_for(
+        "blind-enumeration"
+    )
 
     meta = MetaLearningController().select(
         (
@@ -469,8 +499,6 @@ def run_cuc5_experiment() -> CUC5Report:
 
     # The independent evaluator itself cannot be supplied by us, but the repository contains
     # a nonce-bound blind challenge harness. Presence is not counted as independent validation.
-    from ix_sally.cognition.external_evaluation import BlindEvaluatorHarness
-
     blind_ready = BlindEvaluatorHarness is not None
 
     return CUC5Report(

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 from ix_sally.foundation import FoundationError, require_text
 
@@ -62,7 +62,8 @@ class UnknownUnknownDetector:
             dominant_context=dominant,
             dominant_context_errors=count,
             reason=(
-                "High-confidence errors cluster in a repeated context, suggesting a missing variable or hypothesis."
+                "High-confidence errors cluster in a repeated context, suggesting a "
+                "missing variable or hypothesis."
                 if detected
                 else "Residuals do not yet justify inventing an unrepresented cause."
             ),

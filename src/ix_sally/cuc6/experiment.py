@@ -14,13 +14,27 @@ from itertools import product
 from ix_sally.cognition.goal_portfolio import GoalPortfolioManager
 from ix_sally.cognition.goal_reasoning import GoalEvidence
 from ix_sally.cognition.goals import GoalSpec
-from ix_sally.cognition.knowledge_maintenance import ContextualKnowledgeEvidence, KnowledgeMaintenanceEngine
+from ix_sally.cognition.knowledge_maintenance import (
+    ContextualKnowledgeEvidence,
+    KnowledgeMaintenanceEngine,
+)
 from ix_sally.cognition.lifelong import KnowledgeItem, LifelongKnowledgeStore
-from ix_sally.cognition.lifetime_learning import LifetimeChallenge, LifetimeLearningEngine, LifetimeLearningReport
+from ix_sally.cognition.lifetime_learning import (
+    LifetimeChallenge,
+    LifetimeLearningEngine,
+    LifetimeLearningReport,
+)
 from ix_sally.cognition.online_meta import OnlineMetaProfile
-from ix_sally.cognition.relational_transfer import RelationEdge, RelationalTransferEngine, RelationalWorld
+from ix_sally.cognition.relational_transfer import (
+    RelationalTransferEngine,
+    RelationalWorld,
+    RelationEdge,
+)
 from ix_sally.cognition.representation import RepresentationObservation
-from ix_sally.cognition.representation_programs import InventedRepresentationProgram, RepresentationProgramInventor
+from ix_sally.cognition.representation_programs import (
+    InventedRepresentationProgram,
+    RepresentationProgramInventor,
+)
 from ix_sally.cognition.system import SallyCognitiveSystem
 from ix_sally.cognition.text_grounding import TextOutcomeGrounder, TextOutcomeObservation
 from ix_sally.cognition.values import CognitiveValue
@@ -28,7 +42,9 @@ from ix_sally.cognition.world_model import FactPattern
 from ix_sally.digest import DigestRecord, JsonObject
 
 
-def _world_observations(prefix: str, *, train: bool, permutation: int = 0) -> tuple[RepresentationObservation, ...]:
+def _world_observations(
+    prefix: str, *, train: bool, permutation: int = 0
+) -> tuple[RepresentationObservation, ...]:
     ab = (-2.0, -1.0, 1.0, 2.0) if train else (-4.0, -3.0, 3.0, 4.0)
     cs = (-6.0, -3.0, -1.0, 1.0, 3.0, 6.0) if train else (-20.0, -7.0, -2.0, 2.0, 7.0, 20.0)
     observations: list[RepresentationObservation] = []
@@ -41,9 +57,7 @@ def _world_observations(prefix: str, *, train: bool, permutation: int = 0) -> tu
         else:
             channels = base
         consequence = channels[0] * channels[1] + channels[2] >= 0.0
-        observations.append(
-            RepresentationObservation(f"{prefix}-{index}", channels, consequence)
-        )
+        observations.append(RepresentationObservation(f"{prefix}-{index}", channels, consequence))
     return tuple(observations)
 
 
@@ -97,12 +111,15 @@ class CUC6Report:
             "goal_portfolio_coherence": self.goal_portfolio_coherence,
             "snapshot_meta_persistence": self.snapshot_meta_persistence,
             "bounded_endurance_generations": self.bounded_endurance_generations,
-            "later_learning_is_more_selective": self.lifetime_learning.later_learning_is_more_selective,
+            "later_learning_is_more_selective": (
+                self.lifetime_learning.later_learning_is_more_selective
+            ),
             "demonstrated_count": self.demonstrated_count,
             "agi_certified": False,
             "claim_boundary": (
-                "Bounded evidence that prior experience changes later learning, that Sally can synthesize multi-operation "
-                "representations and maintain contradictory knowledge. This is not proof of AGI or unrestricted autonomy."
+                "Bounded evidence that prior experience changes later learning, that Sally can "
+                "synthesize multi-operation representations and maintain contradictory knowledge. "
+                "This is not proof of AGI or unrestricted autonomy."
             ),
         }
 
@@ -139,7 +156,9 @@ def run_cuc6_experiment() -> CUC6Report:
         ContextualKnowledgeEvidence("overbroad-rule", "shifted", True, False),
     )
     maintenance = KnowledgeMaintenanceEngine().reconcile(store, evidence=evidence)
-    knowledge_context_split = maintenance.contradiction_resolved and maintenance.split_concepts == ("overbroad-rule",)
+    knowledge_context_split = maintenance.contradiction_resolved and maintenance.split_concepts == (
+        "overbroad-rule",
+    )
 
     source_world = RelationalWorld(
         "industrial-control",
@@ -215,10 +234,10 @@ def run_cuc6_experiment() -> CUC6Report:
         attention_budget=0.6,
         per_goal_cost={"map-world": 0.3, "exploit-map": 0.3, "stale-goal": 0.3},
     )
-    goal_portfolio_coherence = (
-        portfolio.selected_goal_ids == ("map-world", "exploit-map")
-        and portfolio.abandoned_goal_ids == ("stale-goal",)
-    )
+    goal_portfolio_coherence = portfolio.selected_goal_ids == (
+        "map-world",
+        "exploit-map",
+    ) and portfolio.abandoned_goal_ids == ("stale-goal",)
 
     system = SallyCognitiveSystem.create()
     system.online_meta_profile = lifetime.profile
@@ -226,7 +245,9 @@ def run_cuc6_experiment() -> CUC6Report:
     # Exercise bounded long-duration maintenance and checkpoint recovery without pretending
     # wall-clock runtime itself establishes intelligence.
     for _ in range(64):
-        system.lifelong_knowledge = system.lifelong_knowledge.advance_generation().consolidate(minimum_score=0.05)
+        system.lifelong_knowledge = system.lifelong_knowledge.advance_generation().consolidate(
+            minimum_score=0.05
+        )
     snapshot = system.snapshot()
     restored = SallyCognitiveSystem.from_snapshot(snapshot)
     snapshot_meta_persistence = (

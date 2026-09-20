@@ -7,11 +7,11 @@ possible confounding/regime change, and simulate branching futures before acting
 
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from math import log2
-from typing import Callable, Iterable
 
-from ix_sally.digest import DigestRecord, JsonArray, JsonObject
+from ix_sally.digest import JsonArray, JsonObject
 from ix_sally.foundation import FoundationError, require_text
 
 
@@ -63,8 +63,7 @@ class ActivePerceptionPlanner:
         ranked: list[tuple[float, str, ProbeChoice]] = []
         for probe in candidates:
             p_positive = sum(
-                p_h * p_pos
-                for p_h, p_pos in zip(prior, probe.positive_likelihoods, strict=True)
+                p_h * p_pos for p_h, p_pos in zip(prior, probe.positive_likelihoods, strict=True)
             )
             expected_entropy = 0.0
             for positive, p_outcome in ((True, p_positive), (False, 1.0 - p_positive)):
@@ -94,8 +93,7 @@ class ActivePerceptionPlanner:
             value if positive else 1.0 - value for value in probe.positive_likelihoods
         )
         unnormalized = tuple(
-            prior * likelihood
-            for prior, likelihood in zip(priors, likelihoods, strict=True)
+            prior * likelihood for prior, likelihood in zip(priors, likelihoods, strict=True)
         )
         total = sum(unnormalized)
         if total == 0.0:
@@ -184,7 +182,9 @@ class CausalDiscoveryEngine:
             for regime in regimes
         )
         effect_values = [effect for _, effect in regime_effects]
-        regime_change = bool(effect_values) and max(effect_values) - min(effect_values) >= regime_threshold
+        regime_change = (
+            bool(effect_values) and max(effect_values) - min(effect_values) >= regime_threshold
+        )
         return CausalDiscoveryReport(
             observational_effect=round(observational_effect, 12),
             interventional_effect=round(interventional_effect, 12),

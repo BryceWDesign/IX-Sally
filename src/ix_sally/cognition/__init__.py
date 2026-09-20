@@ -1,5 +1,16 @@
 """Integrated cognitive architecture for the IX-Sally research runtime."""
 
+from ix_sally.cognition.active_inference import (
+    ActivePerceptionPlanner,
+    CausalDiscoveryEngine,
+    CausalDiscoveryReport,
+    CausalObservation,
+    CounterfactualAction,
+    CounterfactualSimulator,
+    ImaginedBranch,
+    PerceptionProbe,
+    ProbeChoice,
+)
 from ix_sally.cognition.active_memory import (
     ActiveMemoryEntry,
     ActiveMemoryStatus,
@@ -41,12 +52,23 @@ from ix_sally.cognition.executive import (
     ExecutiveDecision,
     ExecutiveDecisionStatus,
 )
+from ix_sally.cognition.external_evaluation import (
+    BlindChallenge,
+    BlindEvaluationResult,
+    BlindEvaluatorHarness,
+)
+from ix_sally.cognition.goal_portfolio import GoalPortfolioDecision, GoalPortfolioManager
+from ix_sally.cognition.goal_reasoning import (
+    GoalArbiter,
+    GoalEvidence,
+    GoalResolution,
+    GoalRevisionEngine,
+)
 from ix_sally.cognition.goals import GoalGraph, GoalSpec, GoalStatus
-from ix_sally.cognition.invention import (
-    ConceptInventor,
-    InventedHypothesis,
-    InventedPrimitive,
-    TransformationExample,
+from ix_sally.cognition.governance_bridge import (
+    CognitiveProposalBridge,
+    CognitiveProposalBridgeReceipt,
+    CognitiveProposalBridgeResult,
 )
 from ix_sally.cognition.instrumental_goals import (
     InstrumentalGoalGenerator,
@@ -54,10 +76,16 @@ from ix_sally.cognition.instrumental_goals import (
     InstrumentalGoalProposal,
     InstrumentalSignals,
 )
-from ix_sally.cognition.governance_bridge import (
-    CognitiveProposalBridge,
-    CognitiveProposalBridgeReceipt,
-    CognitiveProposalBridgeResult,
+from ix_sally.cognition.invention import (
+    ConceptInventor,
+    InventedHypothesis,
+    InventedPrimitive,
+    TransformationExample,
+)
+from ix_sally.cognition.knowledge_maintenance import (
+    ContextualKnowledgeEvidence,
+    KnowledgeMaintenanceEngine,
+    KnowledgeMaintenanceReport,
 )
 from ix_sally.cognition.learning import (
     LearningLedger,
@@ -65,100 +93,6 @@ from ix_sally.cognition.learning import (
     OutcomeStatus,
     SkillProfile,
     TransferEvaluation,
-)
-from ix_sally.cognition.metacognition import (
-    CapabilityMeasure,
-    ImprovementProposal,
-    ImprovementStatus,
-    SelfModel,
-)
-from ix_sally.cognition.ninefold import (
-    NinefoldCognitiveCycle,
-    NinefoldCoordinator,
-    RoleFinding,
-)
-from ix_sally.cognition.open_choice import (
-    ActionPrimitive,
-    ConstructedAction,
-    DeliberationPolicy,
-    DeliberationSignals,
-    OpenChoiceResult,
-    OpenChoiceSynthesizer,
-)
-from ix_sally.cognition.open_goals import GeneratedGoal, IntrinsicDrives, OpenGoalGenesis
-from ix_sally.cognition.semantic_genesis import (
-    InventedSemantic,
-    SemanticGenesisEngine,
-    SemanticObservation,
-)
-from ix_sally.cognition.persistence import CognitiveSnapshot
-from ix_sally.cognition.planning import (
-    ActionSpec,
-    DeterministicPlanner,
-    ExecutionPermission,
-    FactEffect,
-    Plan,
-    PlanExecutionReceipt,
-    PlanSimulator,
-    PlanStatus,
-)
-from ix_sally.cognition.primitives import (
-    PrimitiveExecution,
-    PrimitiveExecutor,
-    PrimitiveKind,
-    PrimitiveOperation,
-    PrimitiveRegistry,
-    PrimitiveSpec,
-    PrimitiveStatus,
-    default_primitive_registry,
-)
-from ix_sally.cognition.storage import (
-    SnapshotLoadResult,
-    SnapshotRepository,
-    SnapshotSaveReceipt,
-    SnapshotSource,
-)
-from ix_sally.cognition.system import SallyCognitiveSystem
-from ix_sally.cognition.uncertainty import (
-    CalibrationBin,
-    CalibrationObservation,
-    CalibrationReport,
-    UncertaintyLedger,
-)
-from ix_sally.cognition.values import (
-    CognitiveScalar,
-    CognitiveValue,
-    CognitiveValueType,
-    value_from_payload,
-)
-from ix_sally.cognition.vm import IXVirtualMachine, VMResult, VMStatus, VMTraceEntry
-from ix_sally.cognition.workspace import (
-    CognitiveWorkspace,
-    WorkspaceItem,
-    WorkspaceItemKind,
-    WorkspaceItemStatus,
-)
-from ix_sally.cognition.active_inference import (
-    ActivePerceptionPlanner,
-    CausalDiscoveryEngine,
-    CausalDiscoveryReport,
-    CausalObservation,
-    CounterfactualAction,
-    CounterfactualSimulator,
-    ImaginedBranch,
-    PerceptionProbe,
-    ProbeChoice,
-)
-from ix_sally.cognition.external_evaluation import (
-    BlindChallenge,
-    BlindEvaluationResult,
-    BlindEvaluatorHarness,
-)
-from ix_sally.cognition.goal_reasoning import (
-    GoalArbiter,
-    GoalEvidence,
-    GoalResolution,
-    GoalRevisionEngine,
 )
 from ix_sally.cognition.lifelong import (
     AbstractTransitionRule,
@@ -171,6 +105,12 @@ from ix_sally.cognition.lifelong import (
     RestructuredConcept,
     SelfDirectedCurriculum,
     StructuralAnalogyEngine,
+)
+from ix_sally.cognition.lifetime_learning import (
+    LifetimeChallenge,
+    LifetimeEpisodeResult,
+    LifetimeLearningEngine,
+    LifetimeLearningReport,
 )
 from ix_sally.cognition.long_horizon import (
     HorizonAction,
@@ -192,10 +132,65 @@ from ix_sally.cognition.meta_learning import (
     SelfImprovementLab,
     SelfImprovementResult,
 )
+from ix_sally.cognition.metacognition import (
+    CapabilityMeasure,
+    ImprovementProposal,
+    ImprovementStatus,
+    SelfModel,
+)
+from ix_sally.cognition.ninefold import (
+    NinefoldCognitiveCycle,
+    NinefoldCoordinator,
+    RoleFinding,
+)
+from ix_sally.cognition.online_meta import (
+    OnlineMetaDecision,
+    OnlineMetaProfile,
+    StrategyExperience,
+    TaskFingerprint,
+)
+from ix_sally.cognition.open_choice import (
+    ActionPrimitive,
+    ConstructedAction,
+    DeliberationPolicy,
+    DeliberationSignals,
+    OpenChoiceResult,
+    OpenChoiceSynthesizer,
+)
+from ix_sally.cognition.open_goals import GeneratedGoal, IntrinsicDrives, OpenGoalGenesis
+from ix_sally.cognition.persistence import CognitiveSnapshot
+from ix_sally.cognition.planning import (
+    ActionSpec,
+    DeterministicPlanner,
+    ExecutionPermission,
+    FactEffect,
+    Plan,
+    PlanExecutionReceipt,
+    PlanSimulator,
+    PlanStatus,
+)
+from ix_sally.cognition.primitives import (
+    PrimitiveExecution,
+    PrimitiveExecutor,
+    PrimitiveKind,
+    PrimitiveOperation,
+    PrimitiveRegistry,
+    PrimitiveSpec,
+    PrimitiveStatus,
+    default_primitive_registry,
+)
 from ix_sally.cognition.raw_perception import GroundedSignal, RawSignal, RawSignalGrounder
 from ix_sally.cognition.recursive_bootstrap import (
     RecursiveBootstrapReport,
     RecursiveCognitionEngine,
+)
+from ix_sally.cognition.relational_transfer import (
+    LearnedStructuralSchema,
+    RelationalTransferEngine,
+    RelationalWorld,
+    RelationEdge,
+    StructuralRole,
+    TransferInference,
 )
 from ix_sally.cognition.representation import (
     FeatureOperator,
@@ -204,48 +199,53 @@ from ix_sally.cognition.representation import (
     RepresentationObservation,
     SemanticPrimitive,
 )
-from ix_sally.cognition.tool_forge import ForgedTool, ToolForge, ToolValidationCase
-from ix_sally.cognition.unknowns import (
-    PredictionResidual,
-    UnknownUnknownDetector,
-    UnknownUnknownSignal,
-)
-from ix_sally.cognition.goal_portfolio import GoalPortfolioDecision, GoalPortfolioManager
-from ix_sally.cognition.knowledge_maintenance import (
-    ContextualKnowledgeEvidence,
-    KnowledgeMaintenanceEngine,
-    KnowledgeMaintenanceReport,
-)
-from ix_sally.cognition.lifetime_learning import (
-    LifetimeChallenge,
-    LifetimeEpisodeResult,
-    LifetimeLearningEngine,
-    LifetimeLearningReport,
-)
-from ix_sally.cognition.online_meta import (
-    OnlineMetaDecision,
-    OnlineMetaProfile,
-    StrategyExperience,
-    TaskFingerprint,
-)
-from ix_sally.cognition.relational_transfer import (
-    LearnedStructuralSchema,
-    RelationEdge,
-    RelationalTransferEngine,
-    RelationalWorld,
-    StructuralRole,
-    TransferInference,
-)
 from ix_sally.cognition.representation_programs import (
     FeatureProgram,
     InventedRepresentationProgram,
     ProgramOperator,
     RepresentationProgramInventor,
 )
+from ix_sally.cognition.semantic_genesis import (
+    InventedSemantic,
+    SemanticGenesisEngine,
+    SemanticObservation,
+)
+from ix_sally.cognition.storage import (
+    SnapshotLoadResult,
+    SnapshotRepository,
+    SnapshotSaveReceipt,
+    SnapshotSource,
+)
+from ix_sally.cognition.system import SallyCognitiveSystem
 from ix_sally.cognition.text_grounding import (
     GroundedTextFeature,
     TextOutcomeGrounder,
     TextOutcomeObservation,
+)
+from ix_sally.cognition.tool_forge import ForgedTool, ToolForge, ToolValidationCase
+from ix_sally.cognition.uncertainty import (
+    CalibrationBin,
+    CalibrationObservation,
+    CalibrationReport,
+    UncertaintyLedger,
+)
+from ix_sally.cognition.unknowns import (
+    PredictionResidual,
+    UnknownUnknownDetector,
+    UnknownUnknownSignal,
+)
+from ix_sally.cognition.values import (
+    CognitiveScalar,
+    CognitiveValue,
+    CognitiveValueType,
+    value_from_payload,
+)
+from ix_sally.cognition.vm import IXVirtualMachine, VMResult, VMStatus, VMTraceEntry
+from ix_sally.cognition.workspace import (
+    CognitiveWorkspace,
+    WorkspaceItem,
+    WorkspaceItemKind,
+    WorkspaceItemStatus,
 )
 from ix_sally.cognition.world_model import (
     CausalRule,
@@ -256,18 +256,27 @@ from ix_sally.cognition.world_model import (
 )
 
 __all__ = [
+    "AbstractTransitionRule",
     "ActionPrimitive",
     "ActionSpec",
     "ActiveMemoryEntry",
     "ActiveMemoryStatus",
     "ActiveMemoryStore",
+    "ActivePerceptionPlanner",
     "AdaptationController",
+    "AdaptiveSearchPolicy",
     "BenchmarkResult",
+    "BlindChallenge",
+    "BlindEvaluationResult",
+    "BlindEvaluatorHarness",
     "BytecodeProgram",
     "CalibrationBin",
     "CalibrationObservation",
     "CalibrationReport",
     "CapabilityMeasure",
+    "CausalDiscoveryEngine",
+    "CausalDiscoveryReport",
+    "CausalObservation",
     "CausalRule",
     "CognitiveEpisode",
     "CognitiveEvaluationReport",
@@ -279,15 +288,21 @@ __all__ = [
     "CognitiveValue",
     "CognitiveValueType",
     "CognitiveWorkspace",
+    "ConceptInventor",
+    "ConstructedAction",
+    "ContextualKnowledgeEvidence",
+    "CounterfactualAction",
+    "CounterfactualSimulator",
     "Curriculum",
+    "CurriculumChoice",
     "CurriculumLedger",
     "CurriculumSplit",
     "CurriculumTask",
     "CurriculumTrial",
-    "ConstructedAction",
-    "DeterministicPlanner",
     "DeliberationPolicy",
     "DeliberationSignals",
+    "DeterministicPlanner",
+    "DomainAdapter",
     "EpisodeLedger",
     "EpisodeStep",
     "EpisodeStepKind",
@@ -300,40 +315,76 @@ __all__ = [
     "FactEffect",
     "FactPattern",
     "FactStatus",
-    "GoalGraph",
-    "GoalSpec",
+    "FailureObservation",
+    "FeatureOperator",
+    "FeatureProgram",
+    "ForgedTool",
     "GeneratedGoal",
+    "GoalArbiter",
+    "GoalEvidence",
+    "GoalGraph",
+    "GoalPortfolioDecision",
+    "GoalPortfolioManager",
+    "GoalResolution",
+    "GoalRevisionEngine",
+    "GoalSpec",
     "GoalStatus",
-    "ConceptInventor",
-    "InventedHypothesis",
-    "InventedPrimitive",
-    "InventedSemantic",
+    "GroundedSignal",
+    "GroundedTextFeature",
+    "HorizonAction",
+    "HorizonStep",
+    "IXCompiler",
+    "IXVirtualMachine",
+    "ImaginedBranch",
+    "ImprovementBenchmark",
+    "ImprovementProposal",
+    "ImprovementStatus",
+    "Instruction",
     "InstrumentalGoalGenerator",
     "InstrumentalGoalKind",
     "InstrumentalGoalProposal",
     "InstrumentalSignals",
     "IntrinsicDrives",
-    "TransformationExample",
-    "IXCompiler",
-    "IXVirtualMachine",
-    "ImprovementProposal",
-    "ImprovementStatus",
-    "Instruction",
+    "InventedHypothesis",
+    "InventedPrimitive",
+    "InventedRepresentation",
+    "InventedRepresentationProgram",
+    "InventedSemantic",
+    "KnowledgeItem",
+    "KnowledgeMaintenanceEngine",
+    "KnowledgeMaintenanceReport",
+    "LearnedStructuralSchema",
     "LearningLedger",
     "LearningOutcome",
+    "LearningStrategyTrial",
+    "LifelongKnowledgeStore",
+    "LifetimeChallenge",
+    "LifetimeEpisodeResult",
+    "LifetimeLearningEngine",
+    "LifetimeLearningReport",
+    "LongHorizonController",
+    "LongHorizonResult",
     "MemoryLayer",
     "MemoryRetrieval",
+    "MetaLearningController",
+    "MetaLearningDecision",
     "NinefoldCognitiveCycle",
     "NinefoldCoordinator",
+    "OnlineMetaDecision",
+    "OnlineMetaProfile",
+    "OntologyRestructurer",
     "OpCode",
-    "OutcomeStatus",
     "OpenChoiceResult",
     "OpenChoiceSynthesizer",
     "OpenGoalGenesis",
+    "OutcomeStatus",
+    "PerceptionProbe",
     "Plan",
     "PlanExecutionReceipt",
     "PlanSimulator",
     "PlanStatus",
+    "PredictionResidual",
+    "PredictionSignature",
     "PrimitiveExecution",
     "PrimitiveExecutor",
     "PrimitiveKind",
@@ -341,22 +392,55 @@ __all__ = [
     "PrimitiveRegistry",
     "PrimitiveSpec",
     "PrimitiveStatus",
+    "ProbeChoice",
+    "ProgramOperator",
+    "RawSignal",
+    "RawSignalGrounder",
+    "RecursiveBootstrapReport",
+    "RecursiveCognitionEngine",
     "RegressionFinding",
     "RegressionOutcome",
     "RegressionReport",
+    "RelationEdge",
+    "RelationalTransferEngine",
+    "RelationalWorld",
+    "RepresentationInventor",
+    "RepresentationObservation",
+    "RepresentationProgramInventor",
+    "RestructuredConcept",
     "RoleFinding",
     "SallyCognitiveSystem",
+    "SearchBudgetAllocation",
+    "SearchOperatorTrial",
+    "SelfDiagnostic",
+    "SelfDiagnosticReport",
+    "SelfDirectedCurriculum",
+    "SelfImprovementLab",
+    "SelfImprovementResult",
     "SelfModel",
     "SemanticGenesisEngine",
     "SemanticObservation",
+    "SemanticPrimitive",
     "SkillProfile",
     "SnapshotLoadResult",
     "SnapshotRepository",
     "SnapshotSaveReceipt",
     "SnapshotSource",
+    "StrategyExperience",
+    "StructuralAnalogyEngine",
+    "StructuralRole",
+    "TaskFingerprint",
+    "TextOutcomeGrounder",
+    "TextOutcomeObservation",
+    "ToolForge",
+    "ToolValidationCase",
     "TransferEvaluation",
+    "TransferInference",
+    "TransformationExample",
     "TrialStatus",
     "UncertaintyLedger",
+    "UnknownUnknownDetector",
+    "UnknownUnknownSignal",
     "VMResult",
     "VMStatus",
     "VMTraceEntry",
@@ -365,92 +449,8 @@ __all__ = [
     "WorkspaceItemStatus",
     "WorldFact",
     "WorldModel",
-    "ActivePerceptionPlanner",
-    "AbstractTransitionRule",
-    "AdaptiveSearchPolicy",
-    "BlindChallenge",
-    "BlindEvaluationResult",
-    "BlindEvaluatorHarness",
-    "CausalDiscoveryEngine",
-    "CausalDiscoveryReport",
-    "CausalObservation",
-    "CounterfactualAction",
-    "CounterfactualSimulator",
-    "CurriculumChoice",
-    "DomainAdapter",
-    "FailureObservation",
-    "FeatureOperator",
-    "ForgedTool",
-    "GoalArbiter",
-    "GoalEvidence",
-    "GoalResolution",
-    "GoalRevisionEngine",
-    "GroundedSignal",
-    "HorizonAction",
-    "HorizonStep",
-    "ImaginedBranch",
-    "ImprovementBenchmark",
-    "InventedRepresentation",
-    "KnowledgeItem",
-    "LearningStrategyTrial",
-    "LifelongKnowledgeStore",
-    "LongHorizonController",
-    "LongHorizonResult",
-    "MetaLearningController",
-    "MetaLearningDecision",
-    "OntologyRestructurer",
-    "PerceptionProbe",
-    "PredictionResidual",
-    "PredictionSignature",
-    "ProbeChoice",
-    "RawSignal",
-    "RawSignalGrounder",
-    "RecursiveBootstrapReport",
-    "RecursiveCognitionEngine",
-    "RepresentationInventor",
-    "RepresentationObservation",
-    "RestructuredConcept",
-    "SearchBudgetAllocation",
-    "SearchOperatorTrial",
-    "SelfDiagnostic",
-    "SelfDiagnosticReport",
-    "SelfDirectedCurriculum",
-    "SelfImprovementLab",
-    "SelfImprovementResult",
-    "SemanticPrimitive",
-    "StructuralAnalogyEngine",
-    "ToolForge",
-    "ToolValidationCase",
-    "UnknownUnknownDetector",
-    "UnknownUnknownSignal",
     "compile_ix_source",
     "default_primitive_registry",
     "run_core_evaluation",
     "value_from_payload",
-    "GoalPortfolioDecision",
-    "GoalPortfolioManager",
-    "ContextualKnowledgeEvidence",
-    "KnowledgeMaintenanceEngine",
-    "KnowledgeMaintenanceReport",
-    "LifetimeChallenge",
-    "LifetimeEpisodeResult",
-    "LifetimeLearningEngine",
-    "LifetimeLearningReport",
-    "OnlineMetaDecision",
-    "OnlineMetaProfile",
-    "StrategyExperience",
-    "TaskFingerprint",
-    "LearnedStructuralSchema",
-    "RelationEdge",
-    "RelationalTransferEngine",
-    "RelationalWorld",
-    "StructuralRole",
-    "TransferInference",
-    "FeatureProgram",
-    "InventedRepresentationProgram",
-    "ProgramOperator",
-    "RepresentationProgramInventor",
-    "GroundedTextFeature",
-    "TextOutcomeGrounder",
-    "TextOutcomeObservation",
 ]

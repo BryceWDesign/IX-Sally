@@ -12,8 +12,8 @@ catalog.  This grants internal goal authorship, not unilateral external authorit
 from __future__ import annotations
 
 from collections import deque
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 from ix_sally.cognition.goals import GoalSpec, GoalStatus
 from ix_sally.cognition.open_choice import ActionPrimitive

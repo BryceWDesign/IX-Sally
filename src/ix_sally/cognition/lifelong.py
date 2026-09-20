@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, replace
-from typing import Callable, Iterable
 
 from ix_sally.cognition.metacognition import SelfModel
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
@@ -64,7 +64,9 @@ class LifelongKnowledgeStore:
             raise FoundationError("knowledge generation must not be negative")
 
     def integrate(self, item: KnowledgeItem) -> LifelongKnowledgeStore:
-        retained = tuple(existing for existing in self.items if existing.concept_id != item.concept_id)
+        retained = tuple(
+            existing for existing in self.items if existing.concept_id != item.concept_id
+        )
         normalized = replace(item, generation=self.generation)
         return LifelongKnowledgeStore(
             items=tuple(sorted((*retained, normalized), key=lambda value: value.concept_id)),
@@ -105,7 +107,9 @@ class LifelongKnowledgeStore:
     def advance_generation(self) -> LifelongKnowledgeStore:
         return LifelongKnowledgeStore(self.items, self.generation + 1)
 
-    def consolidate(self, *, minimum_score: float = 0.25, protected_utility: float = 0.75) -> LifelongKnowledgeStore:
+    def consolidate(
+        self, *, minimum_score: float = 0.25, protected_utility: float = 0.75
+    ) -> LifelongKnowledgeStore:
         """Forget weak, unused stale items while retaining useful or validated knowledge."""
         if not 0.0 <= minimum_score <= 1.0 or not 0.0 <= protected_utility <= 1.0:
             raise FoundationError("consolidation thresholds must be between zero and one")
@@ -161,7 +165,9 @@ class RestructuredConcept:
 class OntologyRestructurer:
     """Compress concepts that make identical predictions into a higher abstraction."""
 
-    def restructure(self, signatures: Iterable[PredictionSignature]) -> tuple[RestructuredConcept, ...]:
+    def restructure(
+        self, signatures: Iterable[PredictionSignature]
+    ) -> tuple[RestructuredConcept, ...]:
         groups: dict[tuple[bool, ...], list[str]] = {}
         for item in signatures:
             groups.setdefault(item.predictions, []).append(item.concept_id)
@@ -169,7 +175,13 @@ class OntologyRestructurer:
         for signature, members in sorted(groups.items(), key=lambda item: item[0]):
             if len(members) < 2:
                 continue
-            identity = DigestRecord.from_payload({"members": sorted(members), "signature": list(signature)})
+            members_payload: JsonArray = []
+            members_payload.extend(sorted(members))
+            signature_payload: JsonArray = []
+            signature_payload.extend(signature)
+            identity = DigestRecord.from_payload(
+                {"members": members_payload, "signature": signature_payload}
+            )
             results.append(
                 RestructuredConcept(
                     concept_id=f"abstraction-{identity.value[:16]}",
@@ -184,8 +196,12 @@ class OntologyRestructurer:
         store: LifelongKnowledgeStore,
         abstraction: RestructuredConcept,
     ) -> LifelongKnowledgeStore:
+        members_payload: JsonArray = []
+        members_payload.extend(abstraction.member_ids)
+        signature_payload: JsonArray = []
+        signature_payload.extend(abstraction.signature)
         identity = DigestRecord.from_payload(
-            {"members": list(abstraction.member_ids), "signature": list(abstraction.signature)}
+            {"members": members_payload, "signature": signature_payload}
         )
         updated: list[KnowledgeItem] = []
         member_confidences: list[float] = []
@@ -208,7 +224,9 @@ class OntologyRestructurer:
                 generation=store.generation,
             )
         )
-        return LifelongKnowledgeStore(tuple(sorted(updated, key=lambda item: item.concept_id)), store.generation)
+        return LifelongKnowledgeStore(
+            tuple(sorted(updated, key=lambda item: item.concept_id)), store.generation
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -311,4 +329,6 @@ class SelfDirectedCurriculum:
                     ),
                 )
             )
-        return max(choices, key=lambda item: (item.score, tuple(-ord(ch) for ch in item.capability_id)))
+        return max(
+            choices, key=lambda item: (item.score, tuple(-ord(ch) for ch in item.capability_id))
+        )

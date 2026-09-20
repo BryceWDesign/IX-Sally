@@ -15,9 +15,9 @@ from ix_sally.cognition import (
     KnowledgeMaintenanceEngine,
     LifelongKnowledgeStore,
     OnlineMetaProfile,
-    RelationEdge,
     RelationalTransferEngine,
     RelationalWorld,
+    RelationEdge,
     RepresentationObservation,
     RepresentationProgramInventor,
     SallyCognitiveSystem,
@@ -148,7 +148,9 @@ def test_goal_portfolio_respects_dependency_and_kills_collapsed_premise() -> Non
     base = GoalSpec.create(
         goal_id="map",
         description="Map world.",
-        desired_state=FactPattern.create(subject="w", predicate="mapped", value=CognitiveValue.from_python(True)),
+        desired_state=FactPattern.create(
+            subject="w", predicate="mapped", value=CognitiveValue.from_python(True)
+        ),
         priority=0.9,
         utility=0.9,
         risk_limit=0.1,
@@ -156,7 +158,9 @@ def test_goal_portfolio_respects_dependency_and_kills_collapsed_premise() -> Non
     child = GoalSpec.create(
         goal_id="solve",
         description="Use map.",
-        desired_state=FactPattern.create(subject="w", predicate="solved", value=CognitiveValue.from_python(True)),
+        desired_state=FactPattern.create(
+            subject="w", predicate="solved", value=CognitiveValue.from_python(True)
+        ),
         priority=0.8,
         utility=0.9,
         risk_limit=0.1,
@@ -165,7 +169,9 @@ def test_goal_portfolio_respects_dependency_and_kills_collapsed_premise() -> Non
     stale = GoalSpec.create(
         goal_id="stale",
         description="No longer warranted.",
-        desired_state=FactPattern.create(subject="w", predicate="old", value=CognitiveValue.from_python(True)),
+        desired_state=FactPattern.create(
+            subject="w", predicate="old", value=CognitiveValue.from_python(True)
+        ),
         priority=1.0,
         utility=0.9,
         risk_limit=0.1,
@@ -187,7 +193,9 @@ def test_goal_portfolio_respects_dependency_and_kills_collapsed_premise() -> Non
 def test_online_meta_profile_persists_through_full_system_snapshot() -> None:
     challenge = LifetimeChallenge("a", _deep("train"), _deep("holdout", holdout=True))
     system = SallyCognitiveSystem.create()
-    report = system.run_lifetime_learning(challenges=(challenge, challenge, challenge), exploration_episodes=1)
+    report = system.run_lifetime_learning(
+        challenges=(challenge, challenge, challenge), exploration_episodes=1
+    )
 
     assert report.later_learning_is_more_selective
     assert len(system.online_meta_profile.experiences) >= 4

@@ -5,6 +5,17 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 
+from ix_sally.cognition.active_inference import (
+    ActivePerceptionPlanner,
+    CausalDiscoveryEngine,
+    CausalDiscoveryReport,
+    CausalObservation,
+    CounterfactualAction,
+    CounterfactualSimulator,
+    ImaginedBranch,
+    PerceptionProbe,
+    ProbeChoice,
+)
 from ix_sally.cognition.active_memory import (
     ActiveMemoryEntry,
     ActiveMemoryStore,
@@ -13,70 +24,6 @@ from ix_sally.cognition.compiler import compile_ix_source
 from ix_sally.cognition.curriculum import CurriculumLedger, CurriculumTrial
 from ix_sally.cognition.episodes import CognitiveEpisode, EpisodeLedger
 from ix_sally.cognition.executive import ExecutiveController, ExecutiveDecision
-from ix_sally.cognition.goals import GoalGraph, GoalSpec, GoalStatus
-from ix_sally.cognition.governance_bridge import (
-    CognitiveProposalBridge,
-    CognitiveProposalBridgeResult,
-)
-from ix_sally.cognition.learning import LearningLedger, LearningOutcome
-from ix_sally.cognition.lifelong import (
-    AbstractTransitionRule,
-    CurriculumChoice,
-    DomainAdapter,
-    KnowledgeItem,
-    LifelongKnowledgeStore,
-    OntologyRestructurer,
-    RestructuredConcept,
-    PredictionSignature,
-    SelfDirectedCurriculum,
-    StructuralAnalogyEngine,
-)
-from ix_sally.cognition.invention import (
-    ConceptInventor,
-    InventedHypothesis,
-    InventedPrimitive,
-    TransformationExample,
-)
-from ix_sally.cognition.instrumental_goals import (
-    InstrumentalGoalGenerator,
-    InstrumentalGoalProposal,
-)
-from ix_sally.cognition.metacognition import CapabilityMeasure, SelfModel
-from ix_sally.cognition.meta_learning import (
-    AdaptiveSearchPolicy,
-    MetaLearningDecision,
-    FailureObservation,
-    ImprovementBenchmark,
-    LearningStrategyTrial,
-    MetaLearningController,
-    SearchBudgetAllocation,
-    SearchOperatorTrial,
-    SelfDiagnostic,
-    SelfDiagnosticReport,
-    SelfImprovementLab,
-    SelfImprovementResult,
-)
-from ix_sally.cognition.ninefold import NinefoldCognitiveCycle, NinefoldCoordinator
-from ix_sally.cognition.open_choice import (
-    ActionPrimitive,
-    ConstructedAction,
-    DeliberationPolicy,
-    DeliberationSignals,
-    OpenChoiceResult,
-    OpenChoiceSynthesizer,
-)
-from ix_sally.cognition.open_goals import GeneratedGoal, IntrinsicDrives, OpenGoalGenesis
-from ix_sally.cognition.active_inference import (
-    ActivePerceptionPlanner,
-    CausalDiscoveryReport,
-    CausalDiscoveryEngine,
-    CausalObservation,
-    CounterfactualAction,
-    CounterfactualSimulator,
-    ImaginedBranch,
-    PerceptionProbe,
-    ProbeChoice,
-)
 from ix_sally.cognition.external_evaluation import (
     BlindChallenge,
     BlindEvaluationResult,
@@ -89,48 +36,71 @@ from ix_sally.cognition.goal_reasoning import (
     GoalResolution,
     GoalRevisionEngine,
 )
-from ix_sally.cognition.long_horizon import HorizonAction, LongHorizonController, LongHorizonResult
+from ix_sally.cognition.goals import GoalGraph, GoalSpec, GoalStatus
+from ix_sally.cognition.governance_bridge import (
+    CognitiveProposalBridge,
+    CognitiveProposalBridgeResult,
+)
+from ix_sally.cognition.instrumental_goals import (
+    InstrumentalGoalGenerator,
+    InstrumentalGoalProposal,
+)
+from ix_sally.cognition.invention import (
+    ConceptInventor,
+    InventedHypothesis,
+    InventedPrimitive,
+    TransformationExample,
+)
 from ix_sally.cognition.knowledge_maintenance import (
     ContextualKnowledgeEvidence,
     KnowledgeMaintenanceEngine,
     KnowledgeMaintenanceReport,
+)
+from ix_sally.cognition.learning import LearningLedger, LearningOutcome
+from ix_sally.cognition.lifelong import (
+    AbstractTransitionRule,
+    CurriculumChoice,
+    DomainAdapter,
+    KnowledgeItem,
+    LifelongKnowledgeStore,
+    OntologyRestructurer,
+    PredictionSignature,
+    RestructuredConcept,
+    SelfDirectedCurriculum,
+    StructuralAnalogyEngine,
 )
 from ix_sally.cognition.lifetime_learning import (
     LifetimeChallenge,
     LifetimeLearningEngine,
     LifetimeLearningReport,
 )
-from ix_sally.cognition.online_meta import OnlineMetaProfile, TaskFingerprint, OnlineMetaDecision
-from ix_sally.cognition.relational_transfer import (
-    LearnedStructuralSchema,
-    RelationalTransferEngine,
-    RelationalWorld,
-    TransferInference,
+from ix_sally.cognition.long_horizon import HorizonAction, LongHorizonController, LongHorizonResult
+from ix_sally.cognition.meta_learning import (
+    AdaptiveSearchPolicy,
+    FailureObservation,
+    ImprovementBenchmark,
+    LearningStrategyTrial,
+    MetaLearningController,
+    MetaLearningDecision,
+    SearchBudgetAllocation,
+    SearchOperatorTrial,
+    SelfDiagnostic,
+    SelfDiagnosticReport,
+    SelfImprovementLab,
+    SelfImprovementResult,
 )
-from ix_sally.cognition.representation_programs import (
-    InventedRepresentationProgram,
-    RepresentationProgramInventor,
+from ix_sally.cognition.metacognition import CapabilityMeasure, SelfModel
+from ix_sally.cognition.ninefold import NinefoldCognitiveCycle, NinefoldCoordinator
+from ix_sally.cognition.online_meta import OnlineMetaDecision, OnlineMetaProfile, TaskFingerprint
+from ix_sally.cognition.open_choice import (
+    ActionPrimitive,
+    ConstructedAction,
+    DeliberationPolicy,
+    DeliberationSignals,
+    OpenChoiceResult,
+    OpenChoiceSynthesizer,
 )
-from ix_sally.cognition.raw_perception import GroundedSignal, RawSignal, RawSignalGrounder
-from ix_sally.cognition.recursive_bootstrap import RecursiveBootstrapReport, RecursiveCognitionEngine
-from ix_sally.cognition.representation import (
-    InventedRepresentation,
-    RepresentationInventor,
-    RepresentationObservation,
-    SemanticPrimitive,
-)
-from ix_sally.cognition.tool_forge import ForgedTool, ToolForge, ToolValidationCase
-from ix_sally.cognition.text_grounding import GroundedTextFeature, TextOutcomeGrounder, TextOutcomeObservation
-from ix_sally.cognition.unknowns import (
-    PredictionResidual,
-    UnknownUnknownDetector,
-    UnknownUnknownSignal,
-)
-from ix_sally.cognition.semantic_genesis import (
-    InventedSemantic,
-    SemanticGenesisEngine,
-    SemanticObservation,
-)
+from ix_sally.cognition.open_goals import GeneratedGoal, IntrinsicDrives, OpenGoalGenesis
 from ix_sally.cognition.persistence import CognitiveSnapshot
 from ix_sally.cognition.planning import (
     ActionSpec,
@@ -145,10 +115,47 @@ from ix_sally.cognition.primitives import (
     PrimitiveRegistry,
     default_primitive_registry,
 )
+from ix_sally.cognition.raw_perception import GroundedSignal, RawSignal, RawSignalGrounder
+from ix_sally.cognition.recursive_bootstrap import (
+    RecursiveBootstrapReport,
+    RecursiveCognitionEngine,
+)
+from ix_sally.cognition.relational_transfer import (
+    LearnedStructuralSchema,
+    RelationalTransferEngine,
+    RelationalWorld,
+    TransferInference,
+)
+from ix_sally.cognition.representation import (
+    InventedRepresentation,
+    RepresentationInventor,
+    RepresentationObservation,
+    SemanticPrimitive,
+)
+from ix_sally.cognition.representation_programs import (
+    InventedRepresentationProgram,
+    RepresentationProgramInventor,
+)
+from ix_sally.cognition.semantic_genesis import (
+    InventedSemantic,
+    SemanticGenesisEngine,
+    SemanticObservation,
+)
+from ix_sally.cognition.text_grounding import (
+    GroundedTextFeature,
+    TextOutcomeGrounder,
+    TextOutcomeObservation,
+)
+from ix_sally.cognition.tool_forge import ForgedTool, ToolForge, ToolValidationCase
 from ix_sally.cognition.uncertainty import (
     CalibrationObservation,
     CalibrationReport,
     UncertaintyLedger,
+)
+from ix_sally.cognition.unknowns import (
+    PredictionResidual,
+    UnknownUnknownDetector,
+    UnknownUnknownSignal,
 )
 from ix_sally.cognition.values import CognitiveValue
 from ix_sally.cognition.vm import IXVirtualMachine, VMResult, VMStatus

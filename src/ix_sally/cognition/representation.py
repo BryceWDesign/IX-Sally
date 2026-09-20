@@ -12,10 +12,11 @@ synthesis, not a claim of unrestricted mathematical invention.
 
 from __future__ import annotations
 
+import itertools
+from collections.abc import Iterable
 from dataclasses import dataclass, replace
 from enum import StrEnum
 from math import isfinite
-from typing import Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import FoundationError, require_text
@@ -187,7 +188,6 @@ class RepresentationInventor:
         self._validate(training)
         if not 0.0 <= minimum_improvement <= 1.0:
             raise FoundationError("minimum_improvement must be between zero and one")
-        arity = len(training[0].channels)
         atomic = self._best(training, operators=(FeatureOperator.ATOMIC,))
         operators = (
             FeatureOperator.SUM,
@@ -201,7 +201,9 @@ class RepresentationInventor:
         if invented is None or atomic is None:
             raise FoundationError("representation search produced no candidate")
         if invented[0] < atomic[0] + minimum_improvement:
-            raise FoundationError("no alternative representation materially improves atomic features")
+            raise FoundationError(
+                "no alternative representation materially improves atomic features"
+            )
         accuracy, operator, left, right, threshold, polarity = invented
         identity = DigestRecord.from_payload(
             {
@@ -232,10 +234,11 @@ class RepresentationInventor:
         observations: Iterable[RepresentationObservation],
     ) -> InventedRepresentation:
         validation = tuple(observations)
-        self._validate(validation, expected_arity=len(representation.training_observations[0].channels))
+        self._validate(
+            validation, expected_arity=len(representation.training_observations[0].channels)
+        )
         correct = sum(
-            representation.activates(item.channels) is item.consequence
-            for item in validation
+            representation.activates(item.channels) is item.consequence for item in validation
         )
         return replace(
             representation,
@@ -245,7 +248,9 @@ class RepresentationInventor:
 
     def promote(self, representation: InventedRepresentation) -> SemanticPrimitive:
         if representation.training_accuracy != 1.0 or representation.validation_accuracy != 1.0:
-            raise FoundationError("semantic promotion requires perfect train and holdout performance")
+            raise FoundationError(
+                "semantic promotion requires perfect train and holdout performance"
+            )
         return SemanticPrimitive(
             primitive_id=f"semantic-{representation.digest().value[:16]}",
             representation=representation,
@@ -259,19 +264,17 @@ class RepresentationInventor:
     ) -> tuple[float, FeatureOperator, int, int | None, float, int] | None:
         arity = len(observations[0].channels)
         best: tuple[float, FeatureOperator, int, int | None, float, int] | None = None
+        index_pairs: list[tuple[int, int | None]]
         for operator in operators:
             if operator is FeatureOperator.ATOMIC:
                 index_pairs = [(index, None) for index in range(arity)]
             else:
                 index_pairs = [
-                    (left, right)
-                    for left in range(arity)
-                    for right in range(left + 1, arity)
+                    (left, right) for left in range(arity) for right in range(left + 1, arity)
                 ]
             for left, right in index_pairs:
                 values = tuple(
-                    self._evaluate(operator, left, right, item.channels)
-                    for item in observations
+                    self._evaluate(operator, left, right, item.channels) for item in observations
                 )
                 for threshold in self._thresholds(values):
                     for polarity in (-1, 1):
@@ -287,7 +290,7 @@ class RepresentationInventor:
 
     @staticmethod
     def _rank(
-        item: tuple[float, FeatureOperator, int, int | None, float, int]
+        item: tuple[float, FeatureOperator, int, int | None, float, int],
     ) -> tuple[float, int, int, int, float, int]:
         accuracy, operator, left, right, threshold, polarity = item
         operator_order = list(FeatureOperator).index(operator)
@@ -333,7 +336,7 @@ class RepresentationInventor:
         if not ordered:
             return (0.0,)
         candidates = [ordered[0] - 1.0, ordered[-1] + 1.0, *ordered]
-        candidates.extend((left + right) / 2.0 for left, right in zip(ordered, ordered[1:]))
+        candidates.extend((left + right) / 2.0 for left, right in itertools.pairwise(ordered))
         return tuple(sorted(set(candidates)))
 
     @staticmethod

@@ -7,10 +7,16 @@ how it learns.  Tasks remain bounded and numeric, but the strategy history is pe
 
 from __future__ import annotations
 
+import itertools
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
-from ix_sally.cognition.online_meta import OnlineMetaDecision, OnlineMetaProfile, StrategyExperience, TaskFingerprint
+from ix_sally.cognition.online_meta import (
+    OnlineMetaDecision,
+    OnlineMetaProfile,
+    StrategyExperience,
+    TaskFingerprint,
+)
 from ix_sally.cognition.representation import RepresentationInventor, RepresentationObservation
 from ix_sally.cognition.representation_programs import RepresentationProgramInventor
 from ix_sally.digest import DigestRecord, JsonObject
@@ -48,8 +54,13 @@ class LifetimeEpisodeResult:
             "effective_score": self.effective_score,
             "strategies_evaluated": self.strategies_evaluated,
             "used_prior_meta_experience": self.used_prior_meta_experience,
-            "concept_digest": {"algorithm": self.concept_digest.algorithm, "value": self.concept_digest.value},
-            "decision": None if self.decision is None else {
+            "concept_digest": {
+                "algorithm": self.concept_digest.algorithm,
+                "value": self.concept_digest.value,
+            },
+            "decision": None
+            if self.decision is None
+            else {
                 "strategy_id": self.decision.strategy_id,
                 "expected_score": self.decision.expected_score,
                 "evidence_weight": self.decision.evidence_weight,
@@ -68,7 +79,11 @@ class LifetimeLearningReport:
         if len(self.episodes) < 2:
             return False
         exploratory = [item for item in self.episodes if item.strategies_evaluated > 1]
-        selective = [item for item in self.episodes if item.used_prior_meta_experience and item.strategies_evaluated == 1]
+        selective = [
+            item
+            for item in self.episodes
+            if item.used_prior_meta_experience and item.strategies_evaluated == 1
+        ]
         return bool(exploratory and selective)
 
 
@@ -94,6 +109,7 @@ class LifetimeLearningEngine:
     ) -> tuple[OnlineMetaProfile, LifetimeEpisodeResult]:
         fingerprint = self.fingerprint(challenge)
         decision: OnlineMetaDecision | None = None
+        strategies: tuple[str, ...]
         if explore or not profile.experiences:
             strategies = self.STRATEGIES
         else:
@@ -113,7 +129,9 @@ class LifetimeLearningEngine:
                     samples_used=len(challenge.training),
                 )
             )
-        effective, accuracy, selected, digest = max(outcomes, key=lambda item: (item[0], item[1], tuple(-ord(ch) for ch in item[2])))
+        effective, accuracy, selected, digest = max(
+            outcomes, key=lambda item: (item[0], item[1], tuple(-ord(ch) for ch in item[2]))
+        )
         return updated, LifetimeEpisodeResult(
             challenge_id=challenge.challenge_id,
             selected_strategy=selected,
@@ -143,17 +161,23 @@ class LifetimeLearningEngine:
             results.append(result)
         return LifetimeLearningReport(current, tuple(results))
 
-    def _execute(self, strategy: str, challenge: LifetimeChallenge) -> tuple[float, int, DigestRecord]:
+    def _execute(
+        self, strategy: str, challenge: LifetimeChallenge
+    ) -> tuple[float, int, DigestRecord]:
         if strategy == "shallow-relations":
             try:
                 inventor = RepresentationInventor()
-                learned = inventor.invent_binary(observations=challenge.training, minimum_improvement=0.05)
+                learned = inventor.invent_binary(
+                    observations=challenge.training, minimum_improvement=0.05
+                )
                 validated = inventor.validate(learned, observations=challenge.holdout)
                 accuracy = validated.validation_accuracy or 0.0
                 return accuracy, 2, validated.digest()
             except FoundationError:
                 accuracy = self._best_atomic_accuracy(challenge.holdout)
-                digest = DigestRecord.from_payload({"strategy": strategy, "fallback_accuracy": accuracy})
+                digest = DigestRecord.from_payload(
+                    {"strategy": strategy, "fallback_accuracy": accuracy}
+                )
                 return accuracy, 1, digest
         if strategy == "compositional-programs":
             try:
@@ -170,13 +194,17 @@ class LifetimeLearningEngine:
                 # A compositional strategy is allowed to fall back to a shallower learned relation.
                 try:
                     inventor = RepresentationInventor()
-                    learned = inventor.invent_binary(observations=challenge.training, minimum_improvement=0.05)
+                    learned = inventor.invent_binary(
+                        observations=challenge.training, minimum_improvement=0.05
+                    )
                     validated = inventor.validate(learned, observations=challenge.holdout)
                     accuracy = validated.validation_accuracy or 0.0
                     return accuracy, 3, validated.digest()
                 except FoundationError:
                     accuracy = self._best_atomic_accuracy(challenge.holdout)
-                    digest = DigestRecord.from_payload({"strategy": strategy, "fallback_accuracy": accuracy})
+                    digest = DigestRecord.from_payload(
+                        {"strategy": strategy, "fallback_accuracy": accuracy}
+                    )
                     return accuracy, 3, digest
         raise FoundationError(f"unknown lifetime learning strategy: {strategy}")
 
@@ -185,13 +213,14 @@ class LifetimeLearningEngine:
         best = 0.0
         arity = len(items[0].channels)
         for index in range(arity):
-            values = sorted(set(item.channels[index] for item in items))
+            values = sorted({item.channels[index] for item in items})
             thresholds = [values[0] - 1.0, values[-1] + 1.0, *values]
-            thresholds.extend((a + b) / 2.0 for a, b in zip(values, values[1:]))
+            thresholds.extend((a + b) / 2.0 for a, b in itertools.pairwise(values))
             for threshold in thresholds:
                 for polarity in (-1, 1):
                     correct = sum(
-                        (polarity * item.channels[index] >= polarity * threshold) is item.consequence
+                        (polarity * item.channels[index] >= polarity * threshold)
+                        is item.consequence
                         for item in items
                     )
                     best = max(best, correct / len(items))

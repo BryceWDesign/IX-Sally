@@ -59,13 +59,9 @@ def test_minimal_sufficiency_removes_unnecessary_steps() -> None:
 
 def test_surprise_reopens_high_confidence_skill() -> None:
     policy = DeliberationPolicy()
-    assert policy.should_reopen(
-        DeliberationSignals(skill_confidence=1.0, surprise=0.5)
-    )
+    assert policy.should_reopen(DeliberationSignals(skill_confidence=1.0, surprise=0.5))
 
 
 def test_stable_high_confidence_skill_can_remain_automatic() -> None:
     policy = DeliberationPolicy()
-    assert not policy.should_reopen(
-        DeliberationSignals(skill_confidence=1.0)
-    )
+    assert not policy.should_reopen(DeliberationSignals(skill_confidence=1.0))

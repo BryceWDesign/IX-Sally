@@ -7,10 +7,10 @@ features, complementing IX-Sally's numeric signal grounding.
 
 from __future__ import annotations
 
+import re
+from collections.abc import Iterable
 from dataclasses import dataclass
 from math import log
-from typing import Iterable
-import re
 
 from ix_sally.foundation import FoundationError, require_text
 
@@ -39,7 +39,9 @@ class GroundedTextFeature:
 class TextOutcomeGrounder:
     """Discover text tokens whose presence reduces uncertainty about an observed outcome."""
 
-    def discover(self, observations: Iterable[TextOutcomeObservation]) -> tuple[GroundedTextFeature, ...]:
+    def discover(
+        self, observations: Iterable[TextOutcomeObservation]
+    ) -> tuple[GroundedTextFeature, ...]:
         items = tuple(observations)
         if len(items) < 4:
             raise FoundationError("text grounding requires at least four observations")
@@ -55,11 +57,17 @@ class TextOutcomeGrounder:
             p_present = len(present) / len(items)
             pos_present = sum(item.outcome for item in present) / len(present)
             pos_absent = sum(item.outcome for item in absent) / len(absent)
-            conditional = p_present * self._entropy(pos_present) + (1 - p_present) * self._entropy(pos_absent)
+            conditional = p_present * self._entropy(pos_present) + (1 - p_present) * self._entropy(
+                pos_absent
+            )
             gain = max(0.0, base_entropy - conditional)
             if gain > 1e-9:
-                features.append(GroundedTextFeature(token, round(gain, 12), pos_present, len(present)))
-        return tuple(sorted(features, key=lambda item: (-item.information_gain, -item.support, item.token)))
+                features.append(
+                    GroundedTextFeature(token, round(gain, 12), pos_present, len(present))
+                )
+        return tuple(
+            sorted(features, key=lambda item: (-item.information_gain, -item.support, item.token))
+        )
 
     @staticmethod
     def _tokens(text: str) -> frozenset[str]:

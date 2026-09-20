@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from math import sqrt
-from typing import Iterable
 
 from ix_sally.digest import JsonArray, JsonObject
 from ix_sally.foundation import FoundationError, require_text
@@ -22,10 +22,12 @@ class TaskFingerprint:
         if any(not 0.0 <= value <= 1.0 for value in self.dimensions):
             raise FoundationError("task fingerprint values must be between zero and one")
 
-    def distance(self, other: "TaskFingerprint") -> float:
+    def distance(self, other: TaskFingerprint) -> float:
         if len(self.dimensions) != len(other.dimensions):
             raise FoundationError("task fingerprints must have equal arity")
-        return sqrt(sum((a - b) ** 2 for a, b in zip(self.dimensions, other.dimensions, strict=True)))
+        return sqrt(
+            sum((a - b) ** 2 for a, b in zip(self.dimensions, other.dimensions, strict=True))
+        )
 
     def to_payload(self) -> JsonArray:
         return list(self.dimensions)
@@ -66,8 +68,10 @@ class OnlineMetaProfile:
 
     experiences: tuple[StrategyExperience, ...] = ()
 
-    def record(self, experience: StrategyExperience) -> "OnlineMetaProfile":
-        if self.experiences and len(experience.fingerprint.dimensions) != len(self.experiences[0].fingerprint.dimensions):
+    def record(self, experience: StrategyExperience) -> OnlineMetaProfile:
+        if self.experiences and len(experience.fingerprint.dimensions) != len(
+            self.experiences[0].fingerprint.dimensions
+        ):
             raise FoundationError("online meta profile fingerprint arity mismatch")
         return OnlineMetaProfile((*self.experiences, experience))
 
@@ -78,7 +82,9 @@ class OnlineMetaProfile:
         candidate_strategies: Iterable[str],
         exploration_prior: float = 0.50,
     ) -> OnlineMetaDecision:
-        candidates = tuple(sorted({require_text(item, field_name="strategy_id") for item in candidate_strategies}))
+        candidates = tuple(
+            sorted({require_text(item, field_name="strategy_id") for item in candidate_strategies})
+        )
         if not candidates:
             raise FoundationError("online meta-learning requires candidate strategies")
         scored: list[tuple[float, float, str, bool]] = []
@@ -100,7 +106,9 @@ class OnlineMetaProfile:
                 cross_domain = cross_domain or distance > 0.05
             expected = weighted_score / weight_total
             scored.append((expected, weight_total, strategy, cross_domain))
-        expected, weight, strategy, cross_domain = max(scored, key=lambda item: (item[0], item[1], tuple(-ord(ch) for ch in item[2])))
+        expected, weight, strategy, cross_domain = max(
+            scored, key=lambda item: (item[0], item[1], tuple(-ord(ch) for ch in item[2]))
+        )
         return OnlineMetaDecision(
             strategy_id=strategy,
             expected_score=round(expected, 12),

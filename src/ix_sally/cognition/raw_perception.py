@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import sqrt
-from typing import Iterable
 
 from ix_sally.foundation import FoundationError, require_text
 

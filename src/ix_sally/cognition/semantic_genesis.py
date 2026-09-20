@@ -11,10 +11,10 @@ Every concrete search remains finite, inspectable, falsifiable, and removable.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, replace
-from itertools import product
+from itertools import pairwise, product
 from math import isfinite
-from typing import Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import FoundationError, require_text
@@ -218,13 +218,13 @@ class SemanticGenesisEngine:
         *,
         max_abs_weight: int,
     ) -> float:
+        _ = max_abs_weight  # Retained for API compatibility with bounded semantic search.
         channel_count = len(observations[0].channels)
         best = 0.0
         for index in range(channel_count):
             for sign in (-1, 1):
                 weights = tuple(
-                    sign if position == index else 0
-                    for position in range(channel_count)
+                    sign if position == index else 0 for position in range(channel_count)
                 )
                 projections = tuple(cls._project(item.channels, weights) for item in observations)
                 for threshold in cls._thresholds(projections):
@@ -238,7 +238,7 @@ class SemanticGenesisEngine:
             return (0.0,)
         candidates = [values[0] - 1.0, values[-1] + 1.0]
         candidates.extend(values)
-        candidates.extend((left + right) / 2.0 for left, right in zip(values, values[1:]))
+        candidates.extend((left + right) / 2.0 for left, right in pairwise(values))
         return tuple(sorted(set(candidates)))
 
     @staticmethod

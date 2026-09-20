@@ -7,8 +7,8 @@ and reveal/score the targets afterward without changing the commitment.
 
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from typing import Callable, Iterable
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import FoundationError, require_text

@@ -4,16 +4,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from ix_sally.cognition.instrumental_goals import (
+    InstrumentalGoalGenerator,
+    InstrumentalGoalKind,
+    InstrumentalGoalProposal,
+)
 from ix_sally.cognition.invention import (
     ConceptInventor,
     InventedHypothesis,
     InventedPrimitive,
     TransformationExample,
-)
-from ix_sally.cognition.instrumental_goals import (
-    InstrumentalGoalGenerator,
-    InstrumentalGoalKind,
-    InstrumentalGoalProposal,
 )
 from ix_sally.cognition.metacognition import CapabilityMeasure, SelfModel
 from ix_sally.cognition.open_choice import ActionPrimitive

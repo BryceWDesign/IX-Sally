@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from collections import deque
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from typing import Callable, Iterable
 
 from ix_sally.foundation import FoundationError, require_text
 

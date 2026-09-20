@@ -9,10 +9,11 @@ simpler one-operation baseline and must survive held-out validation.
 
 from __future__ import annotations
 
+import itertools
+from collections.abc import Iterable
 from dataclasses import dataclass, replace
 from enum import StrEnum
 from math import isfinite
-from typing import Iterable
 
 from ix_sally.cognition.representation import RepresentationObservation
 from ix_sally.digest import DigestRecord, JsonObject
@@ -34,8 +35,8 @@ class FeatureProgram:
 
     operator: ProgramOperator
     channel_index: int | None = None
-    left: "FeatureProgram | None" = None
-    right: "FeatureProgram | None" = None
+    left: FeatureProgram | None = None
+    right: FeatureProgram | None = None
 
     def __post_init__(self) -> None:
         if self.operator is ProgramOperator.CHANNEL:
@@ -191,7 +192,9 @@ class RepresentationProgramInventor:
         if baseline is None or best is None:
             raise FoundationError("representation-program search produced no candidate")
         if best[0] < baseline[0] + minimum_improvement:
-            raise FoundationError("no compositional representation materially improves shallow features")
+            raise FoundationError(
+                "no compositional representation materially improves shallow features"
+            )
         accuracy, program, threshold, polarity = best
         identity = DigestRecord.from_payload(
             {
@@ -221,8 +224,12 @@ class RepresentationProgramInventor:
         correct = sum(representation.activates(item.channels) is item.consequence for item in items)
         return replace(representation, validation_accuracy=correct / len(items))
 
-    def _generate(self, *, arity: int, max_depth: int, max_candidates: int) -> tuple[FeatureProgram, ...]:
-        programs: list[FeatureProgram] = [FeatureProgram(ProgramOperator.CHANNEL, channel_index=i) for i in range(arity)]
+    def _generate(
+        self, *, arity: int, max_depth: int, max_candidates: int
+    ) -> tuple[FeatureProgram, ...]:
+        programs: list[FeatureProgram] = [
+            FeatureProgram(ProgramOperator.CHANNEL, channel_index=i) for i in range(arity)
+        ]
         by_depth: dict[int, list[FeatureProgram]] = {0: list(programs)}
         seen = {program.expression() for program in programs}
         for depth in range(1, max_depth + 1):
@@ -238,7 +245,11 @@ class RepresentationProgramInventor:
             # At least one child must be from the previous depth so the candidate really grows.
             for left in frontier:
                 for right in previous:
-                    for operator in (ProgramOperator.ADD, ProgramOperator.SUBTRACT, ProgramOperator.MULTIPLY):
+                    for operator in (
+                        ProgramOperator.ADD,
+                        ProgramOperator.SUBTRACT,
+                        ProgramOperator.MULTIPLY,
+                    ):
                         candidate = FeatureProgram(operator, left=left, right=right)
                         expression = candidate.expression()
                         if expression not in seen:
@@ -283,7 +294,9 @@ class RepresentationProgramInventor:
         return best
 
     @staticmethod
-    def _rank(item: tuple[float, FeatureProgram, float, int]) -> tuple[float, int, int, float, int, tuple[int, ...]]:
+    def _rank(
+        item: tuple[float, FeatureProgram, float, int],
+    ) -> tuple[float, int, int, float, int, tuple[int, ...]]:
         accuracy, program, threshold, polarity = item
         return (
             accuracy,
@@ -298,7 +311,7 @@ class RepresentationProgramInventor:
     def _thresholds(values: tuple[float, ...]) -> tuple[float, ...]:
         ordered = sorted(set(values))
         candidates = [ordered[0] - 1.0, ordered[-1] + 1.0, *ordered]
-        candidates.extend((left + right) / 2.0 for left, right in zip(ordered, ordered[1:]))
+        candidates.extend((left + right) / 2.0 for left, right in itertools.pairwise(ordered))
         return tuple(sorted(set(candidates)))
 
     @staticmethod
@@ -309,4 +322,6 @@ class RepresentationProgramInventor:
         if any(len(item.channels) != arity for item in observations):
             raise FoundationError("representation-program observations must share one arity")
         if len({item.consequence for item in observations}) < 2:
-            raise FoundationError("representation-program invention requires both consequence classes")
+            raise FoundationError(
+                "representation-program invention requires both consequence classes"
+            )

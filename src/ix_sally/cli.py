@@ -129,10 +129,14 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         cuc4_report = run_cuc4_experiment()
         sys.stdout.write(f"{stable_json(cuc4_report.to_payload())}\n")
-        return 0 if (
-            cuc4_report.semantic_genesis_demonstrated
-            and cuc4_report.open_goal_genesis_demonstrated
-        ) else 1
+        return (
+            0
+            if (
+                cuc4_report.semantic_genesis_demonstrated
+                and cuc4_report.open_goal_genesis_demonstrated
+            )
+            else 1
+        )
 
     if args.cuc5_experiment:
         from ix_sally.cuc5 import run_cuc5_experiment

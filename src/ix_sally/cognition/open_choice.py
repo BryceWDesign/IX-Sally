@@ -141,9 +141,7 @@ class OpenChoiceSynthesizer:
 
         offered_tuple = tuple(offered_actions)
         offered_ids = tuple(item.action_id for item in offered_tuple)
-        queue: deque[tuple[State, tuple[str, ...], float]] = deque(
-            [(initial_state, (), 0.0)]
-        )
+        queue: deque[tuple[State, tuple[str, ...], float]] = deque([(initial_state, (), 0.0)])
         explored = 0
         visited_depth: dict[State, int] = {initial_state: 0}
 

@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from collections import deque
-from typing import Iterable
+from collections.abc import Iterable
+from dataclasses import dataclass
 
 from ix_sally.foundation import FoundationError, require_text
 
@@ -35,7 +35,9 @@ class RelationalWorld:
 
     @property
     def nodes(self) -> tuple[str, ...]:
-        return tuple(sorted({edge.source for edge in self.edges} | {edge.target for edge in self.edges}))
+        return tuple(
+            sorted({edge.source for edge in self.edges} | {edge.target for edge in self.edges})
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -68,15 +70,29 @@ class RelationalTransferEngine:
         roles = self._roles(world)
         if effective_node not in roles:
             raise FoundationError("effective node is not present in source world")
-        signature = tuple(sorted((r.indegree, r.outdegree, r.distance_from_source, r.distance_to_sink) for r in roles.values()))
+        signature = tuple(
+            sorted(
+                (r.indegree, r.outdegree, r.distance_from_source, r.distance_to_sink)
+                for r in roles.values()
+            )
+        )
         return LearnedStructuralSchema(world.domain_id, roles[effective_node], signature)
 
-    def transfer(self, schema: LearnedStructuralSchema, *, world: RelationalWorld) -> TransferInference:
+    def transfer(
+        self, schema: LearnedStructuralSchema, *, world: RelationalWorld
+    ) -> TransferInference:
         roles = self._roles(world)
-        signature = tuple(sorted((r.indegree, r.outdegree, r.distance_from_source, r.distance_to_sink) for r in roles.values()))
+        signature = tuple(
+            sorted(
+                (r.indegree, r.outdegree, r.distance_from_source, r.distance_to_sink)
+                for r in roles.values()
+            )
+        )
         matches = sorted(node for node, role in roles.items() if role == schema.effective_role)
         if signature != schema.graph_signature or len(matches) != 1:
-            raise FoundationError("target world does not contain one unambiguous learned structural role")
+            raise FoundationError(
+                "target world does not contain one unambiguous learned structural role"
+            )
         node = matches[0]
         return TransferInference(world.domain_id, node, roles[node], True)
 
@@ -90,7 +106,9 @@ class RelationalTransferEngine:
         sources = [node for node in nodes if not incoming[node]]
         sinks = [node for node in nodes if not outgoing[node]]
         if not sources or not sinks:
-            raise FoundationError("relational transfer requires an acyclic source-to-sink structure")
+            raise FoundationError(
+                "relational transfer requires an acyclic source-to-sink structure"
+            )
         from_source = self._distances(sources, outgoing)
         to_sink = self._distances(sinks, incoming)
         if set(from_source) != set(nodes) or set(to_sink) != set(nodes):

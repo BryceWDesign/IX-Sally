@@ -7,11 +7,11 @@ items can be merged through the existing ontology restructuring machinery.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, replace
-from typing import Iterable
 
 from ix_sally.cognition.lifelong import KnowledgeItem, LifelongKnowledgeStore
-from ix_sally.digest import DigestRecord, JsonObject
+from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import FoundationError, require_text
 
 
@@ -64,8 +64,8 @@ class KnowledgeMaintenanceEngine:
     ) -> KnowledgeMaintenanceReport:
         items = tuple(evidence)
         evidence_by_concept: dict[str, list[ContextualKnowledgeEvidence]] = {}
-        for item in items:
-            evidence_by_concept.setdefault(item.concept_id, []).append(item)
+        for evidence_item in items:
+            evidence_by_concept.setdefault(evidence_item.concept_id, []).append(evidence_item)
         updated = store
         split: list[str] = []
         children: list[str] = []
@@ -86,13 +86,18 @@ class KnowledgeMaintenanceEngine:
             if len(qualified) < 2:
                 continue
             accuracies = {
-                context: sum(obs.predicted == obs.actual for obs in observations) / len(observations)
+                context: sum(obs.predicted == obs.actual for obs in observations)
+                / len(observations)
                 for context, observations in qualified.items()
             }
             if max(accuracies.values()) - min(accuracies.values()) < context_accuracy_gap:
                 continue
+            contexts_payload: JsonArray = []
+            for context, accuracy in sorted(accuracies.items()):
+                context_entry: JsonArray = [context, accuracy]
+                contexts_payload.append(context_entry)
             family_digest = DigestRecord.from_payload(
-                {"source": concept_id, "contexts": sorted(accuracies.items())}
+                {"source": concept_id, "contexts": contexts_payload}
             )
             family_id = f"context-family-{family_digest.value[:16]}"
             replaced: list[KnowledgeItem] = []
@@ -124,7 +129,9 @@ class KnowledgeMaintenanceEngine:
                         generation=updated.generation,
                     )
                 )
-            updated = LifelongKnowledgeStore(tuple(sorted(replaced, key=lambda item: item.concept_id)), updated.generation)
+            updated = LifelongKnowledgeStore(
+                tuple(sorted(replaced, key=lambda item: item.concept_id)), updated.generation
+            )
             split.append(concept_id)
 
         retained: list[KnowledgeItem] = []

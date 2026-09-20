@@ -32,8 +32,8 @@ from ix_sally.cognition.learning import (
     OutcomeStatus,
     SkillProfile,
 )
-from ix_sally.cognition.metacognition import CapabilityMeasure, SelfModel
 from ix_sally.cognition.lifelong import KnowledgeItem, LifelongKnowledgeStore
+from ix_sally.cognition.metacognition import CapabilityMeasure, SelfModel
 from ix_sally.cognition.online_meta import OnlineMetaProfile, StrategyExperience, TaskFingerprint
 from ix_sally.cognition.persistence import CognitiveSnapshot
 from ix_sally.cognition.planning import ActionSpec, FactEffect
@@ -651,7 +651,6 @@ def _restore_primitives(value: JsonValue) -> PrimitiveRegistry:
     )
 
 
-
 def _restore_lifelong(value: JsonValue) -> LifelongKnowledgeStore:
     payload = _object(value, field="lifelong_knowledge")
     generation = _integer(payload.get("generation"), field="lifelong_knowledge.generation")
@@ -682,6 +681,7 @@ def _restore_lifelong(value: JsonValue) -> LifelongKnowledgeStore:
     )
     return LifelongKnowledgeStore(items=items, generation=generation)
 
+
 def _restore_online_meta(value: JsonValue) -> OnlineMetaProfile:
     # v0.6 snapshots had no online meta profile; preserve backward compatibility.
     if value is None:
@@ -693,11 +693,15 @@ def _restore_online_meta(value: JsonValue) -> OnlineMetaProfile:
             fingerprint=TaskFingerprint(
                 tuple(
                     _number(raw_value, field="online_meta_profile.fingerprint[]")
-                    for raw_value in _array(item.get("fingerprint"), field="online_meta_profile.fingerprint")
+                    for raw_value in _array(
+                        item.get("fingerprint"), field="online_meta_profile.fingerprint"
+                    )
                 )
             ),
             score=_number(item.get("score"), field="online_meta_profile.score"),
-            samples_used=_integer(item.get("samples_used"), field="online_meta_profile.samples_used"),
+            samples_used=_integer(
+                item.get("samples_used"), field="online_meta_profile.samples_used"
+            ),
         )
         for item in (
             _object(raw, field="online_meta_profile.experiences[]")
@@ -705,6 +709,7 @@ def _restore_online_meta(value: JsonValue) -> OnlineMetaProfile:
         )
     )
     return OnlineMetaProfile(experiences)
+
 
 def restore_system_state(snapshot: CognitiveSnapshot) -> RestoredCognitiveState:
     """Restore and revalidate every serialized IX-Sally cognitive subsystem."""

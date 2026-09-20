@@ -9,9 +9,10 @@ representation invention. Discoveries therefore change the inputs to future cogn
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
+from ix_sally.cognition.goals import GoalSpec
 from ix_sally.cognition.lifelong import KnowledgeItem, LifelongKnowledgeStore
 from ix_sally.cognition.open_choice import ActionPrimitive, OpenChoiceSynthesizer
 from ix_sally.cognition.open_goals import GeneratedGoal, IntrinsicDrives, OpenGoalGenesis
@@ -22,7 +23,11 @@ from ix_sally.cognition.representation import (
     SemanticPrimitive,
 )
 from ix_sally.cognition.tool_forge import ForgedTool, ToolForge, ToolValidationCase
-from ix_sally.cognition.unknowns import PredictionResidual, UnknownUnknownDetector, UnknownUnknownSignal
+from ix_sally.cognition.unknowns import (
+    PredictionResidual,
+    UnknownUnknownDetector,
+    UnknownUnknownSignal,
+)
 from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import FoundationError
 
@@ -45,11 +50,8 @@ class RecursiveBootstrapReport:
         return (
             self.first_representation.validation_accuracy == 1.0
             and self.forged_tool.validation_accuracy == 1.0
-            and self.generated_goal.goal.evidence_digests
-            and (
-                not self.unknown_unknown.detected
-                or self.second_representation is not None
-            )
+            and bool(self.generated_goal.goal.evidence_digests)
+            and (not self.unknown_unknown.detected or self.second_representation is not None)
         )
 
     def to_payload(self) -> JsonObject:
@@ -111,13 +113,12 @@ class RecursiveCognitionEngine:
             max_depth=max_goal_depth,
         )
         evidence = (*goal.goal.evidence_digests, first.digest())
-        from ix_sally.cognition.goals import GoalSpec
-
         evidence_bound_goal = GoalSpec.create(
             goal_id=goal.goal.goal_id.value,
             description=(
                 goal.goal.description
-                + " The objective was authored only after a validated machine-invented representation entered cognition."
+                + " The objective was authored only after a validated machine-invented "
+                "representation entered cognition."
             ),
             desired_state=goal.goal.desired_state,
             priority=goal.goal.priority,
@@ -179,7 +180,9 @@ class RecursiveCognitionEngine:
         signal = (
             UnknownUnknownDetector().detect(residual_tuple)
             if residual_tuple
-            else UnknownUnknownSignal(False, 0.0, None, 0, "No post-action residuals were supplied.")
+            else UnknownUnknownSignal(
+                False, 0.0, None, 0, "No post-action residuals were supplied."
+            )
         )
         second: InventedRepresentation | None = None
         if signal.detected:

@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 from ix_sally.cognition.metacognition import ImprovementProposal, SelfModel
-from ix_sally.digest import DigestRecord, JsonArray, JsonObject
+from ix_sally.digest import DigestRecord, JsonObject
 from ix_sally.foundation import FoundationError, require_text
 
 
@@ -65,7 +65,7 @@ class AdaptiveSearchPolicy:
             mean_gain = sum(item.information_gain for item in relevant) / len(relevant)
             mean_cost = sum(item.cost for item in relevant) / len(relevant)
             scores[operator] = (0.6 * success_rate + 0.4 * mean_gain) / (1.0 + mean_cost)
-        allocations = {operator: minimum_each for operator in operators}
+        allocations = dict.fromkeys(operators, minimum_each)
         remaining = total_budget - sum(allocations.values())
         if remaining:
             score_total = sum(scores.values())
@@ -199,7 +199,7 @@ class SelfDiagnostic:
             failures = [item.failure_mode for item in relevant if not item.actual_success]
             dominant = None
             if failures:
-                dominant = max(sorted(set(failures)), key=lambda mode: failures.count(mode))
+                dominant = max(sorted(set(failures)), key=failures.count)
             reports.append(
                 SelfDiagnosticReport(
                     capability_id=capability,
@@ -289,7 +289,11 @@ class SelfImprovementLab:
             for item in measured
         )
         identity = DigestRecord.from_payload(
-            {"target": target, "description": description, "evidence": [item.value for item in evidence]}
+            {
+                "target": target,
+                "description": description,
+                "evidence": [item.value for item in evidence],
+            }
         )
         proposal = ImprovementProposal.create(
             proposal_id=f"self-improvement-{identity.value[:16]}",

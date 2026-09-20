@@ -1,6 +1,7 @@
 from ix_sally.cognition.open_choice import ActionPrimitive
 from ix_sally.cognition.open_goals import OpenGoalGenesis
 from ix_sally.cognition.semantic_genesis import SemanticGenesisEngine, SemanticObservation
+from ix_sally.cognition.system import SallyCognitiveSystem
 from ix_sally.cuc4 import run_cuc4_experiment
 
 
@@ -66,8 +67,6 @@ def test_generated_goals_remain_internal_and_do_not_grant_external_authority() -
 
 
 def test_sally_system_exposes_semantic_and_goal_genesis() -> None:
-    from ix_sally.cognition.system import SallyCognitiveSystem
-
     system = SallyCognitiveSystem.create()
     semantic = system.invent_semantic(
         observations=(

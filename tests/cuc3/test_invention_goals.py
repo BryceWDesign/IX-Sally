@@ -1,13 +1,14 @@
-from ix_sally.cognition.invention import (
-    ConceptInventor,
-    TransformationExample,
-)
 from ix_sally.cognition.instrumental_goals import (
     InstrumentalGoalGenerator,
     InstrumentalGoalKind,
 )
+from ix_sally.cognition.invention import (
+    ConceptInventor,
+    TransformationExample,
+)
 from ix_sally.cognition.metacognition import CapabilityMeasure, ImprovementStatus, SelfModel
 from ix_sally.cognition.open_choice import ActionPrimitive
+from ix_sally.cognition.system import SallyCognitiveSystem
 from ix_sally.cognition.uncertainty import CalibrationObservation, UncertaintyLedger
 from ix_sally.cuc3 import run_cuc3_experiment
 from ix_sally.digest import DigestRecord
@@ -129,8 +130,6 @@ def test_internal_measurements_can_trigger_goals_without_user_supplying_goal_tex
 
 
 def test_sally_system_exposes_invention_pipeline() -> None:
-    from ix_sally.cognition.system import SallyCognitiveSystem
-
     system = SallyCognitiveSystem.create()
     primitives = _primitives()
     hypothesis = system.invent_hypothesis(
