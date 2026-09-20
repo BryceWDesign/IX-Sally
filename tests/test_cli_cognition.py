@@ -81,3 +81,34 @@ def test_cli_empty_snapshot_is_complete_and_named_ix_sally(
     assert payload["state"]["goals"] == {"goals": []}
     assert payload["state"]["episodes"] == {"episodes": []}
     assert captured.err == ""
+
+
+def test_cli_cuc7_reports_reality_triggered_recovery(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    result = main(["--cuc7-experiment"])
+    payload = json.loads(capsys.readouterr().out)
+    assert result == 0
+    assert payload["baseline_operation"] == "act"
+    assert payload["shifted_operation"] == "recover"
+    assert payload["contradiction_detected"] is True
+
+
+def test_cli_cuc8_reports_complete_recovery(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    result = main(["--cuc8-experiment"])
+    payload = json.loads(capsys.readouterr().out)
+    assert result == 0
+    assert payload["entered_hold"] is True
+    assert payload["recovered_to_normal"] is True
+
+
+def test_cli_cuc9_never_auto_promotes_shadow_strategy(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    result = main(["--cuc9-experiment"])
+    payload = json.loads(capsys.readouterr().out)
+    assert result == 0
+    assert payload["eligible_for_human_review"] is True
+    assert payload["auto_promoted"] is False

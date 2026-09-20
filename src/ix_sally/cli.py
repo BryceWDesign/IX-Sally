@@ -73,6 +73,21 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Run the lifelong generalization and representation-language CUC-6 experiment.",
     )
+    parser.add_argument(
+        "--cuc7-experiment",
+        action="store_true",
+        help="Run the reality-coupled perceptual agency CUC-7 experiment.",
+    )
+    parser.add_argument(
+        "--cuc8-experiment",
+        action="store_true",
+        help="Run the autonomous epistemic recovery CUC-8 experiment.",
+    )
+    parser.add_argument(
+        "--cuc9-experiment",
+        action="store_true",
+        help="Run the shadow cognitive-strategy evolution CUC-9 experiment.",
+    )
     return parser
 
 
@@ -151,6 +166,31 @@ def main(argv: Sequence[str] | None = None) -> int:
         cuc6_report = run_cuc6_experiment()
         sys.stdout.write(f"{stable_json(cuc6_report.to_payload())}\n")
         return 0 if cuc6_report.demonstrated_count == 9 else 1
+
+    if args.cuc7_experiment:
+        from ix_sally.cuc7 import run_cuc7
+
+        cuc7_report = run_cuc7()
+        sys.stdout.write(f"{stable_json(cuc7_report.to_payload())}\n")
+        return (
+            0
+            if cuc7_report.contradiction_detected and cuc7_report.generated_goal is not None
+            else 1
+        )
+
+    if args.cuc8_experiment:
+        from ix_sally.cuc8 import run_cuc8
+
+        cuc8_report = run_cuc8()
+        sys.stdout.write(f"{stable_json(cuc8_report.to_payload())}\n")
+        return 0 if cuc8_report.entered_hold and cuc8_report.recovered_to_normal else 1
+
+    if args.cuc9_experiment:
+        from ix_sally.cuc9 import run_cuc9
+
+        cuc9_report = run_cuc9()
+        sys.stdout.write(f"{stable_json(cuc9_report.to_payload())}\n")
+        return 0 if cuc9_report.eligible_for_human_review and not cuc9_report.auto_promoted else 1
 
     sys.stdout.write(f"IX-Sally {__version__}\n")
     return 0

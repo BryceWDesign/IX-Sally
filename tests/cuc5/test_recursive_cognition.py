@@ -413,6 +413,7 @@ def test_system_persists_lifelong_knowledge_across_snapshot_restore() -> None:
 
 
 def test_cli_cuc5_reports_integrated_capabilities(capsys: pytest.CaptureFixture[str]) -> None:
+
     result = main(["--cuc5-experiment"])
     captured = capsys.readouterr()
     payload = json.loads(captured.out)

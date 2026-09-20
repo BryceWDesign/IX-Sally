@@ -171,17 +171,24 @@ class OntologyRestructurer:
         groups: dict[tuple[bool, ...], list[str]] = {}
         for item in signatures:
             groups.setdefault(item.predictions, []).append(item.concept_id)
+
         results: list[RestructuredConcept] = []
         for signature, members in sorted(groups.items(), key=lambda item: item[0]):
             if len(members) < 2:
                 continue
-            members_payload: JsonArray = []
-            members_payload.extend(sorted(members))
-            signature_payload: JsonArray = []
-            signature_payload.extend(signature)
-            identity = DigestRecord.from_payload(
-                {"members": members_payload, "signature": signature_payload}
-            )
+
+            member_values: JsonArray = []
+            member_values.extend(sorted(members))
+
+            signature_values: JsonArray = []
+            signature_values.extend(signature)
+
+            identity_payload: JsonObject = {
+                "members": member_values,
+                "signature": signature_values,
+            }
+            identity = DigestRecord.from_payload(identity_payload)
+
             results.append(
                 RestructuredConcept(
                     concept_id=f"abstraction-{identity.value[:16]}",
@@ -189,6 +196,7 @@ class OntologyRestructurer:
                     signature=signature,
                 )
             )
+
         return tuple(results)
 
     def apply_to_store(
@@ -196,16 +204,22 @@ class OntologyRestructurer:
         store: LifelongKnowledgeStore,
         abstraction: RestructuredConcept,
     ) -> LifelongKnowledgeStore:
-        members_payload: JsonArray = []
-        members_payload.extend(abstraction.member_ids)
-        signature_payload: JsonArray = []
-        signature_payload.extend(abstraction.signature)
-        identity = DigestRecord.from_payload(
-            {"members": members_payload, "signature": signature_payload}
-        )
+        member_values: JsonArray = []
+        member_values.extend(abstraction.member_ids)
+
+        signature_values: JsonArray = []
+        signature_values.extend(abstraction.signature)
+
+        identity_payload: JsonObject = {
+            "members": member_values,
+            "signature": signature_values,
+        }
+        identity = DigestRecord.from_payload(identity_payload)
+
         updated: list[KnowledgeItem] = []
         member_confidences: list[float] = []
         member_utilities: list[float] = []
+
         for item in store.items:
             if item.concept_id in abstraction.member_ids:
                 member_confidences.append(item.confidence)
@@ -213,8 +227,10 @@ class OntologyRestructurer:
                 updated.append(replace(item, superseded_by=abstraction.concept_id))
             else:
                 updated.append(item)
+
         if len(member_confidences) != len(abstraction.member_ids):
             raise FoundationError("ontology restructuring members are missing from lifelong store")
+
         updated.append(
             KnowledgeItem(
                 concept_id=abstraction.concept_id,
@@ -224,8 +240,10 @@ class OntologyRestructurer:
                 generation=store.generation,
             )
         )
+
         return LifelongKnowledgeStore(
-            tuple(sorted(updated, key=lambda item: item.concept_id)), store.generation
+            tuple(sorted(updated, key=lambda item: item.concept_id)),
+            store.generation,
         )
 
 
@@ -268,11 +286,18 @@ class StructuralAnalogyEngine:
         pairs = tuple(examples)
         if not pairs:
             raise FoundationError("structural transfer requires examples")
+
         encoded = tuple((adapter.encode(left), adapter.encode(right)) for left, right in pairs)
+
         for multiplier in range(-multiplier_bound, multiplier_bound + 1):
             for offset in range(-offset_bound, offset_bound + 1):
                 if all(multiplier * left + offset == right for left, right in encoded):
-                    return AbstractTransitionRule(multiplier, offset, adapter.domain_id)
+                    return AbstractTransitionRule(
+                        multiplier,
+                        offset,
+                        adapter.domain_id,
+                    )
+
         raise FoundationError("no affine structural rule found within bounds")
 
     def evaluate_transfer(
@@ -285,6 +310,7 @@ class StructuralAnalogyEngine:
         pairs = tuple(examples)
         if not pairs:
             raise FoundationError("transfer evaluation requires examples")
+
         correct = sum(rule.apply(left, adapter) == right for left, right in pairs)
         return correct / len(pairs)
 
@@ -310,25 +336,40 @@ class SelfDirectedCurriculum:
     ) -> CurriculumChoice:
         if not self_model.measures:
             raise FoundationError("self-directed curriculum requires capability measures")
+
         uncertainty = uncertainty or {}
         opportunity = opportunity or {}
         choices: list[CurriculumChoice] = []
+
         for measure in self_model.measures:
             capability = measure.capability_id.value
             weakness = 1.0 - measure.score
-            uncertain = min(1.0, max(0.0, uncertainty.get(capability, 0.0)))
-            potential = min(1.0, max(0.0, opportunity.get(capability, 0.5)))
+            uncertain = min(
+                1.0,
+                max(0.0, uncertainty.get(capability, 0.0)),
+            )
+            potential = min(
+                1.0,
+                max(0.0, opportunity.get(capability, 0.5)),
+            )
             score = 0.55 * weakness + 0.25 * uncertain + 0.20 * potential
+
             choices.append(
                 CurriculumChoice(
                     capability_id=capability,
                     score=round(score, 12),
                     reason=(
-                        f"weakness={weakness:.3f}; uncertainty={uncertain:.3f}; "
+                        f"weakness={weakness:.3f}; "
+                        f"uncertainty={uncertain:.3f}; "
                         f"learning-opportunity={potential:.3f}"
                     ),
                 )
             )
+
         return max(
-            choices, key=lambda item: (item.score, tuple(-ord(ch) for ch in item.capability_id))
+            choices,
+            key=lambda item: (
+                item.score,
+                tuple(-ord(ch) for ch in item.capability_id),
+            ),
         )

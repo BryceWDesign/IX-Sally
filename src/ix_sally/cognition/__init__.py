@@ -24,8 +24,40 @@ from ix_sally.cognition.adaptation import (
     RegressionOutcome,
     RegressionReport,
 )
+from ix_sally.cognition.agency_loop import (
+    AgencyCycleResult,
+    CognitiveContextSignals,
+    RealityCoupledAgencyLoop,
+)
+from ix_sally.cognition.assumption_ledger import (
+    Assumption,
+    AssumptionDiagnosis,
+    AssumptionLedger,
+    AssumptionStatus,
+)
+from ix_sally.cognition.authority_envelope import (
+    AuthorityEnvelope,
+    EpistemicAuthorityEnvelope,
+    ProposalScope,
+)
+from ix_sally.cognition.autobiographical_trace import (
+    AutobiographicalEpistemicTrace,
+    EpistemicTraceEntry,
+    TraceKind,
+)
 from ix_sally.cognition.bytecode import BytecodeProgram, Instruction, OpCode
+from ix_sally.cognition.cognitive_recovery import (
+    CognitiveRecoveryController,
+    RecoveryDecision,
+    RecoveryStage,
+)
 from ix_sally.cognition.compiler import IXCompiler, compile_ix_source
+from ix_sally.cognition.counterfactual_goals import (
+    BlockedCondition,
+    CounterfactualGoalGenerator,
+    EpistemicGoal,
+    GoalSource,
+)
 from ix_sally.cognition.curriculum import (
     Curriculum,
     CurriculumLedger,
@@ -40,6 +72,12 @@ from ix_sally.cognition.episodes import (
     EpisodeStep,
     EpisodeStepKind,
     EpisodeStepStatus,
+)
+from ix_sally.cognition.epistemic_pressure import (
+    CognitiveDirective,
+    CognitiveOperation,
+    CognitiveOperationSelector,
+    EpistemicPressure,
 )
 from ix_sally.cognition.evaluation import (
     BenchmarkResult,
@@ -158,7 +196,17 @@ from ix_sally.cognition.open_choice import (
     OpenChoiceSynthesizer,
 )
 from ix_sally.cognition.open_goals import GeneratedGoal, IntrinsicDrives, OpenGoalGenesis
+from ix_sally.cognition.perception_quorum import (
+    PerceptionChannelObservation,
+    PerceptionQuorum,
+    PerceptionQuorumReport,
+)
 from ix_sally.cognition.persistence import CognitiveSnapshot
+from ix_sally.cognition.perspectives import (
+    PerspectiveEnsemble,
+    PerspectivePrediction,
+    PerspectiveReport,
+)
 from ix_sally.cognition.planning import (
     ActionSpec,
     DeterministicPlanner,
@@ -180,6 +228,12 @@ from ix_sally.cognition.primitives import (
     default_primitive_registry,
 )
 from ix_sally.cognition.raw_perception import GroundedSignal, RawSignal, RawSignalGrounder
+from ix_sally.cognition.reality_coupling import (
+    RealityComparator,
+    RealityDelta,
+    RealityObservation,
+    RealityPrediction,
+)
 from ix_sally.cognition.recursive_bootstrap import (
     RecursiveBootstrapReport,
     RecursiveCognitionEngine,
@@ -209,6 +263,11 @@ from ix_sally.cognition.semantic_genesis import (
     InventedSemantic,
     SemanticGenesisEngine,
     SemanticObservation,
+)
+from ix_sally.cognition.shadow_strategies import (
+    ShadowStrategyEvaluator,
+    StrategyOutcome,
+    StrategyPromotionProposal,
 )
 from ix_sally.cognition.storage import (
     SnapshotLoadResult,
@@ -265,10 +324,18 @@ __all__ = [
     "ActivePerceptionPlanner",
     "AdaptationController",
     "AdaptiveSearchPolicy",
+    "AgencyCycleResult",
+    "Assumption",
+    "AssumptionDiagnosis",
+    "AssumptionLedger",
+    "AssumptionStatus",
+    "AuthorityEnvelope",
+    "AutobiographicalEpistemicTrace",
     "BenchmarkResult",
     "BlindChallenge",
     "BlindEvaluationResult",
     "BlindEvaluatorHarness",
+    "BlockedCondition",
     "BytecodeProgram",
     "CalibrationBin",
     "CalibrationObservation",
@@ -278,11 +345,16 @@ __all__ = [
     "CausalDiscoveryReport",
     "CausalObservation",
     "CausalRule",
+    "CognitiveContextSignals",
+    "CognitiveDirective",
     "CognitiveEpisode",
     "CognitiveEvaluationReport",
+    "CognitiveOperation",
+    "CognitiveOperationSelector",
     "CognitiveProposalBridge",
     "CognitiveProposalBridgeReceipt",
     "CognitiveProposalBridgeResult",
+    "CognitiveRecoveryController",
     "CognitiveScalar",
     "CognitiveSnapshot",
     "CognitiveValue",
@@ -292,6 +364,7 @@ __all__ = [
     "ConstructedAction",
     "ContextualKnowledgeEvidence",
     "CounterfactualAction",
+    "CounterfactualGoalGenerator",
     "CounterfactualSimulator",
     "Curriculum",
     "CurriculumChoice",
@@ -307,6 +380,10 @@ __all__ = [
     "EpisodeStep",
     "EpisodeStepKind",
     "EpisodeStepStatus",
+    "EpistemicAuthorityEnvelope",
+    "EpistemicGoal",
+    "EpistemicPressure",
+    "EpistemicTraceEntry",
     "EvaluationCategory",
     "ExecutionPermission",
     "ExecutiveController",
@@ -327,6 +404,7 @@ __all__ = [
     "GoalPortfolioManager",
     "GoalResolution",
     "GoalRevisionEngine",
+    "GoalSource",
     "GoalSpec",
     "GoalStatus",
     "GroundedSignal",
@@ -378,7 +456,13 @@ __all__ = [
     "OpenChoiceSynthesizer",
     "OpenGoalGenesis",
     "OutcomeStatus",
+    "PerceptionChannelObservation",
     "PerceptionProbe",
+    "PerceptionQuorum",
+    "PerceptionQuorumReport",
+    "PerspectiveEnsemble",
+    "PerspectivePrediction",
+    "PerspectiveReport",
     "Plan",
     "PlanExecutionReceipt",
     "PlanSimulator",
@@ -394,8 +478,16 @@ __all__ = [
     "PrimitiveStatus",
     "ProbeChoice",
     "ProgramOperator",
+    "ProposalScope",
     "RawSignal",
     "RawSignalGrounder",
+    "RealityComparator",
+    "RealityCoupledAgencyLoop",
+    "RealityDelta",
+    "RealityObservation",
+    "RealityPrediction",
+    "RecoveryDecision",
+    "RecoveryStage",
     "RecursiveBootstrapReport",
     "RecursiveCognitionEngine",
     "RegressionFinding",
@@ -421,12 +513,15 @@ __all__ = [
     "SemanticGenesisEngine",
     "SemanticObservation",
     "SemanticPrimitive",
+    "ShadowStrategyEvaluator",
     "SkillProfile",
     "SnapshotLoadResult",
     "SnapshotRepository",
     "SnapshotSaveReceipt",
     "SnapshotSource",
     "StrategyExperience",
+    "StrategyOutcome",
+    "StrategyPromotionProposal",
     "StructuralAnalogyEngine",
     "StructuralRole",
     "TaskFingerprint",
@@ -434,6 +529,7 @@ __all__ = [
     "TextOutcomeObservation",
     "ToolForge",
     "ToolValidationCase",
+    "TraceKind",
     "TransferEvaluation",
     "TransferInference",
     "TransformationExample",

@@ -9,10 +9,10 @@ simpler one-operation baseline and must survive held-out validation.
 
 from __future__ import annotations
 
-import itertools
 from collections.abc import Iterable
 from dataclasses import dataclass, replace
 from enum import StrEnum
+from itertools import pairwise
 from math import isfinite
 
 from ix_sally.cognition.representation import RepresentationObservation
@@ -311,7 +311,7 @@ class RepresentationProgramInventor:
     def _thresholds(values: tuple[float, ...]) -> tuple[float, ...]:
         ordered = sorted(set(values))
         candidates = [ordered[0] - 1.0, ordered[-1] + 1.0, *ordered]
-        candidates.extend((left + right) / 2.0 for left, right in itertools.pairwise(ordered))
+        candidates.extend((left + right) / 2.0 for left, right in pairwise(ordered))
         return tuple(sorted(set(candidates)))
 
     @staticmethod

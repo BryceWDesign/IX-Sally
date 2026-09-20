@@ -64,8 +64,8 @@ class KnowledgeMaintenanceEngine:
     ) -> KnowledgeMaintenanceReport:
         items = tuple(evidence)
         evidence_by_concept: dict[str, list[ContextualKnowledgeEvidence]] = {}
-        for evidence_item in items:
-            evidence_by_concept.setdefault(evidence_item.concept_id, []).append(evidence_item)
+        for item in items:
+            evidence_by_concept.setdefault(item.concept_id, []).append(item)
         updated = store
         split: list[str] = []
         children: list[str] = []
@@ -94,18 +94,17 @@ class KnowledgeMaintenanceEngine:
                 continue
             contexts_payload: JsonArray = []
             for context, accuracy in sorted(accuracies.items()):
-                context_entry: JsonArray = [context, accuracy]
-                contexts_payload.append(context_entry)
+                contexts_payload.append({"context_id": context, "accuracy": accuracy})
             family_digest = DigestRecord.from_payload(
                 {"source": concept_id, "contexts": contexts_payload}
             )
             family_id = f"context-family-{family_digest.value[:16]}"
             replaced: list[KnowledgeItem] = []
-            for item in updated.items:
-                if item.concept_id == concept_id:
-                    replaced.append(replace(item, superseded_by=family_id))
+            for knowledge_item in updated.items:
+                if knowledge_item.concept_id == concept_id:
+                    replaced.append(replace(knowledge_item, superseded_by=family_id))
                 else:
-                    replaced.append(item)
+                    replaced.append(knowledge_item)
             family = KnowledgeItem(
                 concept_id=family_id,
                 content_digest=family_digest,
@@ -135,17 +134,17 @@ class KnowledgeMaintenanceEngine:
             split.append(concept_id)
 
         retained: list[KnowledgeItem] = []
-        for item in updated.items:
+        for knowledge_item in updated.items:
             should_retire = (
-                item.superseded_by is None
-                and item.confidence < retire_confidence_below
-                and item.utility < retire_utility_below
-                and item.contradiction_count >= retire_contradictions_at
+                knowledge_item.superseded_by is None
+                and knowledge_item.confidence < retire_confidence_below
+                and knowledge_item.utility < retire_utility_below
+                and knowledge_item.contradiction_count >= retire_contradictions_at
             )
             if should_retire:
-                retired.append(item.concept_id)
+                retired.append(knowledge_item.concept_id)
             else:
-                retained.append(item)
+                retained.append(knowledge_item)
         updated = LifelongKnowledgeStore(tuple(retained), updated.generation)
         return KnowledgeMaintenanceReport(
             store=updated,

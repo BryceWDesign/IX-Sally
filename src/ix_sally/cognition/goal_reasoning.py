@@ -86,8 +86,8 @@ class GoalArbiter:
             conflicting_goal_ids=tuple(sorted(conflicts)),
             scores=tuple(scored),
             reason=(
-                "Selected by current premise support, utility, information value, risk, "
-                "and priority."
+                "Selected by current premise support, utility, information value, "
+                "risk, and priority."
             ),
         )
 

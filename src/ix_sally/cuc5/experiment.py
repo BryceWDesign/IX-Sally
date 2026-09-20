@@ -10,9 +10,7 @@ spot, change learning strategy from evidence, and propose (not self-authorize) i
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from dataclasses import dataclass
-from typing import cast
 
 from ix_sally.cognition.active_inference import (
     ActivePerceptionPlanner,
@@ -58,6 +56,12 @@ from ix_sally.cognition.unknowns import PredictionResidual
 from ix_sally.cognition.values import CognitiveValue
 from ix_sally.cognition.world_model import FactPattern
 from ix_sally.digest import DigestRecord, JsonObject
+
+
+def _encode_integer_domain(value: object) -> int:
+    if not isinstance(value, int):
+        raise TypeError("number-domain adapter requires integer values")
+    return value
 
 
 def _primary_training() -> tuple[RepresentationObservation, ...]:
@@ -289,11 +293,7 @@ def run_cuc5_experiment() -> CUC5Report:
     )
 
     # Cross-domain transfer: learn 2x+1 on numbers, reuse unchanged relation on letters.
-    numbers = DomainAdapter(
-        "numbers",
-        cast(Callable[[object], int], int),
-        int,
-    )
+    numbers = DomainAdapter("numbers", _encode_integer_domain, lambda value: value)
     letters = DomainAdapter(
         "letters",
         encode=lambda value: ord(str(value).upper()) - ord("A"),

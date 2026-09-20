@@ -1,157 +1,335 @@
-# IX-Sally v0.7.0 Validation Report
+# IX-Sally v0.8.0 Validation Report
 
-Validation in this report records only checks actually executed on the v0.7.0 release tree in
-this environment. It is not an AGI certification or independent replication.
+This report records the final locally verified state of IX-Sally v0.8.0 after the Reality-Coupled Cognition upgrade and release cleanup.
 
 ## Release identity
 
-- Repository: `IX-Sally`
-- Package version: `0.7.0`
-- Primary experiment: `CUC-6 lifelong generalization and representational freedom`
-- Governance rule retained: `AI proposes. Humans decide.`
+- Package: `ix-sally`
+- Version: `0.8.0`
+- Python requirement: `>=3.11`
+- Runtime dependencies: none
+- Governing doctrine: **AI proposes. Humans decide. Evidence governs what may proceed.**
 
-## What v0.7.0 adds over v0.6.0
+## v0.8.0 additions
 
-### Compositional representation-language invention
+The release adds:
 
-The previous representation inventor searched atomic or single relational operators. v0.7.0 can
-synthesize bounded multi-operation feature programs. In the CUC-6 task:
+- reality/prediction separation with immutable deltas;
+- independent perception quorum with disagreement retention;
+- multidimensional epistemic pressure;
+- choice over cognitive operation;
+- first-class assumption aging, diagnosis, contradiction, and revalidation;
+- counterfactual goal generation from blocked conditions and failures;
+- explicit cognitive recovery;
+- disagreement-preserving perspective ensembles;
+- epistemic authority envelopes that shrink proposal scope under uncertainty;
+- autobiographical epistemic traces with causal lineage;
+- shadow cognitive-strategy evaluation with human-review-only promotion;
+- CUC-7 reality-coupled perceptual agency;
+- CUC-8 autonomous epistemic recovery;
+- CUC-9 cognitive strategy evolution.
 
-- best shallow training accuracy: `0.8125`
-- invented expression: `((x0*x1)+x2)`
-- program depth: `2`
-- training accuracy: `1.0`
-- held-out accuracy: `1.0`
+## Final local release verification
 
-The holdout uses values outside the training range. A negative-control test verifies that Sally
-refuses compositional novelty when a shallow representation is already sufficient.
+The complete repository quality gate was executed successfully on the final v0.8.0 working tree:
 
-### Persistent online meta-learning
-
-CUC-6 runs `12` sealed numeric worlds. The first two episodes explore both learning-strategy
-families. The subsequent ten use the accumulated online meta-profile to select one strategy
-before learning. All twelve observed episodes achieve held-out accuracy `1.0`.
-
-Observed behavior:
-
-- episode 0: two strategies evaluated
-- episode 1: two strategies evaluated
-- episodes 2-11: one strategy evaluated
-- later strategy decisions use prior cross-domain structural evidence
-- online meta-profile survives complete `SallyCognitiveSystem` snapshot/restore
-
-This demonstrates a bounded form of later Sally changing how it learns because of earlier
-experience. It does not establish open-ended universal meta-learning.
-
-### Active lifelong knowledge maintenance
-
-A concept that is consistently correct in one context and consistently wrong in another is
-superseded by a context family and context-specific descendants. This avoids treating every
-regime-dependent contradiction as a permanent exception to one over-broad concept. Low-value,
-low-confidence, repeatedly contradicted items can also be retired.
-
-### Surface-independent relational transfer
-
-A learned topological role transfers from an industrial-control graph to a software-rendering
-graph despite different entity names and relation labels. In the release challenge, the role of
-`controller` is transferred to `adapter` from graph structure rather than text similarity.
-
-### Raw-text outcome grounding
-
-A new text-grounding path begins from unstructured strings and observed binary outcomes and
-measures token information gain. In the release challenge, `glint` is discovered as the strongest
-outcome-linked token. This is explicitly not general language understanding.
-
-### Multi-goal portfolio coherence
-
-Finite attention is allocated using current evidence, utility, information value, risk,
-dependencies, and resource cost. A dependent goal is selected only after its prerequisite and a
-goal whose premise collapses is abandoned.
-
-### Bounded endurance and recovery
-
-The integrated runtime advances the maintained lifelong store through `64` generations with
-repeated consolidation, snapshots the complete cognitive state, restores it, and verifies exact
-state equality including the online meta-profile and lifelong knowledge store. This is a bounded
-checkpoint/recovery exercise, not evidence of long wall-clock autonomous operation.
-
-## CUC-6 direct CLI result
-
-Command executed:
-
-```text
-python -m ix_sally.cli --cuc6-experiment
+```
+python check_green.py
 ```
 
-Observed release-level result:
+Observed final results:
 
-```text
-release = IX-Sally-v0.7.0
-demonstrated_count = 9
-later_learning_is_more_selective = true
-compositional representation = ((x0*x1)+x2)
-compositional held-out accuracy = 1.0
-agi_certified = false
+```
+Ruff format:
+354 files already formatted
+
+Ruff lint:
+All checks passed
+
+MyPy strict:
+Success: no issues found in 332 source files
+
+Cross-platform repository integrity:
+333 source/test files
+0 violations
+
+Runtime dependency graph:
+178 modules
+895 imports
+0 cycles
+
+Runtime architecture boundaries:
+178 modules
+895 imports
+0 boundary violations
+
+Pytest:
+1053 passed
+
+Installed wheel smoke test:
+passed
+
+Overall:
+All selected quality gates passed
 ```
 
-## Automated test execution
+## MyPy environment isolation
 
-Collected test count:
+IX-Sally retains Python 3.11 as its declared compatibility floor:
 
-```text
-1036
+```
+python_version = "3.11"
+strict = true
+no_site_packages = true
+mypy_path = "src"
 ```
 
-The entire collected suite was executed exhaustively in partitions because one large legacy
-human-review partition can exceed this environment's individual command time limit. The executed
-partitions covered:
+`no_site_packages = true` prevents unrelated packages installed in the user's ambient Python environment from contaminating IX-Sally's strict type-checking gate.
 
-- `tests/cognition`
-- `tests/language`
-- `tests/cuc1`
-- `tests/cuc2`
-- `tests/cuc3`
-- `tests/cuc4`
-- `tests/cuc5`
-- `tests/cuc6`
-- every root-level `tests/test_*.py` file, split into smaller exhaustive batches
+This became necessary because an unrelated globally installed NumPy package exposed Python 3.12+ typing syntax while MyPy was intentionally validating IX-Sally against its Python 3.11 compatibility target.
 
-All executed partitions passed. No test in the collected 1,036-test set was omitted from the
-partitioned execution.
+The final isolated strict type check completed successfully:
 
-## Structural verification
-
-Executed after generated caches were removed:
-
-```text
-repository integrity: PASS
-source/test files checked by repository gate: 312
-violations: 0
-
-runtime dependency graph: PASS
-runtime modules: 161
-imports: 843
-cycles: 0
-
-runtime architecture: PASS
-runtime modules: 161
-imports: 843
-boundary violations: 0
+```
+Success: no issues found in 332 source files
 ```
 
-Python compilation/import validation and package smoke checks also passed.
+## Repository integrity
 
-`ruff` and `mypy` are not installed in this execution environment, so this report does **not**
-claim those two optional development gates passed.
+The final repository integrity check reported:
 
-## Claim boundary
+```
+IX-Sally repository integrity passed:
+333 source/test files
+0 violations
+```
 
-v0.7.0 is a stronger bounded experimental cognitive architecture than v0.6.0. It shows that prior
-experience can alter later strategy selection, that representation synthesis can exceed a
-one-step feature language, and that persistent cognition can repair context-dependent knowledge
-and transfer relational structure across different surfaces.
+Generated Python bytecode and development caches are excluded from version control through `.gitignore`.
 
-It does **not** establish AGI, consciousness, free will, unrestricted self-modification, general
-vision/audio perception, indefinite autonomous operation, independent replication, or an accepted
-scientific AGI threshold. Independent evaluation still requires challenge sets created by parties
-other than IX-Sally's builders.
+Ignored generated artifacts include:
+
+```
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+.venv/
+venv/
+.env
+```
+
+## Runtime dependency graph
+
+The dependency checker reported:
+
+```
+IX-Sally runtime dependency graph passed:
+178 modules
+895 imports
+0 cycles
+```
+
+This verifies that the runtime module graph remains acyclic under the repository's dependency rules.
+
+## Runtime architecture boundaries
+
+The architecture checker reported:
+
+```
+IX-Sally runtime architecture passed:
+178 modules
+895 imports
+0 boundary violations
+```
+
+This confirms that the v0.8.0 additions did not violate the repository's declared architectural boundaries.
+
+## Test suite
+
+The complete pytest suite executed successfully:
+
+```
+1053 passed
+```
+
+The suite includes existing IX-Sally behavior plus the v0.8.0 Reality-Coupled Cognition additions and CUC-7 through CUC-9 coverage.
+
+## Installed wheel smoke test
+
+The installed-package smoke test completed successfully:
+
+```
+Installed IX-Sally wheel smoke test passed.
+```
+
+This verifies that IX-Sally operates correctly as an installed package rather than only from the repository source tree.
+
+## CUC-7 through CUC-9 observations
+
+The v0.8.0 experimental suites exercise the new reality-coupled cognition mechanisms.
+
+Observed bounded experiment behavior includes:
+
+```
+CUC-7:
+baseline=act
+shifted=recover
+contradiction=true
+generated_goal=epistemic:contradiction:predict-source
+dependent_assumption=contradicted
+
+CUC-8:
+commitment-hold
+-> retract
+-> reassess
+-> revalidate
+-> normal
+
+CUC-9:
+candidate improvement=0.25 across 3 holdouts
+eligible_for_human_review=true
+auto_promoted=false
+```
+
+### CUC-7
+
+CUC-7 exercises reality-coupled perceptual agency.
+
+The experiment demonstrates that a previously acceptable operating state can encounter contradictory evidence and cause subsequent cognition to change.
+
+The bounded experiment verifies mechanisms for:
+
+- prediction/reality comparison;
+- contradiction detection;
+- assumption invalidation;
+- epistemic pressure generation;
+- cognitive-operation selection;
+- recovery behavior;
+- endogenous information-seeking goal generation.
+
+### CUC-8
+
+CUC-8 exercises autonomous epistemic recovery.
+
+The observed recovery path is:
+
+```
+commitment-hold
+-> retract
+-> reassess
+-> revalidate
+-> normal
+```
+
+This verifies that the architecture can suspend continued commitment after contradiction, revisit implicated assumptions, perform revalidation, and return to normal operation after the bounded recovery conditions are satisfied.
+
+### CUC-9
+
+CUC-9 exercises cognitive-strategy comparison.
+
+The bounded experiment produced:
+
+```
+candidate improvement=0.25 across 3 holdouts
+eligible_for_human_review=true
+auto_promoted=false
+```
+
+The important authority property is that successful experimental cognitive strategies do not automatically promote themselves.
+
+Evidence may make a candidate eligible for review, but promotion remains outside autonomous authority.
+
+## Reproducible quality gates
+
+Run the complete quality gate with:
+
+```
+python check_green.py
+```
+
+Individual gates remain available:
+
+```
+python check_green.py --gate format
+python check_green.py --gate lint
+python check_green.py --gate type-check
+python check_green.py --gate repository
+python check_green.py --gate dependencies
+python check_green.py --gate architecture
+python check_green.py --gate test
+python check_green.py --gate package
+```
+
+The final full run reported:
+
+```
+All selected quality gates passed.
+```
+
+## Validation scope
+
+This report validates repository behavior and the implemented mechanisms under the repository's test conditions.
+
+The successful quality gates establish that:
+
+- the source tree is formatted according to the configured Ruff formatter;
+- Ruff reports no lint violations;
+- MyPy strict type checking passes;
+- repository integrity checks pass;
+- the runtime dependency graph contains no detected cycles;
+- architecture-boundary checks pass;
+- all 1,053 collected tests pass;
+- the installed wheel passes its smoke test.
+
+These results do not establish that every possible external environment, workload, or open-ended cognitive setting has been tested.
+
+## AGI claim boundary
+
+IX-Sally v0.8.0 is an experimental cognitive architecture investigating mechanisms that may be relevant to general intelligence.
+
+The current results do **not** establish:
+
+- AGI;
+- consciousness;
+- sentience;
+- unrestricted autonomy;
+- independent self-replication;
+- open-ended general intelligence;
+- human-equivalent cognition;
+- autonomous authority over consequential actions.
+
+CUC-7 through CUC-9 are bounded experiments.
+
+They test whether mechanisms involving prediction error, independent observations, disagreement, contradiction, assumption revalidation, information-seeking goals, recovery, and cognitive-strategy comparison can cause later cognition to change in an evidence-linked manner.
+
+The appropriate claim is therefore:
+
+> IX-Sally v0.8.0 implements and tests a reality-coupled experimental cognitive architecture with evidence-linked recovery, uncertainty-sensitive cognitive selection, assumption revalidation, and bounded cognitive-strategy evaluation.
+
+It should not be described as a demonstrated AGI system.
+
+## Final verification status
+
+Final locally verified release state:
+
+```
+Version: 0.8.0
+
+Ruff format: PASS
+Ruff lint: PASS
+MyPy strict: PASS
+Repository integrity: PASS
+Dependency graph: PASS
+Architecture boundaries: PASS
+Pytest: 1053 passed
+Installed wheel smoke: PASS
+
+Overall:
+All selected quality gates passed.
+```

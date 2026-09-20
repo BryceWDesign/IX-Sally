@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
 from ix_sally.cognition.active_inference import (
     ActivePerceptionPlanner,
@@ -164,6 +165,9 @@ from ix_sally.cognition.world_model import CausalRule, FactPattern, WorldFact, W
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
 from ix_sally.foundation import FoundationError
 
+if TYPE_CHECKING:
+    from ix_sally.cognition.agency_loop import RealityCoupledAgencyLoop
+
 
 @dataclass(slots=True)
 class SallyCognitiveSystem:
@@ -198,6 +202,16 @@ class SallyCognitiveSystem:
     def create(cls) -> SallyCognitiveSystem:
         """Create a clean IX-Sally cognitive runtime."""
         return cls()
+
+    def reality_coupled_loop(self) -> RealityCoupledAgencyLoop:
+        """Create a reality-coupled agency layer around this cognitive system.
+
+        The loop is deliberately composed rather than persisted inside the core state so
+        existing v0.7 snapshots remain restorable without migration.
+        """
+        from ix_sally.cognition.agency_loop import RealityCoupledAgencyLoop
+
+        return RealityCoupledAgencyLoop()
 
     @classmethod
     def from_snapshot(cls, snapshot: CognitiveSnapshot) -> SallyCognitiveSystem:

@@ -62,6 +62,7 @@ testpaths = ["tests"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
+no_site_packages = true
 mypy_path = "src"
 packages = ["ix_sally"]
 

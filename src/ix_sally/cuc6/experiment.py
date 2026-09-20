@@ -117,9 +117,9 @@ class CUC6Report:
             "demonstrated_count": self.demonstrated_count,
             "agi_certified": False,
             "claim_boundary": (
-                "Bounded evidence that prior experience changes later learning, that Sally can "
-                "synthesize multi-operation representations and maintain contradictory knowledge. "
-                "This is not proof of AGI or unrestricted autonomy."
+                "Bounded evidence that prior experience changes later learning, that Sally "
+                "can synthesize multi-operation representations and maintain contradictory "
+                "knowledge. This is not proof of AGI or unrestricted autonomy."
             ),
         }
 

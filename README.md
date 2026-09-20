@@ -14,6 +14,48 @@ certification authority, or substitute for independent engineering and human
 judgment.
 
 
+## v0.8.0 reality-coupled cognition and choice over thought
+
+IX-Sally v0.8.0 connects existing cognitive mechanisms into a reality-coupled agency layer.
+Predictions remain separate from independently acquired observations; multi-channel disagreement
+is retained as evidence; reality deltas can invalidate assumptions; failures can generate their own
+information-seeking goals; and multidimensional epistemic pressure chooses what kind of cognition
+should happen next. The system can choose to observe, discriminate between models, inspect
+assumptions, generate hypotheses, invent representations, revalidate stale knowledge, reconsider a
+goal, or enter explicit cognitive recovery before proposing an external action.
+
+The release also adds perspective ensembles that preserve minority evidence, an append-only
+autobiographical epistemic trace, uncertainty-sensitive proposal envelopes, and shadow evaluation
+of alternative cognitive strategies. A candidate strategy can become eligible for human review
+only after measured holdout improvement without recorded safety failure; it cannot auto-promote.
+The new layer is composed around `SallyCognitiveSystem`, so existing v0.7 snapshots remain
+restorable without silently migrating the core state schema.
+
+CUC-7 introduces an unannounced regime change after a previously valid assumption has worked.
+Reliable reality contradicts Sally's high-confidence prediction, the dependent assumption is marked
+contradicted, cognitive recovery begins, outward proposal strength collapses, and an endogenous
+objective is generated to explain the discrepancy. CUC-8 verifies the bounded recovery sequence.
+CUC-9 verifies reality-scored shadow strategy evaluation while preserving human-authorized
+promotion.
+
+These mechanisms synthesize useful patterns identified in IX-VisualAuthority, SynapDrive-AI,
+IX-Autonomy-Assurance-Case-Runtime, IX-BlackFox-Cognition, IX-BlackFox-WorldTwin, IX-HapticSight,
+and IX-IntentRealityLoop without importing those projects as runtime dependencies. See
+`docs/V080_REALITY_COUPLED_COGNITION.md` and `VALIDATION_REPORT.md`.
+
+Run the new experiments:
+
+```
+python -m ix_sally --cuc7-experiment
+python -m ix_sally --cuc8-experiment
+python -m ix_sally --cuc9-experiment
+```
+
+IX-Sally v0.8.0 remains an experimental bounded cognitive architecture. It is not a demonstrated
+AGI, consciousness claim, unrestricted self-modifying system, or autonomous authority.
+Consequential action remains governed by the inherited human-authority control plane.
+
+
 ## v0.7.0 lifelong generalization and representational freedom
 
 IX-Sally v0.7.0 targets the remaining gap between having individual cognitive mechanisms and
@@ -423,8 +465,8 @@ valid copy remains.
 The final source state was locally observed with:
 
 - CPython 3.12.14 execution;
-- exactly 990 collected tests across 138 test files;
-- all 990 tests passing in one complete run;
+- exactly 1,053 collected tests in the final v0.8.0 validation run;
+- all 1,053 tests passing in one complete run;
 - Ruff formatting and lint checks passing;
 - Mypy strict typing passing across 271 source files;
 - repository integrity passing with 0 violations;

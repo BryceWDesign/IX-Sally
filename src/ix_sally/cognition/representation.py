@@ -12,10 +12,10 @@ synthesis, not a claim of unrestricted mathematical invention.
 
 from __future__ import annotations
 
-import itertools
 from collections.abc import Iterable
 from dataclasses import dataclass, replace
 from enum import StrEnum
+from itertools import pairwise
 from math import isfinite
 
 from ix_sally.digest import DigestRecord, JsonArray, JsonObject
@@ -336,7 +336,7 @@ class RepresentationInventor:
         if not ordered:
             return (0.0,)
         candidates = [ordered[0] - 1.0, ordered[-1] + 1.0, *ordered]
-        candidates.extend((left + right) / 2.0 for left, right in itertools.pairwise(ordered))
+        candidates.extend((left + right) / 2.0 for left, right in pairwise(ordered))
         return tuple(sorted(set(candidates)))
 
     @staticmethod

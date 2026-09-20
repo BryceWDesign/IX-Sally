@@ -132,7 +132,7 @@ class SemanticGenesisEngine:
             raise FoundationError("minimum_improvement must be between zero and one")
 
         channel_count = len(training[0].channels)
-        atomic_accuracy = self._best_atomic_accuracy(training, max_abs_weight=max_abs_weight)
+        atomic_accuracy = self._best_atomic_accuracy(training)
         best_rank: tuple[float, int, int, tuple[int, ...], float] | None = None
         best_choice: tuple[tuple[int, ...], float, float] | None = None
 
@@ -215,10 +215,7 @@ class SemanticGenesisEngine:
     def _best_atomic_accuracy(
         cls,
         observations: tuple[SemanticObservation, ...],
-        *,
-        max_abs_weight: int,
     ) -> float:
-        _ = max_abs_weight  # Retained for API compatibility with bounded semantic search.
         channel_count = len(observations[0].channels)
         best = 0.0
         for index in range(channel_count):

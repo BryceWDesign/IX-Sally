@@ -7,9 +7,9 @@ how it learns.  Tasks remain bounded and numeric, but the strategy history is pe
 
 from __future__ import annotations
 
-import itertools
 from collections.abc import Iterable
 from dataclasses import dataclass
+from itertools import pairwise
 
 from ix_sally.cognition.online_meta import (
     OnlineMetaDecision,
@@ -90,7 +90,7 @@ class LifetimeLearningReport:
 class LifetimeLearningEngine:
     """Run representation-learning episodes while retaining evidence about learning strategy."""
 
-    STRATEGIES = ("shallow-relations", "compositional-programs")
+    STRATEGIES: tuple[str, ...] = ("shallow-relations", "compositional-programs")
 
     def fingerprint(self, challenge: LifetimeChallenge) -> TaskFingerprint:
         items = challenge.training
@@ -109,7 +109,6 @@ class LifetimeLearningEngine:
     ) -> tuple[OnlineMetaProfile, LifetimeEpisodeResult]:
         fingerprint = self.fingerprint(challenge)
         decision: OnlineMetaDecision | None = None
-        strategies: tuple[str, ...]
         if explore or not profile.experiences:
             strategies = self.STRATEGIES
         else:
@@ -215,7 +214,7 @@ class LifetimeLearningEngine:
         for index in range(arity):
             values = sorted({item.channels[index] for item in items})
             thresholds = [values[0] - 1.0, values[-1] + 1.0, *values]
-            thresholds.extend((a + b) / 2.0 for a, b in itertools.pairwise(values))
+            thresholds.extend((a + b) / 2.0 for a, b in pairwise(values))
             for threshold in thresholds:
                 for polarity in (-1, 1):
                     correct = sum(
