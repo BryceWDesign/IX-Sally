@@ -19,7 +19,7 @@ def test_cli_runtime_baseline_prints_stable_json(capsys: object) -> None:
     assert result == 0
     payload = json.loads(captured.out)
     assert payload["package"] == "ix-sally"
-    assert payload["version"] == "0.1.0"
+    assert payload["version"] == "0.7.0"
     assert payload["baseline"] == "session-one"
     assert payload["session_one_complete"] is True
     assert payload["role_count"] == 9

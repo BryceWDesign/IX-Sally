@@ -13,6 +13,164 @@ IX-Sally is not a demonstrated AGI, autonomous deployment platform,
 certification authority, or substitute for independent engineering and human
 judgment.
 
+
+## v0.7.0 lifelong generalization and representational freedom
+
+IX-Sally v0.7.0 targets the remaining gap between having individual cognitive mechanisms and
+becoming measurably better at learning because of prior experience. CUC-6 adds a bounded
+compositional representation language, persistent online meta-learning, active lifelong
+knowledge maintenance, surface-independent relational transfer, raw-text outcome grounding,
+and multi-goal portfolio coherence. These mechanisms are integrated into
+`SallyCognitiveSystem` and persist through canonical snapshot/restore where stateful.
+
+The strongest CUC-6 representation task cannot be perfectly expressed by the prior one-step
+feature language. The best shallow representation reaches 0.8125 training accuracy. Sally
+synthesizes the multi-operation expression `((x0*x1)+x2)`, reaches 1.0 training accuracy, and
+retains 1.0 accuracy on held-out values outside the training range.
+
+CUC-6 also runs twelve sealed numeric worlds. During the first two worlds Sally evaluates both
+available learning strategies. Its online meta-profile then changes later learning: the
+remaining worlds select one strategy from accumulated structural experience instead of
+re-running both strategy families, while retaining 1.0 held-out accuracy. The challenge IDs
+and channel orderings change; strategy selection is based on measured task fingerprints rather
+than a hard-coded world-type switch.
+
+Additional v0.7 mechanisms include contextual concept splitting when a formerly useful rule
+becomes systematically wrong in one regime, structural analogy that transfers a learned
+topological role from an industrial-control graph to a software-rendering graph despite
+different entity and relation names, empirical token grounding from raw text/outcome pairs,
+and dependency-aware attention allocation across multiple goals with premise collapse and
+goal abandonment. A 64-generation bounded maintenance/checkpoint exercise verifies that the
+meta-learning profile and lifelong store survive exact snapshot/restore.
+
+These are bounded research results. v0.7 does not establish AGI, consciousness, unrestricted
+self-modification, general vision/audio grounding, unlimited open-world agency, or independent
+replication. External consequential action remains governed by the inherited human-authority
+control plane. See `docs/CUC6_LIFELONG_GENERALIZATION.md` and `VALIDATION_REPORT.md`.
+
+Run the experiment:
+
+```text
+python -m ix_sally --cuc6-experiment
+```
+
+
+## v0.6.0 recursive cognitive bootstrapping
+
+IX-Sally v0.6.0 integrates the major bounded mechanisms that remained after v0.5.0 into a
+single recursive research path instead of presenting them as disconnected feature claims.
+CUC-5 demonstrates a closed cycle where an atomic representation fails, Sally invents and
+validates a new representation, promotes the discovery into a reusable opaque semantic
+primitive, persists it, authors an internal goal afterward, constructs an action for that
+goal, validates the procedure into a reusable tool, detects a structured high-confidence
+failure, and invents a second, different representation.
+
+The release also adds long-horizon replanning, structural cross-domain transfer,
+self-directed curriculum selection, persistent lifelong knowledge and ontology
+restructuring, intervention-aware causal discovery, numeric raw-signal grounding, active
+perception, counterfactual imagination, self-diagnosis, governed measured self-improvement,
+goal conflict resolution and abandonment, unknown-unknown detection, adaptive search
+budgeting, meta-learning, procedural unfamiliar-world tests, and a nonce-bound blind
+evaluator interface for challenge sets supplied by third parties.
+
+These are bounded experimental mechanisms, not an AGI certification. Raw perception remains
+limited to numeric streams, every concrete search is finite, and genuinely independent
+evaluation still requires an external evaluator. External consequential action and adoption
+of self-improvement proposals remain under the existing human-authority control plane. See
+`docs/CUC5_RECURSIVE_COGNITION.md`, `docs/CUC5_VALIDATION_REPORT.md`, and
+`VALIDATION_REPORT.md`.
+
+Run the integrated experiment:
+
+```text
+python -m ix_sally --cuc5-experiment
+```
+
+## v0.5.0 semantic genesis and open goal authorship
+
+IX-Sally now includes CUC-4, which adds two bounded research capabilities that were not
+present in v0.4.0. First, Sally can create an opaque latent semantic distinction directly
+from unexplained relations among raw numeric channels when every single-channel
+explanation is materially worse. The concept receives no human semantic label, must beat
+the existing atomic vocabulary, and must survive held-out reality testing. Second, Sally
+can author internal sandbox goals without receiving a target value or selecting from a
+fixed goal-kind catalog. A bounded counterfactual search generates reachable possibilities
+and Sally selects a target using intrinsic novelty, information value, competence expansion,
+simplicity, reversibility, and risk. Generated goals do not grant external authority. See
+`docs/CUC4_SEMANTIC_GOAL_GENESIS.md` and `docs/CUC4_VALIDATION_REPORT.md`.
+
+
+## v0.4.0 generative cognition
+
+IX-Sally now includes CUC-3, which moves beyond action composition into bounded
+**hypothesis invention** and **primitive invention**. Sally can synthesize an explanatory
+program directly from observed input/output evidence without receiving a hypothesis
+catalog, test that program on held-out evidence, and promote a validated program into a
+new reusable learned abstraction. Sally can also derive proposed instrumental goals from
+measured internal conditions such as capability weakness, uncertainty, continuity risk,
+resource pressure, and integrity anomalies. Self-improvement remains proposal-only until
+human authorization; continuity never implies resistance to shutdown, resource goals do
+not authorize external acquisition or spending, and objective-integrity goals do not block
+authorized changes. See `docs/CUC3_GENERATIVE_COGNITION.md`.
+
+## v0.3.0 generative open choice
+
+IX-Sally now includes a bounded generative choice subsystem that can construct complete actions from reusable primitives rather than selecting only from a pre-enumerated menu. CUC-2 demonstrates a case where all four offered single-step actions fail and Sally composes a new multi-step action that reaches the goal. Surprise, context shift, conflict, or a newly valuable alternative can reopen deliberation even when a learned skill exists. A minimal-sufficiency pass can also remove unnecessary steps while retaining only solutions that still pass an independent goal test. See `docs/CUC2_OPEN_CHOICE.md`.
+
+## Version 0.2.0: Choice Under Consequence
+
+Version 0.2.0 adds the first closed-loop acquired-capability experiment,
+**Choice Under Consequence 1 (CUC-1)**. Unlike the repository's mechanism
+checks, CUC-1 begins with uncertainty over a hidden causal transformation and
+requires measured interaction to change later behavior.
+
+The experiment provides:
+
+- an evaluator-owned causal rule absent from agent-visible observations;
+- four competing causal hypotheses with an initially uniform prior;
+- transparent action scoring across expected success, information gain,
+  novelty, reversibility, cost, and risk;
+- evaluator-generated consequences after every intervention;
+- Bayesian belief revision from success and failure;
+- compilation of a supported hypothesis into an executable skill;
+- transfer of that skill to a held-out cue;
+- a frozen pre-learning counterfactual on the same held-out observation;
+- random and fixed-action baselines;
+- content-addressed choices, consequences, state transitions, and rule commitment;
+- explicit leakage checks and post-run rule reveal for reproducibility.
+
+The default observed run begins with four equally likely transformations. Three
+failed interventions eliminate inconsistent hypotheses. The surviving rule is
+compiled into a skill, succeeds on the fourth training intervention, and then
+succeeds on a held-out cue. On that same held-out observation, the frozen
+pre-learning agent selects `north`; the learned agent selects `east`.
+
+The bounded classification is:
+
+```text
+causal-skill-acquisition-observed
+```
+
+This is not an AGI claim. The task family contains four rotation hypotheses,
+transfer remains within that family, and no independent replication has
+occurred.
+
+Run the experiment:
+
+```text
+python -m ix_sally --cuc1-experiment
+```
+
+Select another deterministic evaluator seed:
+
+```text
+python -m ix_sally --cuc1-experiment --cuc1-seed 11
+```
+
+The command exits successfully only when its strict acquired-competence claim
+is supported. See `docs/CUC1_EXPERIMENT.md` for its protocol and falsification
+criteria.
+
 ## What is delivered
 
 The repository contains two integrated architectural layers.
@@ -59,6 +217,18 @@ The cognitive runtime adds:
 - complete canonical snapshots, exact restoration, backup, and recovery;
 - an explicit bridge from cognitive plans into the existing proposal path;
 - human-authority and risk gates before consequential action may proceed.
+- a sealed causal-learning experiment where consequence changes future choice.
+- bounded latent semantic genesis from raw relational structure with held-out validation.
+- runtime authorship of novel internal sandbox goal targets without a fixed goal-kind catalog.
+- bounded representation invention that can create non-atomic feature spaces when raw channels fail.
+- validated semantic promotion and persistent lifelong knowledge across snapshot/restore.
+- recursive discover -> goal -> act -> tool -> rediscover bootstrapping.
+- active perception, intervention-aware causal discovery, and branching counterfactual imagination.
+- long-horizon replanning after observed model surprise.
+- self-directed curriculum selection, adaptive search allocation, and meta-learning.
+- evidence-aware goal conflict resolution, goal abandonment, and unknown-unknown detection.
+- benchmarked self-improvement proposals that cannot authorize their own adoption.
+- a blind evaluator interface for externally supplied nonce-bound challenge commitments.
 
 ## Core boundaries
 
@@ -252,11 +422,13 @@ valid copy remains.
 
 The final source state was locally observed with:
 
-- CPython 3.13.5 compilation across `src`, `tests`, and `examples`;
-- exactly 969 collected tests across 135 test files;
-- all 969 tests passing in four balanced shards;
+- CPython 3.12.14 execution;
+- exactly 990 collected tests across 138 test files;
+- all 990 tests passing in one complete run;
+- Ruff formatting and lint checks passing;
+- Mypy strict typing passing across 271 source files;
 - repository integrity passing with 0 violations;
-- 123 runtime modules and 655 imports with 0 dependency cycles;
+- 128 runtime modules and 676 imports with 0 dependency cycles;
 - 0 architecture-boundary violations;
 - installed-wheel smoke testing passing;
 - all 15 built-in cognitive benchmarks passing;
@@ -264,8 +436,7 @@ The final source state was locally observed with:
 - 0 trailing-whitespace findings;
 - 0 source TODO/FIXME/placeholder/`pass`/`NotImplementedError` findings.
 
-Ruff, Mypy, CPython 3.11, and CPython 3.12 were not available in the local
-execution environment and are not falsely reported as passed. GitHub Actions is
+Separate local CPython 3.11 and 3.13 runs were not performed. GitHub Actions is
 configured to run formatting, lint, strict typing, structural checks, tests,
 and wheel verification on Python 3.11, 3.12, and 3.13.
 
