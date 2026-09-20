@@ -53,7 +53,7 @@ def test_version_module_is_dependency_neutral() -> None:
 import sys
 from ix_sally.version import __version__
 
-assert __version__ == '0.1.0'
+assert __version__ == '0.7.0'
 
 forbidden = {
     'ix_sally.state',

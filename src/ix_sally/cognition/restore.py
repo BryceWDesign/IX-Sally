@@ -33,6 +33,8 @@ from ix_sally.cognition.learning import (
     SkillProfile,
 )
 from ix_sally.cognition.metacognition import CapabilityMeasure, SelfModel
+from ix_sally.cognition.lifelong import KnowledgeItem, LifelongKnowledgeStore
+from ix_sally.cognition.online_meta import OnlineMetaProfile, StrategyExperience, TaskFingerprint
 from ix_sally.cognition.persistence import CognitiveSnapshot
 from ix_sally.cognition.planning import ActionSpec, FactEffect
 from ix_sally.cognition.primitives import (
@@ -79,6 +81,8 @@ class RestoredCognitiveState:
     episodes: EpisodeLedger
     curriculum: CurriculumLedger | None
     primitive_registry: PrimitiveRegistry
+    lifelong_knowledge: LifelongKnowledgeStore
+    online_meta_profile: OnlineMetaProfile
     runtime_memories: dict[str, CognitiveValue]
     execution_count: int
     cycle_count: int
@@ -647,6 +651,61 @@ def _restore_primitives(value: JsonValue) -> PrimitiveRegistry:
     )
 
 
+
+def _restore_lifelong(value: JsonValue) -> LifelongKnowledgeStore:
+    payload = _object(value, field="lifelong_knowledge")
+    generation = _integer(payload.get("generation"), field="lifelong_knowledge.generation")
+    items = tuple(
+        KnowledgeItem(
+            concept_id=_text(item.get("concept_id"), field="lifelong_knowledge.concept_id"),
+            content_digest=_digest(
+                item.get("content_digest"),
+                field="lifelong_knowledge.content_digest",
+            ),
+            confidence=_number(item.get("confidence"), field="lifelong_knowledge.confidence"),
+            utility=_number(item.get("utility"), field="lifelong_knowledge.utility"),
+            use_count=_integer(item.get("use_count"), field="lifelong_knowledge.use_count"),
+            contradiction_count=_integer(
+                item.get("contradiction_count"),
+                field="lifelong_knowledge.contradiction_count",
+            ),
+            generation=_integer(item.get("generation"), field="lifelong_knowledge.item_generation"),
+            superseded_by=_optional_text(
+                item.get("superseded_by"),
+                field="lifelong_knowledge.superseded_by",
+            ),
+        )
+        for item in (
+            _object(raw, field="lifelong_knowledge.items[]")
+            for raw in _array(payload.get("items"), field="lifelong_knowledge.items")
+        )
+    )
+    return LifelongKnowledgeStore(items=items, generation=generation)
+
+def _restore_online_meta(value: JsonValue) -> OnlineMetaProfile:
+    # v0.6 snapshots had no online meta profile; preserve backward compatibility.
+    if value is None:
+        return OnlineMetaProfile()
+    payload = _object(value, field="online_meta_profile")
+    experiences = tuple(
+        StrategyExperience(
+            strategy_id=_text(item.get("strategy_id"), field="online_meta_profile.strategy_id"),
+            fingerprint=TaskFingerprint(
+                tuple(
+                    _number(raw_value, field="online_meta_profile.fingerprint[]")
+                    for raw_value in _array(item.get("fingerprint"), field="online_meta_profile.fingerprint")
+                )
+            ),
+            score=_number(item.get("score"), field="online_meta_profile.score"),
+            samples_used=_integer(item.get("samples_used"), field="online_meta_profile.samples_used"),
+        )
+        for item in (
+            _object(raw, field="online_meta_profile.experiences[]")
+            for raw in _array(payload.get("experiences"), field="online_meta_profile.experiences")
+        )
+    )
+    return OnlineMetaProfile(experiences)
+
 def restore_system_state(snapshot: CognitiveSnapshot) -> RestoredCognitiveState:
     """Restore and revalidate every serialized IX-Sally cognitive subsystem."""
     state = snapshot.state
@@ -671,6 +730,8 @@ def restore_system_state(snapshot: CognitiveSnapshot) -> RestoredCognitiveState:
         episodes=_restore_episodes(state.get("episodes")),
         curriculum=_restore_curriculum(state.get("curriculum")),
         primitive_registry=_restore_primitives(state.get("primitive_registry")),
+        lifelong_knowledge=_restore_lifelong(state.get("lifelong_knowledge")),
+        online_meta_profile=_restore_online_meta(state.get("online_meta_profile")),
         runtime_memories=runtime_memories,
         execution_count=_integer(
             state.get("execution_count"),

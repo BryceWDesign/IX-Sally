@@ -291,6 +291,34 @@ hardware-level durability that Python or the host filesystem cannot prove.
 
 The evaluation report contains `agi_certified: false` by construction.
 
+## Choice Under Consequence boundary
+
+The `ix_sally.cuc1` package adds a closed-loop experimental boundary alongside
+the deterministic cognitive runtime. The environment owns its hidden causal
+rule and exposes only a typed public observation. The agent creates competing
+hypotheses, scores every action, intervenes, receives a measured consequence,
+updates its distribution, and can compile a supported hypothesis into an
+executable skill.
+
+CUC-1 remains outside the external-execution path. Its actions affect only the
+bounded causal environment. It therefore permits autonomous choice and learning
+inside a reversible sandbox while preserving human authority over consequential
+external execution.
+
+```text
+public observation
+  -> competing hypotheses
+  -> scored choice
+  -> evaluator-owned consequence
+  -> causal belief update
+  -> executable skill
+  -> held-out transfer
+  -> pre/post behavioral counterfactual
+```
+
+This establishes acquired competence only within the declared experiment. It
+does not alter the repository's AGI claim boundary.
+
 ## Dependency posture
 
 The runtime declares zero third-party dependencies. Development gates use
