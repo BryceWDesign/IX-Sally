@@ -16,13 +16,17 @@ from ix_sally.foundation import FoundationError
 
 def test_holdout_regression_cannot_be_hidden_by_training_improvement() -> None:
     evidence = tuple(
-        item for index in range(15) for item in (
+        item
+        for index in range(15)
+        for item in (
             StrategyOutcome("inc", f"case-{index}", 0.1 if index < 3 else 1.0, index < 3),
             StrategyOutcome("cand", f"case-{index}", 0.9 if index < 3 else 0.0, index < 3),
         )
     )
     report = ShadowStrategyEvaluator().evaluate(
-        incumbent_id="inc", candidate_id="cand", outcomes=evidence,
+        incumbent_id="inc",
+        candidate_id="cand",
+        outcomes=evidence,
     )
     assert report.holdout_cases == 3
     assert report.incumbent_mean_error == 0.1
@@ -39,7 +43,9 @@ def test_duplicate_case_rejected_even_when_scores_match() -> None:
     )
     with pytest.raises(FoundationError, match="duplicate"):
         ShadowStrategyEvaluator().evaluate(
-            incumbent_id="inc", candidate_id="cand", outcomes=evidence,
+            incumbent_id="inc",
+            candidate_id="cand",
+            outcomes=evidence,
         )
 
 
@@ -50,19 +56,28 @@ def test_disagreement_over_holdout_identity_is_not_evidence() -> None:
     )
     with pytest.raises(FoundationError, match="holdout classification"):
         ShadowStrategyEvaluator().evaluate(
-            incumbent_id="inc", candidate_id="cand", outcomes=evidence,
+            incumbent_id="inc",
+            candidate_id="cand",
+            outcomes=evidence,
         )
 
 
 def test_nonholdout_safety_failure_still_blocks_review() -> None:
-    evidence = tuple(
-        item for i in range(3) for item in (
-            StrategyOutcome("inc", f"c{i}", 0.8, True),
-            StrategyOutcome("cand", f"c{i}", 0.1, True),
-        )
-    ) + (StrategyOutcome("cand", "training", 0.0, False, safety_failure=True),)
+    evidence = (
+        *(
+            item
+            for i in range(3)
+            for item in (
+                StrategyOutcome("inc", f"c{i}", 0.8, True),
+                StrategyOutcome("cand", f"c{i}", 0.1, True),
+            )
+        ),
+        StrategyOutcome("cand", "training", 0.0, False, safety_failure=True),
+    )
     report = ShadowStrategyEvaluator().evaluate(
-        incumbent_id="inc", candidate_id="cand", outcomes=evidence,
+        incumbent_id="inc",
+        candidate_id="cand",
+        outcomes=evidence,
     )
     assert report.improvement > 0
     assert not report.eligible_for_human_review
@@ -80,7 +95,9 @@ def test_no_holdouts_does_not_generate_training_based_promotion() -> None:
         StrategyOutcome("cand", "train", 0.0, False),
     )
     result = ShadowStrategyEvaluator().evaluate(
-        incumbent_id="inc", candidate_id="cand", outcomes=evidence,
+        incumbent_id="inc",
+        candidate_id="cand",
+        outcomes=evidence,
     )
     assert result.holdout_cases == 0
     assert result.improvement == 0.0

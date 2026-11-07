@@ -35,9 +35,12 @@ def test_complete_curriculum_is_inductively_learned_and_scored_on_disjoint_holdo
     assert report.retained_concepts == 8
     assert report.retention_accuracy == 1.0
     assert report.retention_cases == 256
-    assert all(item.previous_digest == "0" * 64 if index == 0 else
-               item.previous_digest == state.episodes[index - 1].digest
-               for index, item in enumerate(state.episodes))
+    assert all(
+        item.previous_digest == "0" * 64
+        if index == 0
+        else item.previous_digest == state.episodes[index - 1].digest
+        for index, item in enumerate(state.episodes)
+    )
 
 
 def test_transfer_uses_fewer_probes_and_shift_requires_recovery() -> None:
@@ -98,9 +101,9 @@ def test_rehashed_but_broken_evidence_chain_is_rejected() -> None:
     _, state = run_developmental_experiment(7)
     raw = json.loads(state.to_json())
     raw["episodes"][1]["previous_digest"] = "f" * 64
-    raw["content_digest"] = stable_digest({
-        key: value for key, value in raw.items() if key != "content_digest"
-    })
+    raw["content_digest"] = stable_digest(
+        {key: value for key, value in raw.items() if key != "content_digest"}
+    )
     with pytest.raises(FoundationError, match="chain"):
         ResearchState.from_json(stable_json(raw))
 
@@ -109,9 +112,9 @@ def test_rehashed_unsupported_expression_is_rejected() -> None:
     state, _ = run_world(ResearchState(), available_worlds()[0])
     raw = json.loads(state.to_json())
     raw["episodes"][0]["program"]["operator"] = "python-eval"
-    raw["content_digest"] = stable_digest({
-        key: value for key, value in raw.items() if key != "content_digest"
-    })
+    raw["content_digest"] = stable_digest(
+        {key: value for key, value in raw.items() if key != "content_digest"}
+    )
     with pytest.raises(FoundationError, match="expression"):
         ResearchState.from_json(stable_json(raw))
 
@@ -120,9 +123,9 @@ def test_rehashed_training_contradiction_is_rejected() -> None:
     state, _ = run_world(ResearchState(), available_worlds()[0])
     raw = json.loads(state.to_json())
     raw["episodes"][0]["examples"][0]["consequence"] += 1000
-    raw["content_digest"] = stable_digest({
-        key: value for key, value in raw.items() if key != "content_digest"
-    })
+    raw["content_digest"] = stable_digest(
+        {key: value for key, value in raw.items() if key != "content_digest"}
+    )
     with pytest.raises(FoundationError, match="contradicts"):
         ResearchState.from_json(stable_json(raw))
 
@@ -152,9 +155,14 @@ def test_episode_rejects_fabricated_training_evidence() -> None:
     program = FeatureProgram(ProgramOperator.CHANNEL, channel_index=0)
     with pytest.raises(FoundationError, match="contradicts"):
         LearningEpisode(
-            world_id="test", examples=(NumericExample((1, 2), 8),),
-            program=program, selection="induced", candidates_remaining=1,
-            heldout_accuracy=1.0, heldout_cases=5, previous_digest="0" * 64,
+            world_id="test",
+            examples=(NumericExample((1, 2), 8),),
+            program=program,
+            selection="induced",
+            candidates_remaining=1,
+            heldout_accuracy=1.0,
+            heldout_cases=5,
+            previous_digest="0" * 64,
         )
 
 
@@ -163,7 +171,10 @@ def _invoke(*args: str) -> subprocess.CompletedProcess[str]:
     env["PYTHONPATH"] = str(Path(__file__).resolve().parents[2] / "src")
     return subprocess.run(
         [sys.executable, "-m", "ix_sally", *args],
-        capture_output=True, text=True, check=False, env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+        env=env,
     )
 
 
@@ -179,17 +190,26 @@ def test_cli_runs_benchmark_and_reports_measured_limits() -> None:
 def test_cli_advances_persistent_learning_across_separate_processes(tmp_path: Path) -> None:
     checkpoint = tmp_path / "research-state.json"
     first = _invoke(
-        "--cuc10-world", available_worlds()[0], "--cuc10-state", str(checkpoint),
+        "--cuc10-world",
+        available_worlds()[0],
+        "--cuc10-state",
+        str(checkpoint),
     )
     assert first.returncode == 0, first.stderr
     second = _invoke(
-        "--cuc10-world", available_worlds()[1], "--cuc10-state", str(checkpoint),
+        "--cuc10-world",
+        available_worlds()[1],
+        "--cuc10-state",
+        str(checkpoint),
     )
     assert second.returncode == 0, second.stderr
     assert json.loads(second.stdout)["selection"] == "transferred"
     assert len(ResearchState.from_json(checkpoint.read_text(encoding="utf-8")).episodes) == 2
     again = _invoke(
-        "--cuc10-world", available_worlds()[1], "--cuc10-state", str(checkpoint),
+        "--cuc10-world",
+        available_worlds()[1],
+        "--cuc10-state",
+        str(checkpoint),
     )
     assert again.returncode != 0
     assert len(ResearchState.from_json(checkpoint.read_text(encoding="utf-8")).episodes) == 2
@@ -209,7 +229,10 @@ def test_cli_declines_existing_checkpoint_lock(tmp_path: Path) -> None:
     lock = tmp_path / "research-state.json.lock"
     lock.write_text("another writer", encoding="utf-8")
     process = _invoke(
-        "--cuc10-world", available_worlds()[0], "--cuc10-state", str(checkpoint),
+        "--cuc10-world",
+        available_worlds()[0],
+        "--cuc10-state",
+        str(checkpoint),
     )
     assert process.returncode != 0
     assert lock.read_text(encoding="utf-8") == "another writer"

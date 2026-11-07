@@ -49,8 +49,12 @@ def advance_research_checkpoint(
         temp_path: Path | None = None
         try:
             with tempfile.NamedTemporaryFile(
-                mode="w", encoding="utf-8", dir=path.parent,
-                prefix=path.name + ".", suffix=".pending", delete=False,
+                mode="w",
+                encoding="utf-8",
+                dir=path.parent,
+                prefix=path.name + ".",
+                suffix=".pending",
+                delete=False,
             ) as temp:
                 temp_path = Path(temp.name)
                 temp.write(updated.to_json() + "\n")

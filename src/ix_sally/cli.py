@@ -237,13 +237,13 @@ def main(argv: Sequence[str] | None = None) -> int:
                 parser.error("--cuc10-world requires --cuc10-state")
             try:
                 world_id = args.cuc10_world
-                result = advance_research_checkpoint(
+                world_result = advance_research_checkpoint(
                     args.cuc10_state,
                     lambda state: run_world(state, world_id, seed=args.cuc10_seed),
                 )
             except (OSError, ValueError) as exc:
                 parser.error(f"CUC-10 research checkpoint failed: {exc}")
-            sys.stdout.write(f"{stable_json(result.to_payload())}\n")
+            sys.stdout.write(f"{stable_json(world_result.to_payload())}\n")
             return 0
         if args.cuc10_state is None:
             report, _ = run_developmental_experiment(seed=args.cuc10_seed)

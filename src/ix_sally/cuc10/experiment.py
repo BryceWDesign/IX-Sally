@@ -69,11 +69,7 @@ def _pools(seed: int, name: str) -> tuple[tuple[tuple[int, int], ...], ...]:
     # A named domain has independent deterministic sampling, even when a run order changes.
     rng = Random(f"IX-Sally:cuc10:{seed}:{name}")
     train = [(a, b) for a in range(-3, 4) for b in range(-3, 4)]
-    test = [
-        (a, b)
-        for a in (-8, -7, -6, -5, 5, 6, 7, 8)
-        for b in (-8, -7, -6, -5, 5, 6, 7, 8)
-    ]
+    test = [(a, b) for a in (-8, -7, -6, -5, 5, 6, 7, 8) for b in (-8, -7, -6, -5, 5, 6, 7, 8)]
     rng.shuffle(train)
     rng.shuffle(test)
     return tuple(train[:32]), tuple(test[:32])
@@ -147,10 +143,15 @@ def run_world(
         pool=pool, observe=world.observe, budget=budget, prior=prior
     )
     cold, cold_queries, _, _ = learner.infer(
-        pool=pool, observe=world.observe, budget=budget,
+        pool=pool,
+        observe=world.observe,
+        budget=budget,
     )
     passive, passive_queries, _, _ = learner.infer(
-        pool=pool, observe=world.observe, budget=budget, active=False,
+        pool=pool,
+        observe=world.observe,
+        budget=budget,
+        active=False,
     )
     disjoint = not ({item.channels for item in queried} & set(heldout))
     if not disjoint:
@@ -242,20 +243,25 @@ def run_developmental_experiment(seed: int = 7) -> tuple[DevelopmentalReport, Re
         for row in outcomes
         for evidence in (
             StrategyOutcome(
-                "passive", row.world_id,
+                "passive",
+                row.world_id,
                 0.7 * (1.0 - row.passive_holdout_accuracy) + 0.3 * row.passive_probes / 10,
                 True,
             ),
             StrategyOutcome(
-                "active", row.world_id,
+                "active",
+                row.world_id,
                 0.7 * (1.0 - row.baseline_holdout_accuracy) + 0.3 * row.baseline_probes / 10,
                 True,
             ),
         )
     )
     proposal = ShadowStrategyEvaluator().evaluate(
-        incumbent_id="passive", candidate_id="active", outcomes=strategy_outcomes,
-        minimum_holdouts=5, minimum_improvement=0.05,
+        incumbent_id="passive",
+        candidate_id="active",
+        outcomes=strategy_outcomes,
+        minimum_holdouts=5,
+        minimum_improvement=0.05,
     )
     # Evaluate every earlier concept again after the whole sequence, without updating it.
     worlds_by_name = {world.name: world for world in _worlds()}

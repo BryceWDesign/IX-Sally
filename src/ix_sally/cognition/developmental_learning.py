@@ -149,10 +149,15 @@ class ResearchState:
             raise FoundationError("episode does not extend the expected evidence chain")
         concepts = self.concepts
         if episode.heldout_accuracy == 1.0:
-            concepts = (*concepts, LearnedConcept(
-                episode.world_id, episode.program, episode.heldout_accuracy,
-                episode.heldout_cases,
-            ))
+            concepts = (
+                *concepts,
+                LearnedConcept(
+                    episode.world_id,
+                    episode.program,
+                    episode.heldout_accuracy,
+                    episode.heldout_cases,
+                ),
+            )
         return ResearchState((*self.episodes, episode), concepts)
 
     def to_payload(self) -> JsonObject:
@@ -197,7 +202,10 @@ def _read_program(raw: object, *, depth: int = 0) -> FeatureProgram:
     if not isinstance(raw, dict) or depth > MAX_PROGRAM_DEPTH:
         raise FoundationError("invalid serialized expression")
     try:
-        operator = ProgramOperator(raw.get("operator"))
+        raw_operator = raw.get("operator")
+        if not isinstance(raw_operator, str):
+            raise FoundationError("invalid serialized expression operator")
+        operator = ProgramOperator(raw_operator)
         channel = raw.get("channel_index")
         left_raw = raw.get("left")
         right_raw = raw.get("right")
@@ -340,13 +348,15 @@ class InductiveLearner:
                     selection = "recovered"
                 elif len(tested) >= minimum_transfer_probes:
                     return prior, tuple(tested), "transferred", len(available)
-            if not prior_active and len(tested) >= 3:
-                # All remaining models must make the same predictions on unqueried probes.
-                if all(
-                    len({model.evaluate(x) for model in available}) == 1
-                    for x in remaining_pool
-                ):
-                    break
+            # All remaining models must make the same predictions on unqueried probes.
+            if (
+                not prior_active
+                and len(tested) >= 3
+                and all(
+                    len({model.evaluate(x) for model in available}) == 1 for x in remaining_pool
+                )
+            ):
+                break
         winner = min(available, key=lambda p: (p.complexity, p.expression()))
         if any(winner.evaluate(item.channels) != item.consequence for item in tested):
             raise FoundationError("candidate contradicts observed training outcomes")

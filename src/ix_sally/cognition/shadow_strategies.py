@@ -76,9 +76,7 @@ class ShadowStrategyEvaluator:
         improvement = inc_mean - cand_mean
         safety_failure = any(item.safety_failure for item in candidate)
         eligible = (
-            count >= minimum_holdouts
-            and improvement >= minimum_improvement
-            and not safety_failure
+            count >= minimum_holdouts and improvement >= minimum_improvement and not safety_failure
         )
         if safety_failure:
             reason = "candidate has a recorded safety failure"
