@@ -125,3 +125,15 @@ These are experimental, bounded forms of semantic and goal genesis. They do not 
 that Sally can invent arbitrary concepts from unrestricted real-world experience, originate
 terminal values without any prior drives, or exercise unilateral authority in the external
 world. Internal cognitive autonomy and external authority remain intentionally separate.
+
+
+## Version 0.9.3: developmental research rather than AGI
+
+CUC-10 implements an active-query numeric world learner, a persistent concept
+library, contradiction recovery, disjoint extrapolation evaluations and
+controlled cold-start/passive baselines. A separate strategy comparison is
+eligible for human review only when paired held-out evidence is sufficient.
+The laboratory uses a fixed finite mathematical grammar and transparent local
+generators. It demonstrates neither unrestricted general learning nor true
+AGI. The new CLI reports `agi_demonstrated = false` by construction, and no
+self-modification is authorized automatically.

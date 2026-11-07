@@ -14,6 +14,41 @@ certification authority, or substitute for independent engineering and human
 judgment.
 
 
+## v0.9.3 experimental developmental learning
+
+IX-Sally 0.9.3 extends its governed cognitive runtime with a runnable
+continual-learning research laboratory. It learns bounded compositional numeric
+relationships from active observations, reuses independently validated concepts,
+rejects mismatched hypotheses after unannounced changes, and compares predictions
+on disjoint extrapolation inputs. Baselines isolate cold-start learning and
+passive querying. Candidate learning-strategy improvements are evaluated on
+paired held-out cases and may be proposed for human review only.
+
+A versioned, digest-linked learning checkpoint supports continued learning
+across separate CLI processes with atomic updates and single-writer protection.
+The shadow-strategy gate no longer lets training improvements override held-out
+regressions, and perception quorum rejects repeated sensor/source identities.
+
+The built-in eight-world experiment reaches 1.0 average held-out accuracy in
+its tested deterministic curriculum. Its cold-start active baseline also
+reaches 1.0. This is **not** evidence of true AGI, human-level intelligence,
+or general open-world competence. Improvement in query efficiency is modest and
+specific to its explicit evaluation protocol.
+
+```bash
+python -m pip install -e ".[dev]"
+python -m ix_sally --cuc10-experiment
+python -m research_gate
+python -m ix_sally --cuc10-world multiplication-acquisition --cuc10-state research.json
+python -m ix_sally --cuc10-world multiplication-transfer --cuc10-state research.json
+```
+
+See [Developmental Cognition Research](docs/V093_DEVELOPMENTAL_RESEARCH.md) for the
+exact measured scores, reproducible experiments, failure boundaries and
+implementation scope. Reference outputs are retained in `results/`. The original human-authority rules and licensing remain
+in effect.
+
+
 ## v0.8.0 reality-coupled cognition and choice over thought
 
 IX-Sally v0.8.0 connects existing cognitive mechanisms into a reality-coupled agency layer.

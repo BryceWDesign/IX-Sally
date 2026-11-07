@@ -245,6 +245,25 @@ def _verify_installed_package(
     if payload.get("version") != expected_version:
         raise RuntimeError("installed module reported an unexpected package version")
 
+    developmental_result = _run(
+        (
+            str(python_executable),
+            "-m",
+            "ix_sally",
+            "--cuc10-experiment",
+        ),
+        cwd=working_root,
+        environment=environment,
+    )
+    research_payload = json.loads(developmental_result.stdout)
+    if (
+        research_payload.get("agi_demonstrated") is not False
+        or research_payload.get("mean_accuracy", 0.0) < 0.95
+        or research_payload.get("retention_cases") != 256
+        or research_payload.get("strategy_auto_promoted") is not False
+    ):
+        raise RuntimeError("installed developmental cognition experiment failed")
+
     console_result = _run(
         (
             str(_venv_console_script(environment_root)),

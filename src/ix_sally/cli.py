@@ -6,6 +6,7 @@ import argparse
 import sys
 from collections.abc import Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from ix_sally.digest import stable_json
 from ix_sally.session_baseline import (
@@ -13,6 +14,10 @@ from ix_sally.session_baseline import (
     session_one_baseline_payload,
 )
 from ix_sally.version import __version__
+
+if TYPE_CHECKING:
+    from ix_sally.cognition.developmental_learning import ResearchState
+    from ix_sally.cuc10 import DevelopmentalReport
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -88,7 +93,38 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Run the shadow cognitive-strategy evolution CUC-9 experiment.",
     )
+    parser.add_argument(
+        "--cuc10-experiment",
+        action="store_true",
+        help="Run the CUC-10 developmental learning, transfer and ablation benchmark.",
+    )
+    parser.add_argument(
+        "--cuc10-seed",
+        type=int,
+        default=7,
+        help="Reproducible world-generation seed (default: 7).",
+    )
+    parser.add_argument(
+        "--cuc10-world",
+        type=str,
+        metavar="WORLD",
+        help="Evaluate one named CUC-10 world using a persistent research checkpoint.",
+    )
+    parser.add_argument(
+        "--cuc10-state",
+        type=Path,
+        metavar="FILE",
+        help="Load and atomically update a durable CUC-10 experiment checkpoint.",
+    )
     return parser
+
+
+def _initial_research_run(seed: int) -> tuple[ResearchState, DevelopmentalReport]:
+    """Build a fresh, deterministic curriculum for checkpoint creation."""
+    from ix_sally.cuc10 import run_developmental_experiment
+
+    report, state = run_developmental_experiment(seed=seed)
+    return state, report
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -191,6 +227,37 @@ def main(argv: Sequence[str] | None = None) -> int:
         cuc9_report = run_cuc9()
         sys.stdout.write(f"{stable_json(cuc9_report.to_payload())}\n")
         return 0 if cuc9_report.eligible_for_human_review and not cuc9_report.auto_promoted else 1
+
+    if args.cuc10_experiment or args.cuc10_world is not None:
+        from ix_sally.cognition.research_checkpoint import advance_research_checkpoint
+        from ix_sally.cuc10 import run_developmental_experiment, run_world
+
+        if args.cuc10_world is not None:
+            if args.cuc10_state is None:
+                parser.error("--cuc10-world requires --cuc10-state")
+            try:
+                world_id = args.cuc10_world
+                result = advance_research_checkpoint(
+                    args.cuc10_state,
+                    lambda state: run_world(state, world_id, seed=args.cuc10_seed),
+                )
+            except (OSError, ValueError) as exc:
+                parser.error(f"CUC-10 research checkpoint failed: {exc}")
+            sys.stdout.write(f"{stable_json(result.to_payload())}\n")
+            return 0
+        if args.cuc10_state is None:
+            report, _ = run_developmental_experiment(seed=args.cuc10_seed)
+        else:
+            try:
+                report = advance_research_checkpoint(
+                    args.cuc10_state,
+                    lambda _: _initial_research_run(args.cuc10_seed),
+                    create_only=True,
+                )
+            except (OSError, ValueError) as exc:
+                parser.error(f"cannot create experiment checkpoint: {exc}")
+        sys.stdout.write(f"{stable_json(report.to_payload())}\n")
+        return 0
 
     sys.stdout.write(f"IX-Sally {__version__}\n")
     return 0

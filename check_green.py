@@ -69,6 +69,12 @@ QUALITY_GATES: Final[tuple[QualityGate, ...]] = (
         arguments=(),
     ),
     QualityGate(
+        name="research",
+        label="CUC-10 developmental research gate",
+        module="research_gate",
+        arguments=(),
+    ),
+    QualityGate(
         name="package",
         label="Installed wheel smoke test",
         module="package_smoke",

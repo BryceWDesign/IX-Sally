@@ -19,6 +19,7 @@ def test_quality_gate_commands_match_ci_tools() -> None:
         "dependencies": ("-m", "dependency_check"),
         "architecture": ("-m", "architecture_check"),
         "test": ("-m", "pytest"),
+        "research": ("-m", "research_gate"),
         "package": ("-m", "package_smoke"),
     }
 
@@ -53,6 +54,7 @@ def test_main_runs_all_gates_in_declared_order(
         "dependencies",
         "architecture",
         "test",
+        "research",
         "package",
     ]
 
@@ -122,6 +124,7 @@ def test_main_returns_failure_after_running_selected_gates(
         "dependencies",
         "architecture",
         "test",
+        "research",
         "package",
     ]
     assert "Failed quality gates: lint" in capsys.readouterr().err
@@ -140,6 +143,7 @@ def test_ci_workflow_delegates_each_gate_to_shared_runner() -> None:
         "dependencies",
         "architecture",
         "test",
+        "research",
         "package",
     ):
         assert f"python check_green.py --gate {gate_name}" in workflow

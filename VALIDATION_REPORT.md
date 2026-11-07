@@ -1,3 +1,13 @@
+# Validation history
+
+The prior validation record below documents the inherited release. For the
+current 0.9.3 developmental-learning implementation, executable experiment
+protocol, reproductions and falsification boundaries, see
+`docs/V093_DEVELOPMENTAL_RESEARCH.md`. Current local checks must not be
+confused with remote GitHub Actions execution.
+
+---
+
 # IX-Sally v0.8.0 Validation Report
 
 This report records the final locally verified state of IX-Sally v0.8.0 after the Reality-Coupled Cognition upgrade and release cleanup.
